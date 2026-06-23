@@ -15,16 +15,25 @@ body{background:var(--bg);color:#E0E0FF;font-family:'DM Mono',monospace;height:1
 #topbar .ttl{font-size:.82rem;letter-spacing:.12em;}
 #cv-wrap{flex:1;position:relative;overflow:hidden;}
 canvas{display:block;width:100%;height:100%;}
-.overlay{position:absolute;inset:0;background:rgba(7,7,26,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;}
+.overlay{position:absolute;inset:0;background:rgba(7,7,26,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
 .overlay.hidden{display:none;}
 #scr-select h2{font-size:1.4rem;letter-spacing:.2em;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.5);}
 .sub{font-size:.7rem;color:#5858A0;letter-spacing:.1em;}
-.song-list{display:flex;flex-direction:column;gap:.7rem;width:min(360px,88vw);}
-.song-card{border:1px solid #1E1E4A;border-radius:8px;padding:.85rem 1.1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#0D0D28;transition:border-color .2s,background .2s;}
+.diff-tabs{display:flex;gap:.4rem;}
+.dtab{border:1px solid #2E2E5A;background:transparent;color:#5858A0;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;padding:.25rem .7rem;border-radius:3px;cursor:pointer;transition:all .18s;}
+.dtab:hover{border-color:var(--cyan);color:var(--cyan);}
+.dtab.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.07);}
+.dtab[data-d="EASY"].active{border-color:#00FF88;color:#00FF88;background:rgba(0,255,136,.07);}
+.dtab[data-d="HARD"].active{border-color:var(--purple);color:var(--purple);background:rgba(139,92,246,.07);}
+.song-list{display:flex;flex-direction:column;gap:.5rem;width:min(360px,88vw);max-height:50vh;overflow-y:auto;padding-right:4px;}
+.song-list::-webkit-scrollbar{width:3px;}
+.song-list::-webkit-scrollbar-track{background:transparent;}
+.song-list::-webkit-scrollbar-thumb{background:#2E2E5A;border-radius:2px;}
+.song-card{border:1px solid #1E1E4A;border-radius:8px;padding:.75rem 1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#0D0D28;transition:border-color .2s,background .2s;flex-shrink:0;}
 .song-card:hover{border-color:var(--cyan);background:#111130;}
-.song-name{font-size:.92rem;}
-.song-bpm{font-size:.72rem;color:var(--cyan);text-align:right;}
-.diff{font-size:.62rem;padding:.12rem .45rem;border-radius:3px;margin-top:.2rem;display:inline-block;}
+.song-name{font-size:.88rem;}
+.song-bpm{font-size:.68rem;color:var(--cyan);text-align:right;}
+.diff{font-size:.58rem;padding:.1rem .4rem;border-radius:3px;margin-top:.18rem;display:inline-block;}
 .d-easy{background:rgba(0,255,136,.1);color:#00FF88;}
 .d-mid{background:rgba(0,212,255,.1);color:var(--cyan);}
 .d-hard{background:rgba(139,92,246,.1);color:var(--purple);}
@@ -50,7 +59,6 @@ canvas{display:block;width:100%;height:100%;}
 .btn{border:1px solid var(--cyan);background:transparent;color:var(--cyan);font-family:'DM Mono',monospace;font-size:.82rem;letter-spacing:.15em;padding:.55rem 1.6rem;cursor:pointer;border-radius:4px;transition:background .2s,color .2s;}
 .btn:hover{background:var(--cyan);color:var(--bg);}
 #rscore{font-size:1.35rem;letter-spacing:.08em;}
-/* key hint */
 .key-hint{display:flex;gap:4px;align-items:center;}
 .kh{height:26px;min-width:26px;padding:0 4px;border:1px solid #2E2E5A;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#5858A0;}
 .kh.kc{border-color:rgba(0,212,255,.5);color:var(--cyan);}
@@ -77,20 +85,13 @@ canvas{display:block;width:100%;height:100%;}
   <div class="overlay" id="scr-select">
     <h2>RHYTHM.EXE</h2>
     <p class="sub">// select a track</p>
-    <div class="song-list">
-      <div class="song-card" data-s="0">
-        <div><div class="song-name">BOOT.EXE</div><span class="diff d-easy">EASY</span></div>
-        <div><div class="song-bpm">120 BPM</div></div>
-      </div>
-      <div class="song-card" data-s="1">
-        <div><div class="song-name">NULL_PTR</div><span class="diff d-mid">MEDIUM</span></div>
-        <div><div class="song-bpm">140 BPM</div></div>
-      </div>
-      <div class="song-card" data-s="2">
-        <div><div class="song-name">KERNEL_PANIC</div><span class="diff d-hard">HARD</span></div>
-        <div><div class="song-bpm">160 BPM</div></div>
-      </div>
+    <div class="diff-tabs">
+      <button class="dtab active" data-d="ALL">ALL</button>
+      <button class="dtab" data-d="EASY">EASY</button>
+      <button class="dtab" data-d="MEDIUM">MEDIUM</button>
+      <button class="dtab" data-d="HARD">HARD</button>
     </div>
+    <div class="song-list" id="song-list"></div>
     <div class="key-hint">
       <div class="kh kc">S</div><div class="kh kc">D</div><div class="kh kc">F</div>
       <div class="kh-sep"></div>
@@ -98,7 +99,7 @@ canvas{display:block;width:100%;height:100%;}
       <div class="kh-sep"></div>
       <div class="kh kp">J</div><div class="kh kp">K</div><div class="kh kp">L</div>
     </div>
-    <p class="sub" style="font-size:.58rem">O2JAM style · 7 keys</p>
+    <p class="sub" style="font-size:.58rem">O2JAM style · 7 keys · 30 tracks</p>
   </div>
 
   <div class="overlay hidden" id="scr-result">
@@ -149,14 +150,11 @@ function sndHit(t,q){try{const a=ac(),o=a.createOscillator(),g=a.createGain();co
 function sndMiss(t){try{const a=ac(),o=a.createOscillator(),g=a.createGain();o.type='sawtooth';o.frequency.value=110;g.gain.setValueAtTime(0.1,t);g.gain.exponentialRampToValueAtTime(.001,t+0.12);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+0.12);}catch(e){}}
 
 // ── 7-LANE CONFIG ──
-// Lanes: S(0) D(1) F(2) B=Space(3) J(4) K(5) L(6)
-// Colors: cyan shades | gold | purple shades
 const LANE_KEYS=['S','D','F','SP','J','K','L'];
 const LANE_COL=['#5CE0FF','#00D4FF','#0099CC','#FFD700','#B09AFF','#8B5CF6','#6633CC'];
 const LANE_RGB=['92,224,255','0,212,255','0,153,204','255,215,0','176,154,255','139,92,246','102,51,204'];
 
-// ── CHART PARSER ──
-// SDFBJKL = lanes 0-6, . = empty, | or space = separator (ignored)
+// ── PARSERS ──
 function parseChart(bpm,str){
   const s=60/bpm/4,notes=[];let step=0;
   for(const ch of str){
@@ -167,8 +165,6 @@ function parseChart(bpm,str){
   }
   return notes;
 }
-
-// ── DRUM PARSER ── K=kick S=snare H=hat h=soft .=empty
 function parseDrums(bpm,bar,bars){
   const s=60/bpm/4,ev=[];
   for(let b=0;b<bars;b++){
@@ -186,95 +182,207 @@ function parseDrums(bpm,bar,bars){
   return ev;
 }
 
-// ── SONGS ──
+// ── CHART HELPERS ──
+const E='................';
+const q1='S...J...D...K...',q2='F...L...B...S...',q3='D...K...F...J...',q4='B...B...B...B...',q5='S...J...F...L...';
+const h1='S.D.J.K.S.D.J.K.',h2='F.B.L.B.F.B.L.B.',h3='S.D.F.B.J.K.L.K.',h4='L.K.J.B.F.D.S.D.',h5='S.B.J.B.D.B.K.B.';
+const m1='SD.FBJ.KSD.FBJ.K',m2='SDF.JKL.SDF.JKL.',m3='LKJ.FDS.LKJ.FDS.',m4='SDFJKL.BSDFJKL..',m5='S.D.F.B.J.K.L...',m6='L.K.J.B.F.D.S...';
+const x1='SDFBJKL.SDFBJKL.',x2='.SDFBJKLSDFBJKL.',x3='SDFBJKLSDFBJKLSD',x4='SLKJBFDSLKJBFDSL',x5='SD.FBJK.SD.FBJK.',x6='DSFJKBLDSFJKBLSD';
+function rp(s,n){let r='';for(let i=0;i<n;i++)r+=s;return r;}
+function alt(a,b,n){let r='';for(let i=0;i<n;i++)r+=i%2===0?a:b;return r;}
+
+// ── SONG FACTORY ──
 let audioOff=0;
 const BARS=32;
 
-// BOOT.EXE — 120 BPM Easy
-const BOOT=(()=>{
-  const bpm=120,s=60/bpm/4;
-  const drums=parseDrums(bpm,'K.H.S.H.K.H.S.H.',BARS);
-  const bassP=[[0,55,4],[8,55,3],[12,49,2]];
+function makeSong(name,bpm,diff,color,fallTime,drumBar,bassP,leadP,lStart,chartFn){
+  const s=60/bpm/4;
+  const drums=parseDrums(bpm,drumBar,BARS);
   const bassEv=[];
   for(let b=0;b<BARS;b++) for(const[st,f,d] of bassP)
     bassEv.push({t:(b*16+st)*s,fn:((_t,_f,_d)=>()=>bass(_t+audioOff,_f,_d*s))((b*16+st)*s,f,d)});
-  const leadP=[[0,330,2],[4,294,2],[8,262,3],[12,294,2]];
   const leadEv=[];
-  for(let b=16;b<BARS;b++) for(const[st,f,d] of leadP)
+  for(let b=lStart;b<BARS;b++) for(const[st,f,d] of leadP)
     leadEv.push({t:(b*16+st)*s,fn:((_t,_f,_d)=>()=>lead(_t+audioOff,_f,_d*s,0.08))((b*16+st)*s,f,d)});
-  // 7-lane chart (each bar = 16 chars, SDFBJKL=lane, .=empty)
-  let ch='';
-  ch+='................'.repeat(4);                                      // bars 0-3  intro
-  for(let b=4;b<8;b++) ch+=b%2===0?'S...J...D...K...':'F...L...B...S...'; // bars 4-7  quarter
-  for(let b=8;b<16;b++) ch+=b%2===0?'S.D.J.K.S.D.J.K.':'F.B.L.B.F.B.L.B.'; // bars 8-15 8th
-  for(let b=16;b<24;b++) ch+=b%2===0?'S.D.F.B.J.K.L.K.':'L.K.J.B.F.D.S.D.'; // bars 16-23 chorus
-  ch+='S.D.F.B.J.K.L.K.'.repeat(4);                                    // bars 24-27 climax
-  for(let b=28;b<32;b++) ch+=b%2===0?'S...J...D...K...':'................'; // bars 28-31 outro
-  return{name:'BOOT.EXE',bpm,diff:'EASY',color:'#00FF88',fallTime:1.5,
-    chart:parseChart(bpm,ch),drums,audio:[...bassEv,...leadEv],duration:BARS*16*s};
-})();
+  return{name,bpm,diff,color,fallTime,
+    chart:parseChart(bpm,chartFn()),
+    drums,audio:[...bassEv,...leadEv],duration:BARS*16*s};
+}
 
-// NULL_PTR — 140 BPM Medium
-const NULLP=(()=>{
-  const bpm=140,s=60/bpm/4;
-  const drums=parseDrums(bpm,'K.hHS.hHK.hHS.hH',BARS);
-  const bassP=[[0,65,3],[4,73,2],[6,65,1],[8,58,3],[12,65,2],[14,69,1]];
-  const bassEv=[];
-  for(let b=0;b<BARS;b++) for(const[st,f,d] of bassP)
-    bassEv.push({t:(b*16+st)*s,fn:((_t,_f,_d)=>()=>bass(_t+audioOff,_f,_d*s))((b*16+st)*s,f,d)});
-  const leadP=[[0,392,2],[2,349,1],[4,330,2],[6,294,1],[8,262,3],[12,294,2],[14,330,1]];
-  const leadEv=[];
-  for(let b=8;b<BARS;b++) for(const[st,f,d] of leadP)
-    leadEv.push({t:(b*16+st)*s,fn:((_t,_f,_d)=>()=>lead(_t+audioOff,_f,_d*s,0.09))((b*16+st)*s,f,d)});
-  let ch='';
-  ch+='................'.repeat(2);                                      // bars 0-1
-  for(let b=2;b<6;b++) ch+=b%2===0?'S.D.J.K.S.D.J.K.':'F.B.L.B.F.B.L.B.'; // bars 2-5
-  for(let b=6;b<12;b++) ch+=b%2===0?'SD.FBJ.KSD.FBJ.K':'LK.JBF.DLK.JBF.D'; // bars 6-11 doubles
-  // bars 12-19 chorus: cycling patterns
-  for(let b=12;b<20;b++){
-    const p=b%4;
-    if(p===0) ch+='SDFJKL.BSDFJKL..';
-    else if(p===1) ch+='S.D.F.B.J.K.L...';
-    else if(p===2) ch+='..SDFBJKL.SDFBJK';
-    else           ch+='L.K.J.B.F.D.S...';
-  }
-  for(let b=20;b<26;b++) ch+=b%2===0?'SDFBJKLS.DFBJKL.':'L.KJBFDS.LKJBFDS'; // bars 20-25 climax
-  for(let b=26;b<32;b++) ch+=b%2===0?'SD.FBJ.KSD.FBJ.K':'S...J...D...K...'; // bars 26-31 outro
-  return{name:'NULL_PTR',bpm,diff:'MEDIUM',color:'#00D4FF',fallTime:1.3,
-    chart:parseChart(bpm,ch),drums,audio:[...bassEv,...leadEv],duration:BARS*16*s};
-})();
+// ── SONGS (30 tracks) ──
+const SONGS=[
 
-// KERNEL_PANIC — 160 BPM Hard
-const KPANIC=(()=>{
-  const bpm=160,s=60/bpm/4;
-  const drums=parseDrums(bpm,'KhHhShHhKhHhShHh',BARS);
-  const bassP=[[0,82,2],[2,73,2],[4,65,2],[6,58,2],[8,55,2],[10,58,2],[12,65,2],[14,73,2]];
-  const bassEv=[];
-  for(let b=0;b<BARS;b++) for(const[st,f,d] of bassP)
-    bassEv.push({t:(b*16+st)*s,fn:((_t,_f,_d)=>()=>bass(_t+audioOff,_f,_d*s))((b*16+st)*s,f,d)});
-  const leadP=[[0,523,1],[2,494,1],[4,440,1],[6,415,1],[8,392,2],[12,440,2],[14,494,1]];
-  const leadEv=[];
-  for(let b=4;b<BARS;b++) for(const[st,f,d] of leadP)
-    leadEv.push({t:(b*16+st)*s,fn:((_t,_f,_d)=>()=>lead(_t+audioOff,_f,_d*s,0.08))((b*16+st)*s,f,d)});
-  let ch='';
-  ch+='................'.repeat(2);   // bars 0-1
-  ch+='S...J...D...K...';             // bar 2
-  ch+='S.D.J.K.F.B.L.B.';            // bar 3
-  for(let b=4;b<8;b++) ch+=b%2===0?'SD.FBJ.KSD.FBJ.K':'SDFBJKLSDFBJKLSD'; // bars 4-7 ramp
-  for(let b=8;b<16;b++) ch+=b%2===0?'SDFBJKL.SDFBJKL.':'.SDFBJKLSDFBJKL.'; // bars 8-15 streams
-  for(let b=16;b<24;b++){             // bars 16-23 complex
-    const p=b%4;
-    if(p===0) ch+='SDFBJKLSDFBJKLSD';
-    else if(p===1) ch+='SLKJBFDSLKJBFDSL';
-    else if(p===2) ch+='SD.FBJK.SD.FBJK.';
-    else           ch+='DSFJKBLDSFJKBLSD';
-  }
-  for(let b=24;b<32;b++) ch+=b%2===0?'SDFBJKL.SDFBJKL.':'SLKJBFDS.LKJBFDS'; // bars 24-31 final
-  return{name:'KERNEL_PANIC',bpm,diff:'HARD',color:'#8B5CF6',fallTime:1.1,
-    chart:parseChart(bpm,ch),drums,audio:[...bassEv,...leadEv],duration:BARS*16*s};
-})();
+// ── EASY ──
+makeSong('BOOT.EXE',120,'EASY','#00FF88',1.5,'K.H.S.H.K.H.S.H.',
+  [[0,55,4],[8,55,3],[12,49,2]],
+  [[0,330,2],[4,294,2],[8,262,3],[12,294,2]],16,
+  ()=>{let c=rp(E,4);
+    for(let b=4;b<8;b++) c+=b%2===0?q1:q2;
+    for(let b=8;b<16;b++) c+=b%2===0?h1:h2;
+    for(let b=16;b<24;b++) c+=b%2===0?h3:h4;
+    c+=rp(h3,4);
+    for(let b=28;b<32;b++) c+=b%2===0?q1:E;
+    return c;}),
 
-const SONGS=[BOOT,NULLP,KPANIC];
+makeSong('HELLO_WORLD',90,'EASY','#00FF88',1.7,'K...S...K...S...',
+  [[0,55,4],[8,49,4]],
+  [[0,262,4],[8,294,4]],16,
+  ()=>rp(E,4)+alt(q1,q2,12)+alt(q1,q3,8)+rp(q2,4)+alt(q1,E,4)),
+
+makeSong('INIT.SYS',100,'EASY','#00FF88',1.6,'K.H.S...K.H.S...',
+  [[0,65,4],[8,55,4]],
+  [[0,330,2],[8,294,2],[12,262,2]],16,
+  ()=>rp(E,4)+alt(q3,q2,6)+alt(h1,E,8)+alt(h1,h2,6)+rp(h1,4)+alt(q3,E,4)),
+
+makeSong('README.MD',85,'EASY','#00FF88',1.8,'K...S...K...S...',
+  [[0,49,4],[8,55,4]],
+  [[0,262,4],[8,330,4]],20,
+  ()=>rp(E,8)+alt(q4,q1,12)+rp(q1,8)+rp(E,4)),
+
+makeSong('PING',95,'EASY','#00FF88',1.65,'K.H.S.H.K.H.S...',
+  [[0,55,4],[8,65,4]],
+  [[0,294,3],[8,330,3]],14,
+  ()=>rp(E,4)+alt(q5,q2,8)+alt(h2,q5,12)+rp(h2,4)+alt(q5,E,4)),
+
+makeSong('LOCALHOST',110,'EASY','#00FF88',1.55,'K.H.S.H.K.H.S.H.',
+  [[0,65,4],[8,65,3],[12,73,1]],
+  [[0,330,2],[4,349,2],[8,330,2],[12,294,2]],14,
+  ()=>rp(E,2)+alt(q1,q2,6)+alt(h1,h2,12)+alt(h3,h4,8)+alt(q1,E,4)),
+
+makeSong('SYNTAX.OK',115,'EASY','#00FF88',1.52,'K.H.S.H.K.H.S.H.',
+  [[0,65,3],[4,73,1],[8,65,4]],
+  [[0,349,2],[4,330,2],[8,294,2],[12,262,2]],12,
+  ()=>rp(E,4)+alt(h5,q1,8)+alt(h3,h2,12)+rp(h3,4)+alt(h5,E,4)),
+
+makeSong('COMPILE',125,'EASY','#00FF88',1.48,'K.H.S.H.K.H.S.H.',
+  [[0,55,4],[8,65,3],[12,73,1]],
+  [[0,392,2],[4,349,2],[8,330,2],[12,294,2]],12,
+  ()=>rp(E,4)+alt(q1,q3,4)+alt(h1,h2,8)+alt(h3,h4,8)+rp(h1,4)+alt(q1,E,4)),
+
+makeSong('FIRST_COMMIT',105,'EASY','#00FF88',1.58,'K...S...K.H.S...',
+  [[0,55,4],[8,55,3],[12,65,1]],
+  [[0,294,2],[4,330,2],[8,262,4]],12,
+  ()=>rp(E,4)+alt(q2,q4,8)+alt(h5,h2,10)+rp(h3,6)+alt(q2,E,4)),
+
+makeSong('LOG.OUT',80,'EASY','#00FF88',1.9,'K...S...K...S...',
+  [[0,49,4],[8,55,4]],
+  [[0,262,4],[8,294,4],[12,330,4]],20,
+  ()=>rp(E,8)+alt(q1,q2,12)+alt(q3,q4,8)+rp(E,4)),
+
+// ── MEDIUM ──
+makeSong('NULL_PTR',140,'MEDIUM','#00D4FF',1.3,'K.hHS.hHK.hHS.hH',
+  [[0,65,3],[4,73,2],[6,65,1],[8,58,3],[12,65,2],[14,69,1]],
+  [[0,392,2],[2,349,1],[4,330,2],[6,294,1],[8,262,3],[12,294,2],[14,330,1]],8,
+  ()=>{let c=rp(E,2);
+    for(let b=2;b<6;b++) c+=b%2===0?h1:h2;
+    for(let b=6;b<12;b++) c+=b%2===0?m1:m3;
+    for(let b=12;b<20;b++){const p=b%4;c+=p===0?m4:p===1?m5:p===2?x1:m6;}
+    for(let b=20;b<26;b++) c+=b%2===0?m1:m3;
+    for(let b=26;b<32;b++) c+=b%2===0?m1:q1;
+    return c;}),
+
+makeSong('MERGE.CONFLICT',145,'MEDIUM','#00D4FF',1.28,'K.hHS.hHK.hHS.hH',
+  [[0,65,3],[4,58,2],[8,65,3],[12,73,1]],
+  [[0,349,2],[4,330,2],[8,392,2],[12,349,2]],8,
+  ()=>rp(E,2)+alt(m1,h1,6)+alt(m1,m3,12)+alt(m4,m1,6)+rp(m1,2)+alt(h1,E,4)),
+
+makeSong('GIT.PUSH',150,'MEDIUM','#00D4FF',1.25,'KhHhS.hHKhHhS.hH',
+  [[0,73,3],[4,65,2],[8,73,3],[12,82,1]],
+  [[0,392,2],[4,440,2],[8,392,2],[12,349,2]],8,
+  ()=>rp(E,2)+alt(h3,m5,6)+alt(m2,m3,8)+alt(m4,m5,8)+rp(m2,4)+alt(h3,E,4)),
+
+makeSong('ASYNC.AWAIT',135,'MEDIUM','#00D4FF',1.35,'K.H.S.hHK.H.S.hH',
+  [[0,65,4],[8,55,3],[12,65,1]],
+  [[0,330,2],[4,294,2],[8,349,2],[12,392,2]],8,
+  ()=>rp(E,4)+alt(h3,m5,8)+alt(m5,m6,8)+alt(m1,m2,8)+alt(h3,E,4)),
+
+makeSong('CALLBACK',155,'MEDIUM','#00D4FF',1.22,'KhHhShHhKhHhShHh',
+  [[0,73,2],[4,65,2],[8,73,2],[12,58,2]],
+  [[0,440,2],[4,392,2],[8,349,2],[12,330,2]],6,
+  ()=>rp(E,2)+alt(m1,m3,6)+alt(m2,m6,8)+alt(m4,m2,8)+rp(m4,4)+alt(m1,E,4)),
+
+makeSong('HTTP_200',138,'MEDIUM','#00D4FF',1.32,'K.H.S.H.K.hHS.hH',
+  [[0,65,4],[8,73,3],[12,65,1]],
+  [[0,330,2],[4,349,2],[8,330,2],[12,294,2]],10,
+  ()=>rp(E,4)+alt(h3,h4,6)+alt(m5,m6,10)+alt(m1,h3,8)+alt(h4,E,4)),
+
+makeSong('DOCKER.RUN',148,'MEDIUM','#00D4FF',1.27,'K.hHS.hHK.hHS.hH',
+  [[0,55,3],[4,65,2],[8,73,3],[12,65,1]],
+  [[0,294,2],[4,330,2],[8,349,2],[12,392,2]],8,
+  ()=>rp(E,2)+alt(h1,h3,4)+alt(m2,m3,10)+alt(m4,m1,8)+rp(m2,4)+alt(h1,E,4)),
+
+makeSong('SQL.JOIN',142,'MEDIUM','#00D4FF',1.3,'K.H.S.hHK.H.S.hH',
+  [[0,65,3],[4,73,2],[8,65,3],[12,58,1]],
+  [[0,349,2],[4,392,2],[8,440,2],[12,392,2]],8,
+  ()=>rp(E,4)+alt(m5,h3,8)+alt(m1,m6,10)+rp(m4,6)+alt(m5,E,4)),
+
+makeSong('CACHE.HIT',152,'MEDIUM','#00D4FF',1.24,'KhHhS.hHKhHhS.hH',
+  [[0,73,2],[4,65,1],[6,73,1],[8,58,3],[12,65,2]],
+  [[0,392,2],[4,440,2],[8,523,2],[12,440,2]],6,
+  ()=>rp(E,2)+alt(m3,h3,6)+alt(m1,m4,10)+alt(m2,m6,8)+rp(m4,2)+alt(m3,E,4)),
+
+makeSong('STACK.FLOW',158,'MEDIUM','#00D4FF',1.2,'KhHhShHhKhHhShHh',
+  [[0,82,2],[4,73,2],[8,65,2],[12,73,2]],
+  [[0,440,2],[4,494,2],[8,523,2],[12,494,2]],6,
+  ()=>rp(E,2)+alt(m5,m6,4)+alt(m1,m3,8)+alt(m4,x1,10)+rp(x1,4)+alt(m5,E,4)),
+
+// ── HARD ──
+makeSong('KERNEL_PANIC',160,'HARD','#8B5CF6',1.1,'KhHhShHhKhHhShHh',
+  [[0,82,2],[2,73,2],[4,65,2],[6,58,2],[8,55,2],[10,58,2],[12,65,2],[14,73,2]],
+  [[0,523,1],[2,494,1],[4,440,1],[6,415,1],[8,392,2],[12,440,2],[14,494,1]],4,
+  ()=>{let c=rp(E,2)+'S...J...D...K...'+'S.D.J.K.F.B.L.B.';
+    for(let b=4;b<8;b++) c+=b%2===0?m1:x3;
+    for(let b=8;b<16;b++) c+=b%2===0?x1:x2;
+    for(let b=16;b<24;b++){const p=b%4;c+=p===0?x3:p===1?x4:p===2?x5:x6;}
+    for(let b=24;b<32;b++) c+=b%2===0?x1:x4;
+    return c;}),
+
+makeSong('SEGFAULT',175,'HARD','#8B5CF6',1.0,'KhHhShHhKhHhShHh',
+  [[0,82,2],[4,73,2],[8,65,2],[12,82,2]],
+  [[0,523,1],[4,494,1],[8,523,2],[12,440,1]],4,
+  ()=>rp(E,2)+m1+h3+alt(x1,x2,8)+alt(x3,x4,12)+rp(x3,4)+alt(x1,x2,4)),
+
+makeSong('HEAP.OVERFLOW',180,'HARD','#8B5CF6',0.98,'KhHhShHhKhHhShHh',
+  [[0,73,2],[2,82,1],[4,73,2],[6,65,1],[8,73,2],[10,82,1],[12,73,2],[14,65,1]],
+  [[0,523,1],[2,494,1],[4,440,2],[8,523,2],[12,494,2],[14,523,1]],4,
+  ()=>rp(E,2)+m1+m4+alt(x1,x5,6)+alt(x3,x4,14)+rp(x6,4)+alt(x5,x1,4)),
+
+makeSong('DEADLOCK',170,'HARD','#8B5CF6',1.05,'KhHhShHhKhHhShHh',
+  [[0,65,2],[4,73,2],[8,82,2],[12,73,2]],
+  [[0,440,2],[4,523,2],[8,494,2],[12,440,2]],4,
+  ()=>rp(E,2)+q1+m1+alt(m4,x1,4)+alt(x1,x2,16)+rp(x3,4)+alt(x1,E,4)),
+
+makeSong('RACE.COND',185,'HARD','#8B5CF6',0.96,'KhHhShHhKhHhShHh',
+  [[0,82,2],[2,73,1],[4,82,2],[6,65,1],[8,82,2],[10,73,1],[12,65,2],[14,73,1]],
+  [[0,523,1],[2,494,2],[6,440,1],[8,523,2],[12,494,1],[14,523,1]],2,
+  ()=>rp(E,2)+alt(m4,x5,4)+alt(x3,x4,18)+rp(x6,4)+alt(x3,x5,4)),
+
+makeSong('NaN.ERR',190,'HARD','#8B5CF6',0.94,'KhHhShHhKhHhShHh',
+  [[0,82,1],[2,73,1],[4,65,1],[6,73,1],[8,82,1],[10,65,1],[12,73,1],[14,82,1]],
+  [[0,523,1],[2,440,1],[4,494,1],[6,523,1],[8,440,2],[12,523,2]],2,
+  ()=>rp(E,2)+rp(x5,2)+alt(x3,x4,20)+rp(x6,4)+alt(x3,x4,4)),
+
+makeSong('404.BREAK',178,'HARD','#8B5CF6',1.0,'KhHhShHhKhHhShHh',
+  [[0,73,2],[4,65,2],[8,73,2],[12,82,2]],
+  [[0,494,2],[4,523,2],[8,440,2],[12,494,2]],4,
+  ()=>rp(E,2)+alt(x5,m1,4)+alt(x1,x4,14)+alt(x6,x3,6)+rp(x5,2)+alt(x1,x2,4)),
+
+makeSong('BUFFER.OVF',195,'HARD','#8B5CF6',0.92,'KhHhShHhKhHhShHh',
+  [[0,82,1],[4,73,1],[8,65,1],[12,73,1]],
+  [[0,523,1],[4,494,1],[8,523,1],[12,440,1]],2,
+  ()=>rp(E,2)+rp(x5,2)+alt(x3,x4,24)+alt(x6,x5,4)),
+
+makeSong('CORE.DUMP',200,'HARD','#8B5CF6',0.9,'KhHhShHhKhHhShHh',
+  [[0,82,1],[2,73,1],[4,82,1],[6,65,1],[8,73,1],[10,82,1],[12,65,1],[14,73,1]],
+  [[0,523,1],[2,494,1],[4,523,1],[6,440,1],[8,494,1],[10,523,1],[12,440,1],[14,494,1]],2,
+  ()=>rp(E,2)+rp(m4,2)+alt(x3,x6,24)+alt(x4,x5,4)),
+
+makeSong('UNDEFINED',210,'HARD','#8B5CF6',0.88,'KhHhShHhKhHhShHh',
+  [[0,82,1],[2,73,1],[4,65,1],[6,58,1],[8,55,1],[10,58,1],[12,65,1],[14,73,1]],
+  [[0,523,1],[2,494,1],[4,440,1],[6,415,1],[8,392,1],[10,415,1],[12,440,1],[14,494,1]],2,
+  ()=>rp(E,2)+rp(x5,2)+alt(x3,x4,28)),
+
+];
 
 // ── CANVAS ──
 const cv=document.getElementById('cv');
@@ -386,28 +494,24 @@ function updateHUD(){
 // ── RENDER ──
 function drawPlay(dt){
   ctx.fillStyle='#07071A';ctx.fillRect(0,0,W,H);
-  // scanlines
   ctx.fillStyle='rgba(0,0,0,.035)';
   for(let y=0;y<H;y+=4) ctx.fillRect(0,y,W,1);
 
   const t=gtime();
   const xl=LX[0],xr=LX[6]+LW;
 
-  // lane backgrounds
   for(let i=0;i<7;i++){
     const x=LX[i];
     if(kd[i]) ctx.fillStyle=`rgba(${LANE_RGB[i]},.09)`;
     else if(i===3) ctx.fillStyle='rgba(255,215,0,.022)';
     else ctx.fillStyle='rgba(255,255,255,.01)';
     ctx.fillRect(x,0,LW,H);
-    // dividers
     ctx.fillStyle=i===3?'rgba(255,215,0,.15)':'#1E1E4A';
     ctx.fillRect(x,0,1,H);
-    if(i===3) ctx.fillRect(x+LW-1,0,1,H); // right edge of center lane
+    if(i===3) ctx.fillRect(x+LW-1,0,1,H);
   }
   ctx.fillStyle='#1E1E4A';ctx.fillRect(LX[6]+LW,0,1,H);
 
-  // hit line gradient
   ctx.save();
   const gl=ctx.createLinearGradient(xl,0,xr,0);
   gl.addColorStop(0,'rgba(92,224,255,.8)');
@@ -419,7 +523,6 @@ function drawPlay(dt){
   ctx.fillStyle=gl;ctx.fillRect(xl,HIT_Y-1,xr-xl,3);
   ctx.restore();
 
-  // lane flash
   for(let i=0;i<7;i++){
     if(flash[i]>0){
       const a=flash[i]/140;
@@ -429,7 +532,6 @@ function drawPlay(dt){
     }
   }
 
-  // receptors
   for(let i=0;i<7;i++){
     const x=LX[i]+LW/2;
     ctx.save();
@@ -438,7 +540,6 @@ function drawPlay(dt){
     ctx.lineWidth=active?2.5:1.5;
     if(active){ctx.shadowColor=LANE_COL[i];ctx.shadowBlur=14;}
     if(i===3){
-      // diamond receptor for center (Space)
       const sz=LW*.3;
       ctx.beginPath();
       ctx.moveTo(x,HIT_Y-sz);ctx.lineTo(x+sz,HIT_Y);
@@ -450,7 +551,6 @@ function drawPlay(dt){
     ctx.restore();
   }
 
-  // notes
   const ft=song.fallTime;
   for(const n of chart){
     if(n.hit||n.miss) continue;
@@ -472,7 +572,6 @@ function drawPlay(dt){
     ctx.restore();
   }
 
-  // particles
   updateParts(dt);
   for(const p of parts){
     ctx.save();ctx.globalAlpha=p.alpha;ctx.fillStyle=p.col;
@@ -480,7 +579,6 @@ function drawPlay(dt){
     ctx.restore();
   }
 
-  // key labels
   ctx.textAlign='center';ctx.textBaseline='middle';
   const ky=HIT_Y+(H-HIT_Y)*.48;
   const kfs=Math.max(8,Math.round(LW*.38));
@@ -491,7 +589,6 @@ function drawPlay(dt){
     ctx.fillText(LANE_KEYS[i],x,ky);
   }
 
-  // judge text
   const jel=document.getElementById('judge');
   if(judgeT>0){
     jel.textContent=judgeTxt;jel.style.color=judgeCol;
@@ -502,7 +599,6 @@ function drawPlay(dt){
     judgeT-=dt*1000;
   } else {jel.style.opacity='0';}
 
-  // countdown
   if(countdown>0){
     ctx.save();
     ctx.fillStyle=`rgba(7,7,26,${Math.min(.88,countdown)})`;
@@ -524,7 +620,7 @@ function drawIdle(){
   for(let i=0;i<7;i++){
     const ph=i*Math.PI/3.5;
     let a=.018+Math.sin(t*.6+ph)*.012;
-    if(i===3) a*=2.2; // center lane subtly brighter
+    if(i===3) a*=2.2;
     ctx.fillStyle=`rgba(${LANE_RGB[i]},${a})`;
     ctx.fillRect(LX[i],0,LW,H);
     ctx.fillStyle=i===3?'rgba(255,215,0,.12)':'#1E1E4A';
@@ -604,7 +700,6 @@ function endSong(){
 }
 
 // ── INPUT ──
-// s=0 d=1 f=2 space=3 j=4 k=5 l=6
 const KMAP={s:0,d:1,f:2,' ':3,j:4,k:5,l:6};
 document.addEventListener('keydown',e=>{
   if(STATE==='select') return;
@@ -649,14 +744,36 @@ wrap.addEventListener('touchend',e=>{
   });
 },{passive:false});
 
-document.querySelectorAll('.song-card').forEach(c=>{
-  c.addEventListener('click',()=>startSong(SONGS[parseInt(c.dataset.s)]));
-});
 document.getElementById('btn-retry').addEventListener('click',()=>startSong(song));
 document.getElementById('btn-sel').addEventListener('click',showSelect);
 
+// ── SONG LIST UI ──
+function renderSongList(filter){
+  const list=document.getElementById('song-list');
+  list.innerHTML='';
+  SONGS.forEach(s=>{
+    if(filter&&filter!=='ALL'&&s.diff!==filter) return;
+    const card=document.createElement('div');
+    card.className='song-card';
+    const dc=s.diff==='EASY'?'d-easy':s.diff==='MEDIUM'?'d-mid':'d-hard';
+    card.innerHTML=`<div><div class="song-name">${s.name}</div><span class="diff ${dc}">${s.diff}</span></div><div class="song-bpm">${s.bpm} BPM</div>`;
+    card.addEventListener('click',()=>startSong(s));
+    list.appendChild(card);
+  });
+}
+
+document.querySelectorAll('.dtab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    renderSongList(tab.dataset.d);
+  });
+});
+
 // ── BOOT ──
-resize();lastTs=performance.now();
+resize();
+renderSongList('ALL');
+lastTs=performance.now();
 requestAnimationFrame(loop);
 </script>
 </body>
