@@ -65,6 +65,9 @@ canvas{display:block;width:100%;height:100%;}
 .kh.kp{border-color:rgba(139,92,246,.5);color:var(--purple);}
 .kh.kg{min-width:42px;border-color:rgba(255,215,0,.5);color:var(--gold);}
 .kh-sep{width:8px;}
+#esc-hint{position:absolute;top:.55rem;right:.9rem;font-size:.58rem;color:#3A3A6A;letter-spacing:.08em;pointer-events:none;}
+#scr-pause{gap:1.6rem;}
+#scr-pause h2{font-size:1.2rem;letter-spacing:.2em;color:var(--gold);}
 </style>
 </head>
 <body>
@@ -81,6 +84,7 @@ canvas{display:block;width:100%;height:100%;}
   </div>
   <div id="prog" class="hidden"><div id="prog-fill"></div></div>
   <div id="judge"></div>
+  <div id="esc-hint" class="hidden">ESC · PAUSE</div>
   <div class="overlay" id="scr-select">
     <h2>RHYTHM.EXE</h2>
     <p class="sub">// select a track</p>
@@ -97,6 +101,15 @@ canvas{display:block;width:100%;height:100%;}
       <div class="kh kp">J</div><div class="kh kp">K</div><div class="kh kp">L</div>
     </div>
     <p class="sub" style="font-size:.58rem">O2JAM style · 7 keys · 30 tracks</p>
+  </div>
+  <div class="overlay hidden" id="scr-pause">
+    <h2>PAUSED</h2>
+    <p class="sub" id="pause-songname" style="font-size:.78rem;color:#8080C0;letter-spacing:.12em;"></p>
+    <div style="display:flex;gap:.7rem">
+      <button class="btn" id="btn-resume">RESUME</button>
+      <button class="btn" id="btn-quit" style="border-color:#FF5555;color:#FF5555">QUIT</button>
+    </div>
+    <p class="sub" style="font-size:.58rem">ESC to resume</p>
   </div>
   <div class="overlay hidden" id="scr-result">
     <h2 id="r-title"></h2>
@@ -745,10 +758,11 @@ function drawIdle(){
 }
 
 // ── GAME LOOP ──
+let pauseAt=0; // audioContext time when paused
 function loop(ts){
   rafId=requestAnimationFrame(loop);
   const dt=Math.min((ts-lastTs)/1000,.05);lastTs=ts;
-  if(STATE==='select'){drawIdle();return;}
+  if(STATE==='select'||STATE==='paused'){drawIdle();return;}
   if(STATE==='playing'){
     if(countdown>0){countdown-=dt;drawPlay(dt);return;}
     scheduleAudio();checkMiss();
@@ -756,14 +770,36 @@ function loop(ts){
     drawPlay(dt);updateHUD();
   }
 }
+function pauseGame(){
+  if(STATE!=='playing') return;
+  STATE='paused';
+  pauseAt=actx?actx.currentTime:0;
+  document.getElementById('scr-pause').classList.remove('hidden');
+  document.getElementById('pause-songname').textContent=song.name;
+  kd.fill(false);
+}
+function resumeGame(){
+  if(STATE!=='paused') return;
+  // shift audioOff forward by however long we were paused
+  if(actx){
+    const pausedFor=actx.currentTime-pauseAt;
+    audioOff+=pausedFor;
+    gameOff+=pausedFor*1000;
+  }
+  STATE='playing';
+  document.getElementById('scr-pause').classList.add('hidden');
+  lastTs=performance.now();
+}
 
 // ── FLOW ──
 function showSelect(){
   STATE='select';
   document.getElementById('scr-select').classList.remove('hidden');
   document.getElementById('scr-result').classList.add('hidden');
+  document.getElementById('scr-pause').classList.add('hidden');
   document.getElementById('hud').classList.add('hidden');
   document.getElementById('prog').classList.add('hidden');
+  document.getElementById('esc-hint').classList.add('hidden');
 }
 function startSong(s){
   song=s;
@@ -783,6 +819,7 @@ function startSong(s){
   document.getElementById('hv-combo').textContent='0';
   document.getElementById('hv-acc').textContent='100.00%';
   document.getElementById('prog-fill').style.width='0%';
+  document.getElementById('esc-hint').classList.remove('hidden');
 }
 function endSong(){
   STATE='result';
@@ -809,8 +846,15 @@ function endSong(){
 // ── INPUT ──
 const KMAP={s:0,d:1,f:2,' ':3,j:4,k:5,l:6};
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    e.preventDefault();
+    if(STATE==='playing') pauseGame();
+    else if(STATE==='paused') resumeGame();
+    return;
+  }
   if(STATE==='select') return;
   if(STATE==='result'){if(e.key==='Enter'||e.key===' '){e.preventDefault();startSong(song);}return;}
+  if(STATE==='paused') return;
   const key=e.key===' '?' ':e.key.toLowerCase();
   const l=KMAP[key];if(l===undefined) return;
   e.preventDefault();if(!kd[l]){kd[l]=true;hitLane(l);}
@@ -837,6 +881,8 @@ wrap.addEventListener('touchend',e=>{
 },{passive:false});
 document.getElementById('btn-retry').addEventListener('click',()=>startSong(song));
 document.getElementById('btn-sel').addEventListener('click',showSelect);
+document.getElementById('btn-resume').addEventListener('click',resumeGame);
+document.getElementById('btn-quit').addEventListener('click',showSelect);
 
 // ── SONG LIST UI ──
 function renderSongList(filter){
