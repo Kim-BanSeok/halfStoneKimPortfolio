@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>halfstone.Kim | Developer</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #07071A;
+      --surface: #0D0D28;
+      --card:    #111130;
+      --border:  #1E1E4A;
+      --text:    #E0E0FF;
+      --muted:   #5858A0;
+      --cyan:    #00D4FF;
+      --purple:  #8B5CF6;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2.2rem;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #loader.done { opacity: 0; transform: translateY(-16px); pointer-events: none; }
+    .loader-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 2.6rem; font-weight: 500;
+      color: var(--cyan);
+      letter-spacing: 0.06em;
+      min-width: 5ch;
+      text-align: center;
+    }
+    .loader-bar-wrap {
+      width: 160px; height: 2px;
+      background: rgba(0,212,255,0.12);
+      border-radius: 1px; overflow: hidden;
+    }
+    .loader-bar {
+      height: 100%; width: 0;
+      background: var(--cyan);
+      border-radius: 1px;
+      transition: width 0.65s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ── PARTICLE CANVAS ── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(7,7,26,0.82);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--cyan);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links { list-style: none; display: flex; gap: 2.5rem; }
+    .nav-links a {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* ── LANG BUTTON ── */
+    #lang-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.1em;
+      padding: 0.28rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #lang-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── HAMBURGER ── */
+    #ham {
+      display: none;
+      flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer;
+      padding: 5px;
+    }
+    #ham span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--cyan); border-radius: 1px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+    nav.nav-open #ham span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    nav.nav-open #ham span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    nav.nav-open #ham span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      border: 1px solid rgba(0,212,255,0.25);
+      background: rgba(0,212,255,0.05);
+      padding: 0.4rem 1.1rem;
+      border-radius: 999px;
+      margin-bottom: 2.2rem;
+    }
+
+    .pulse-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: pulse-dot 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    /* GLITCH NAME */
+    .glitch-wrap {
+      position: relative;
+      display: inline-block;
+      font-size: clamp(5rem, 14vw, 11rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+
+    .glitch-wrap .gtext {
+      background: linear-gradient(130deg, #fff 25%, var(--cyan) 60%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .glitch-wrap::before,
+    .glitch-wrap::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(130deg, #fff 25%, var(--cyan) 60%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .glitch-wrap::before {
+      animation: glitch-top 5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+    }
+
+    .glitch-wrap::after {
+      animation: glitch-bot 5s infinite;
+      clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+    }
+
+    @keyframes glitch-top {
+      0%, 80%, 100% { transform: none; opacity: 0; }
+      82% { transform: translate(-4px, 0); opacity: 0.85; filter: hue-rotate(80deg); }
+      85% { transform: translate(4px, 0);  opacity: 0.85; }
+      88% { transform: none; opacity: 0; }
+    }
+
+    @keyframes glitch-bot {
+      0%, 84%, 100% { transform: none; opacity: 0; }
+      86% { transform: translate(4px, 0);  opacity: 0.85; filter: hue-rotate(-80deg); }
+      89% { transform: translate(-4px, 0); opacity: 0.85; }
+      92% { transform: none; opacity: 0; }
+    }
+
+    /* TYPING */
+    .hero-sub {
+      font-size: clamp(1rem, 2.4vw, 1.35rem);
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 1.6rem;
+      min-height: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 2px; height: 1.1em;
+      background: var(--cyan);
+      border-radius: 1px;
+      animation: blink 0.75s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .hero-desc {
+      max-width: 460px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.85;
+      margin-bottom: 2.8rem;
+    }
+
+    /* BUTTONS */
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .btn-primary {
+      padding: 0.75rem 2.2rem;
+      background: var(--cyan);
+      color: #000;
+      font-weight: 600;
+      font-size: 0.88rem;
+      border-radius: 6px;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: box-shadow 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 28px rgba(0,212,255,0.55);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      padding: 0.75rem 2.2rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.88rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 16px rgba(0,212,255,0.12);
+    }
+
+    /* SOCIAL LINKS */
+    .hero-socials {
+      display: flex;
+      gap: 1.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-socials a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+
+    .hero-socials a:hover { color: var(--cyan); }
+
+    /* SCROLL HINT */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .scroll-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+      animation: scroll-drop 1.6s ease-in-out infinite;
+    }
+
+    @keyframes scroll-drop {
+      0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+      40%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+      41%  { transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+    }
+
+    /* ── SECTION WRAPPER ── */
+    .section-wrap { position: relative; z-index: 1; }
+
+    section {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 6rem 3rem;
+    }
+
+    hr.sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 1.2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .sec-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--cyan);
+    }
+
+    .sec-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+
+    /* ── PROJECTS ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .proj-card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.8rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      overflow: hidden;
+      transition: transform 0.35s, border-color 0.35s, box-shadow 0.35s;
+    }
+
+    .proj-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+      transition: left 0.45s;
+    }
+
+    .proj-card:hover {
+      transform: translateY(-7px);
+      border-color: rgba(0,212,255,0.28);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.45), 0 0 36px rgba(0,212,255,0.07);
+    }
+
+    .proj-card:hover::before { left: 0; }
+
+    .proj-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: radial-gradient(circle at 50% 0%, rgba(0,212,255,0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+
+    .proj-card:hover::after { opacity: 1; }
+
+    .proj-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .proj-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--cyan);
+    }
+
+    .proj-arrow {
+      font-size: 1rem;
+      color: var(--muted);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .proj-card:hover .proj-arrow {
+      color: var(--cyan);
+      transform: translate(3px, -3px);
+    }
+
+    .proj-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .proj-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.72;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .proj-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .ptag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+      background: rgba(0,212,255,0.04);
+    }
+
+    div.proj-card { cursor: default; }
+    div.proj-card:hover { transform: none; border-color: var(--border); box-shadow: none; }
+    div.proj-card::before { display: none; }
+    div.proj-card::after  { display: none; }
+
+    /* ── SKILLS ── */
+    .skill-row {
+      display: flex;
+      align-items: center;
+      gap: 2.2rem;
+      padding: 1.4rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .skill-row:first-of-type { border-top: 1px solid var(--border); }
+
+    .skill-cat {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      min-width: 76px;
+    }
+
+    .skill-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .chip {
+      font-size: 0.82rem;
+      padding: 0.3rem 0.85rem;
+      border-radius: 4px;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+
+    .chip:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0,212,255,0.18);
+      transform: translateY(-2px);
+    }
+
+    /* ── EXPERIENCE TIMELINE ── */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 10px; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--cyan), transparent 90%);
+    }
+
+    .exp-item {
+      position: relative;
+      padding: 0 0 2.8rem 2.5rem;
+    }
+
+    .exp-item::before {
+      content: '';
+      position: absolute;
+      left: -4.5px; top: 8px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--cyan);
+      box-shadow: 0 0 14px rgba(0,212,255,0.6);
+    }
+
+    .exp-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--cyan);
+      margin-bottom: 0.45rem;
+    }
+
+    .exp-role {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .exp-company { font-size: 0.88rem; color: var(--muted); }
+
+    .exp-badge {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      padding: 0.12rem 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--muted);
+    }
+
+    /* ── ABOUT ── */
+    .about-text {
+      font-size: 1.1rem;
+      line-height: 1.9;
+      color: var(--muted);
+      max-width: 640px;
+    }
+
+    .about-text strong { color: var(--text); }
+
+    /* ── CONTACT FORM ── */
+    .contact-form {
+      display: flex; flex-direction: column;
+      gap: 1rem; max-width: 560px;
+    }
+    .cf-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', 'Apple SD Gothic Neo', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: none;
+    }
+    .contact-form input::placeholder,
+    .contact-form textarea::placeholder { color: var(--muted); }
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      border-color: rgba(0,212,255,0.5);
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+    }
+    .cf-submit {
+      padding: 0.75rem 2.2rem;
+      background: var(--cyan); color: #000;
+      font-weight: 600; font-size: 0.88rem;
+      border: none; border-radius: 6px; cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: box-shadow 0.3s, transform 0.2s;
+      align-self: flex-start;
+    }
+    .cf-submit:hover {
+      box-shadow: 0 0 28px rgba(0,212,255,0.55);
+      transform: translateY(-2px);
+    }
+    .cf-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    #cf-status {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      min-height: 1.4em;
+      transition: color 0.2s;
+    }
+    #cf-status.ok  { color: #00FF88; }
+    #cf-status.err { color: #FF5555; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.8rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1060px;
+      margin: 0 auto;
+    }
+
+    footer span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    .projects-grid .proj-card:nth-child(2) { transition-delay: 0.1s; }
+    .projects-grid .proj-card:nth-child(3) { transition-delay: 0.2s; }
+    .skill-row:nth-child(2) { transition-delay: 0.08s; }
+    .skill-row:nth-child(3) { transition-delay: 0.16s; }
+    .skill-row:nth-child(4) { transition-delay: 0.24s; }
+
+    /* ── GAMES ── */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.4rem;
+    }
+
+    .game-card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.35s, border-color 0.35s, box-shadow 0.35s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+    }
+
+    .game-card.snake-card:hover { border-color: rgba(0,255,136,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,255,136,.08); }
+    .game-card.g2048-card:hover { border-color: rgba(139,92,246,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(139,92,246,.1); }
+
+    .game-preview {
+      height: 170px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* snake preview */
+    .snake-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(0,255,136,.07) 0%, transparent 70%);
+    }
+    .snake-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 16px);
+      grid-template-rows:    repeat(5, 16px);
+      gap: 3px;
+      position: relative;
+      z-index: 1;
+    }
+    .sc { width:16px; height:16px; border-radius:3px; background:rgba(255,255,255,.04); }
+    .sc.body { background:#00FF88; box-shadow: 0 0 8px rgba(0,255,136,.6); animation: snake-pulse 2s ease-in-out infinite; }
+    .sc.head { background:#00D4FF; box-shadow: 0 0 12px rgba(0,212,255,.8); }
+    .sc.food { background:#FF6B6B; border-radius:50%; box-shadow:0 0 8px rgba(255,107,107,.7); animation:food-pulse 1s ease-in-out infinite; }
+    @keyframes snake-pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+    @keyframes food-pulse  { 0%,100%{transform:scale(1)} 50%{transform:scale(1.2)} }
+
+    /* 2048 preview */
+    .g2048-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(139,92,246,.08) 0%, transparent 70%);
+    }
+    .mini-board {
+      display: grid;
+      grid-template-columns: repeat(4, 44px);
+      grid-template-rows:    repeat(4, 44px);
+      gap: 5px;
+      position: relative; z-index: 1;
+    }
+    .mt {
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; font-weight: 600;
+    }
+    .mt.empty { background: rgba(255,255,255,.03); }
+    .mt.v2    { background:#1a1a4a; color:#aab; }
+    .mt.v4    { background:#1e1a4e; color:#bcb; }
+    .mt.v8    { background:#2a1f5e; color:#00D4FF; }
+    .mt.v16   { background:#1f2860; color:#00D4FF; }
+    .mt.v32   { background:#1e3070; color:#00D4FF; font-size:.65rem; }
+    .mt.v64   { background:#1c3878; color:#8B5CF6; font-size:.65rem; }
+    .mt.v128  { background:#1a3f82; color:#8B5CF6; font-size:.6rem; }
+    .mt.v256  { background:#183880; color:#c4a0ff; font-size:.6rem; }
+    .mt.v512  { background:#c49c2a; color:#fff; font-size:.55rem; }
+    .mt.v1024 { background:#c46f2a; color:#fff; font-size:.5rem; }
+
+    .game-info { padding: 1.2rem 1.4rem 1.4rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .game-info-top { display: flex; justify-content: space-between; align-items: center; }
+    .game-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .snake-card .game-badge { color: #00FF88; }
+    .g2048-card .game-badge { color: var(--purple); }
+
+    .game-arrow {
+      font-size: 1rem;
+      color: var(--muted);
+      transition: color 0.2s, transform 0.2s;
+    }
+    .snake-card:hover .game-arrow { color: #00FF88; transform: translate(3px,-3px); }
+    .g2048-card:hover .game-arrow  { color: var(--purple); transform: translate(3px,-3px); }
+    .type-card:hover  { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.08); }
+    .type-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
+
+    .game-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .game-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .game-feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: .2rem;
+    }
+
+    .ftag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      padding: 0.18rem 0.5rem;
+      border-radius: 3px;
+    }
+    .snake-card .ftag { border: 1px solid rgba(0,255,136,.25); color: #00FF88; background: rgba(0,255,136,.05); }
+    .g2048-card .ftag { border: 1px solid rgba(139,92,246,.25); color: var(--purple); background: rgba(139,92,246,.05); }
+
+    .games-grid .game-card:nth-child(2) { transition-delay: 0.1s; }
+    .games-grid .game-card:nth-child(3) { transition-delay: 0.2s; }
+    .games-grid .game-card:nth-child(4) { transition-delay: 0.3s; }
+
+    /* runner preview */
+    .runner-preview-inner {
+      font-family: 'DM Mono', monospace;
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.55rem;
+    }
+    .runner-track {
+      width: 210px; height: 56px;
+      border-bottom: 2px solid rgba(0,212,255,0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .runner-char {
+      position: absolute;
+      bottom: 2px; left: 22px;
+      width: 14px; height: 22px;
+      background: var(--cyan);
+      border-radius: 2px;
+      box-shadow: 0 0 10px rgba(0,212,255,0.8);
+      animation: runner-bob 0.35s ease-in-out infinite alternate;
+    }
+    @keyframes runner-bob { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+    .runner-obs {
+      position: absolute;
+      bottom: 2px;
+      border-radius: 3px;
+    }
+    .runner-card:hover { border-color: rgba(255,85,85,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(255,85,85,.08); }
+    .runner-card:hover .game-arrow { color: #FF5555; transform: translate(3px,-3px); }
+    .runner-card .ftag { border: 1px solid rgba(255,85,85,.25); color: #FF5555; background: rgba(255,85,85,.05); }
+
+    /* breakout card */
+    .break-card:hover { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.1); }
+    .break-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
+    .break-card .ftag { border: 1px solid rgba(0,212,255,.25); color: var(--cyan); background: rgba(0,212,255,.05); }
+    .games-grid .game-card:nth-child(5) { transition-delay: 0.4s; }
+    .break-preview-grid {
+      display: grid; grid-template-columns: repeat(10,1fr); gap: 3px;
+      width: 100%; padding: 0 6px;
+    }
+    .bp-brick { height: 12px; border-radius: 2px; opacity: .85; }
+    .bp-paddle { width: 50%; height: 8px; background: linear-gradient(90deg,rgba(255,255,255,.9),rgba(0,212,255,.8)); border-radius: 4px; box-shadow: 0 0 12px rgba(0,212,255,.5); margin-top: 12px; }
+    .bp-ball { width: 9px; height: 9px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(0,212,255,.8); margin-bottom: 4px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      #loader { display: none !important; }
+      .fade-up { opacity: 1; transform: none; transition: none; }
+      .glitch-wrap::before, .glitch-wrap::after { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem 1.5rem;
+        flex-wrap: wrap;
+        position: fixed;
+      }
+      #ham { display: flex; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        flex-direction: column;
+        gap: 0; list-style: none;
+        background: rgba(7,7,26,0.97);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.4rem 0;
+      }
+      nav.nav-open .nav-links { display: flex; }
+      .nav-links li a {
+        padding: 0.85rem 1.5rem;
+        font-size: 0.8rem;
+        display: block;
+        border-bottom: 1px solid rgba(30,30,74,0.5);
+      }
+      section { padding: 4rem 1.5rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .games-grid    { grid-template-columns: 1fr; }
+      .skill-row { flex-direction: column; gap: 0.9rem; }
+      .cf-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.8rem; padding: 1.5rem; text-align: center; }
+      .hero-desc { font-size: 0.88rem; }
+      .glitch-wrap { font-size: clamp(3.5rem, 16vw, 8rem); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── LOADING OVERLAY ── -->
+  <div id="loader">
+    <div class="loader-logo" id="loader-logo"></div>
+    <div class="loader-bar-wrap">
+      <div class="loader-bar" id="loader-bar"></div>
+    </div>
+  </div>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <nav id="main-nav">
+    <a class="nav-logo" href="#">_KB</a>
+    <ul class="nav-links">
+      <li><a href="#projects" data-i18n="nav-projects">프로젝트</a></li>
+      <li><a href="#games"    data-i18n="nav-games">게임</a></li>
+      <li><a href="#skills"   data-i18n="nav-skills">기술</a></li>
+      <li><a href="#experience" data-i18n="nav-career">경력</a></li>
+      <li><a href="#about"    data-i18n="nav-about">소개</a></li>
+      <li><a href="#contact"  data-i18n="nav-contact">연락</a></li>
+    </ul>
+    <div class="nav-controls">
+      <button id="lang-btn" onclick="toggleLang()">EN</button>
+      <button id="ham" onclick="toggleNav()" aria-label="메뉴">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      <span data-i18n="hero-badge">Full-Stack Developer</span>
+    </div>
+
+    <div class="glitch-wrap" data-text="halfstone.Kim">
+      <span class="gtext">halfstone.Kim</span>
+    </div>
+
+    <div class="hero-sub">
+      <span id="typing-text"></span><span class="typing-cursor"></span>
+    </div>
+
+    <p class="hero-desc" data-i18n-html="hero-desc">
+      웹 개발과 소프트웨어 엔지니어링.<br>
+      아이디어를 완성된 제품으로 만듭니다.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="#projects" class="btn-primary" data-i18n="btn-work">프로젝트 보기</a>
+      <a href="#contact" class="btn-ghost" data-i18n="btn-contact">연락하기</a>
+    </div>
+
+    <div class="hero-socials">
+      <a href="https://github.com/Kim-BanSeok" target="_blank">GitHub</a>
+      <a href="https://www.youtube.com/@부지런이투데이" target="_blank">YouTube</a>
+      <a href="https://blog.naver.com/teddybearmagazine" target="_blank">Blog</a>
+      <a href="https://teddybearjobstory.tistory.com" target="_blank">Tistory</a>
+      <a href="https://www.instagram.com/teddybear_magazine_world" target="_blank">Instagram</a>
+    </div>
+
+    <div class="scroll-hint">
+      <span class="scroll-label">scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ── -->
+  <div class="section-wrap">
+
+    <hr class="sep">
+
+    <section id="projects">
+      <div class="sec-head fade-up">
+        <span class="sec-label" data-i18n="sec-label-projects">Work</span>
+        <h2 class="sec-title" data-i18n="sec-title-projects">프로젝트</h2>
+      </div>
+      <div class="projects-grid">
+
+        <a class="proj-card fade-up" href="#" target="_blank">
+          <div class="proj-card-top">
+            <span class="proj-num">01</span>
+            <span class="proj-arrow">↗</span>
+          </div>
+          <div class="proj-title" data-i18n="proj1-title">나만의 언어 생성기</div>
+          <p class="proj-desc" data-i18n="proj1-desc">사용자가 자신만의 언어 변환 규칙을 정의하여 일반 텍스트를 암호화하거나 복호화할 수 있는 웹 기반 도구. 간단한 문자 치환부터 알파벳 랜덤 암호화까지 지원.</p>
+          <div class="proj-tags">
+            <span class="ptag">Next.js</span>
+            <span class="ptag">React</span>
+            <span class="ptag">Tailwind CSS</span>
+            <span class="ptag">Vercel</span>
+          </div>
+        </a>
+
+        <a class="proj-card fade-up" href="#" target="_blank">
+          <div class="proj-card-top">
+            <span class="proj-num">02</span>
+            <span class="proj-arrow">↗</span>
+          </div>
+          <div class="proj-title" data-i18n="proj2-title">포트폴리오 웹사이트</div>
+          <p class="proj-desc" data-i18n="proj2-desc">Workfolio 기반의 개인 포트폴리오 사이트. 프로젝트, 블로그, AI 이미지, 음악·유튜브 콘텐츠를 한곳에서 관리.</p>
+          <div class="proj-tags">
+            <span class="ptag">Next.js</span>
+            <span class="ptag">Supabase</span>
+            <span class="ptag">Vercel</span>
+          </div>
+        </a>
+
+        <div class="proj-card fade-up">
+          <div class="proj-card-top">
+            <span class="proj-num">03</span>
+          </div>
+          <div class="proj-title" data-i18n="proj3-title">다음 프로젝트</div>
+          <p class="proj-desc" data-i18n="proj3-desc">1인 개발로 새로운 아이디어를 구상 중입니다. 곧 공개될 예정입니다.</p>
+          <div class="proj-tags">
+            <span class="ptag" data-i18n="proj3-tag">기획 중</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="games">
+      <div class="sec-head fade-up">
+        <span class="sec-label" data-i18n="sec-label-games">Play</span>
+        <h2 class="sec-title" data-i18n="sec-title-games">미니 게임</h2>
+      </div>
+      <div class="games-grid">
+
+        <a class="game-card snake-card fade-up" href="snake.html">
+          <div class="game-preview">
+            <div class="snake-bg"></div>
+            <div class="snake-grid">
+              <div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc food"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div>
+              <div class="sc"></div><div class="sc body"></div><div class="sc body"></div><div class="sc body"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div>
+              <div class="sc"></div><div class="sc body"></div><div class="sc"></div><div class="sc head"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div>
+              <div class="sc"></div><div class="sc body"></div><div class="sc body"></div><div class="sc body"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div>
+              <div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div><div class="sc"></div>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge">🐍 SNAKE</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-snake-title">스네이크</div>
+            <p class="game-desc" data-i18n="game-snake-desc">파워업 3종, 콤보 시스템, 파티클 효과와 8비트 사운드가 어우러진 IT 테마 스네이크 게임.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-powerup">파워업</span>
+              <span class="ftag">콤보 x8</span>
+              <span class="ftag" data-i18n="ftag-particle">파티클</span>
+              <span class="ftag">Web Audio</span>
+              <span class="ftag" data-i18n="ftag-mobile">모바일</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card g2048-card fade-up" href="2048.html">
+          <div class="game-preview">
+            <div class="g2048-bg"></div>
+            <div class="mini-board">
+              <div class="mt v256">256</div><div class="mt v64">64</div><div class="mt v8">8</div><div class="mt empty"></div>
+              <div class="mt v128">128</div><div class="mt v32">32</div><div class="mt v4">4</div><div class="mt v2">2</div>
+              <div class="mt v512">512</div><div class="mt v16">16</div><div class="mt v2">2</div><div class="mt empty"></div>
+              <div class="mt v1024">1024</div><div class="mt v8">8</div><div class="mt empty"></div><div class="mt empty"></div>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge">🎮 2048</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title">2048</div>
+            <p class="game-desc" data-i18n="game-2048-desc">타임어택 모드, 업적 시스템, 5단 되돌리기와 힌트까지 갖춘 전략 퍼즐 게임.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-timeattack">타임어택</span>
+              <span class="ftag" data-i18n="ftag-achievements">업적 9개</span>
+              <span class="ftag" data-i18n="ftag-undo">5단 되돌리기</span>
+              <span class="ftag" data-i18n="ftag-hint">힌트</span>
+              <span class="ftag" data-i18n="ftag-particle">파티클</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card type-card fade-up" href="type.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,.06) 0%,transparent 70%);">
+            <div style="font-family:'DM Mono',monospace;font-size:1.05rem;letter-spacing:.06em;line-height:1.7;text-align:center;position:relative;z-index:1;padding:0 1rem;">
+              <span style="color:#E0E0FF;">the </span><span style="color:#E0E0FF;">quick </span><span style="color:#FF5555;background:rgba(255,85,85,.1);border-radius:2px;">brwon</span><span style="color:#5858A0;"> fox</span><br>
+              <span style="font-size:.75rem;color:var(--muted)">WPM <span style="color:#00D4FF;font-size:1.1rem;">87</span> &nbsp; ACC <span style="color:#8B5CF6;font-size:1.1rem;">96%</span></span>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:var(--cyan);">⌨ TYPE.RUN</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-type-title">타이핑 연습</div>
+            <p class="game-desc" data-i18n="game-type-desc">WPM · 정확도 · 일관성을 실시간으로 측정하는 타이핑 연습 앱. 세 가지 텍스트 모드와 WPM 그래프 제공.</p>
+            <div class="game-feature-tags" style="--ftag-border:rgba(0,212,255,.25);--ftag-color:var(--cyan);--ftag-bg:rgba(0,212,255,.05);">
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);" data-i18n="ftag-modes">단어 / 인용구 / 코드</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);" data-i18n="ftag-wpm-chart">WPM 그래프</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);" data-i18n="ftag-pb">개인 최고</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card runner-card fade-up" href="runner.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(255,85,85,.06) 0%,transparent 70%);">
+            <div class="runner-preview-inner">
+              <div class="runner-track">
+                <div class="runner-char"></div>
+                <div class="runner-obs" style="left:90px;bottom:2px;width:13px;height:20px;background:#FF5555;box-shadow:0 0 8px rgba(255,85,85,.6);">
+                  <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6px;color:#07071A;font-weight:700;">ERR</span>
+                </div>
+                <div class="runner-obs" style="left:155px;bottom:14px;width:19px;height:14px;background:#A78BFA;box-shadow:0 0 8px rgba(167,139,250,.6);">
+                  <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6px;color:#07071A;font-weight:700;">NaN</span>
+                </div>
+              </div>
+              <span style="font-size:.7rem;color:var(--muted);letter-spacing:.1em;">
+                SCORE <span style="color:#FF5555;font-size:.95rem;">01337</span>
+              </span>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:#FF5555;">▶ IT RUNNER</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-runner-title">무한 러너</div>
+            <p class="game-desc" data-i18n="game-runner-desc">ERR, BUG, NULL, VOID 장애물을 피하는 IT 테마 무한 러너. 더블 점프와 슬라이드, 속도 증가, 콤보 시스템.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-djump">더블 점프</span>
+              <span class="ftag" data-i18n="ftag-slide">슬라이드</span>
+              <span class="ftag" data-i18n="ftag-runner-combo">콤보</span>
+              <span class="ftag" data-i18n="ftag-speed">속도 증가</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="game-card break-card fade-up" href="breakout.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,.06) 0%,transparent 70%);flex-direction:column;align-items:center;justify-content:flex-end;gap:0;padding-bottom:18px;">
+            <div class="break-preview-grid">
+              <div class="bp-brick" style="background:#00D4FF;box-shadow:0 0 6px rgba(0,212,255,.6);"></div>
+              <div class="bp-brick" style="background:#8B5CF6;box-shadow:0 0 6px rgba(139,92,246,.6);"></div>
+              <div class="bp-brick" style="background:#00D4FF;"></div>
+              <div class="bp-brick" style="background:#FF5555;box-shadow:0 0 6px rgba(255,85,85,.6);"></div>
+              <div class="bp-brick" style="background:#00D4FF;"></div>
+              <div class="bp-brick" style="background:#8B5CF6;"></div>
+              <div class="bp-brick" style="background:#FFD700;box-shadow:0 0 6px rgba(255,215,0,.6);"></div>
+              <div class="bp-brick" style="background:#00D4FF;"></div>
+              <div class="bp-brick" style="background:#3a3a6a;"></div>
+              <div class="bp-brick" style="background:#00D4FF;"></div>
+            </div>
+            <div style="width:100%;padding:0 6px;margin-top:6px;">
+              <div class="break-preview-grid">
+                <div class="bp-brick" style="background:#8B5CF6;"></div>
+                <div class="bp-brick" style="background:#00D4FF;"></div>
+                <div class="bp-brick" style="background:#8B5CF6;"></div>
+                <div class="bp-brick" style="background:#00D4FF;"></div>
+                <div class="bp-brick" style="background:#FF5555;box-shadow:0 0 6px rgba(255,85,85,.4);"></div>
+                <div class="bp-brick" style="background:#8B5CF6;"></div>
+                <div class="bp-brick" style="background:#00D4FF;"></div>
+                <div class="bp-brick" style="background:#8B5CF6;"></div>
+                <div class="bp-brick" style="background:#00D4FF;"></div>
+                <div class="bp-brick" style="background:#8B5CF6;"></div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;margin-top:14px;">
+              <div class="bp-ball"></div>
+              <div class="bp-paddle"></div>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:var(--cyan);">◈ BREAKOUT</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-break-title">벽돌 깨기</div>
+            <p class="game-desc" data-i18n="game-break-desc">다양한 벽돌 타입(강화·무적·폭발)과 파워업 드롭이 있는 IT 테마 브레이크아웃. 레이저, 멀티볼, 쉴드 등.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-multiball">멀티볼</span>
+              <span class="ftag" data-i18n="ftag-laser">레이저</span>
+              <span class="ftag" data-i18n="ftag-explosive">폭발 벽돌</span>
+              <span class="ftag" data-i18n="ftag-powerups">파워업</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="skills">
+      <div class="sec-head fade-up">
+        <span class="sec-label" data-i18n="sec-label-skills">Stack</span>
+        <h2 class="sec-title" data-i18n="sec-title-skills">기술 스택</h2>
+      </div>
+
+      <div class="skill-row fade-up">
+        <span class="skill-cat">Frontend</span>
+        <div class="skill-chips">
+          <span class="chip">JavaScript</span>
+          <span class="chip">React</span>
+          <span class="chip">Vue</span>
+          <span class="chip">React Native</span>
+          <span class="chip">Tailwind CSS</span>
+          <span class="chip">Axios</span>
+        </div>
+      </div>
+
+      <div class="skill-row fade-up">
+        <span class="skill-cat">Backend</span>
+        <div class="skill-chips">
+          <span class="chip">Node.js</span>
+          <span class="chip">Express</span>
+          <span class="chip">PostgreSQL</span>
+          <span class="chip">MongoDB</span>
+          <span class="chip">Redis</span>
+          <span class="chip">Supabase</span>
+          <span class="chip">Firebase</span>
+        </div>
+      </div>
+
+      <div class="skill-row fade-up">
+        <span class="skill-cat">Systems</span>
+        <div class="skill-chips">
+          <span class="chip">C++</span>
+          <span class="chip">C#</span>
+        </div>
+      </div>
+
+      <div class="skill-row fade-up">
+        <span class="skill-cat">Tools</span>
+        <div class="skill-chips">
+          <span class="chip">VS Code</span>
+          <span class="chip">Cursor</span>
+          <span class="chip">Visual Studio</span>
+          <span class="chip">GitHub</span>
+          <span class="chip">Vercel</span>
+          <span class="chip">Netlify</span>
+          <span class="chip">Notion</span>
+          <span class="chip">Slack</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="experience">
+      <div class="sec-head fade-up">
+        <span class="sec-label" data-i18n="sec-label-career">Career</span>
+        <h2 class="sec-title" data-i18n="sec-title-career">경력</h2>
+      </div>
+      <div class="timeline">
+
+        <div class="exp-item fade-up">
+          <div class="exp-period">2025 – 2026</div>
+          <div class="exp-role" data-i18n="exp1-role">사원</div>
+          <div class="exp-company" data-i18n="exp1-company">에스더블유기술원</div>
+          <span class="exp-badge" data-i18n="exp1-badge">퇴사</span>
+        </div>
+
+        <div class="exp-item fade-up">
+          <div class="exp-period">2018 – 2022</div>
+          <div class="exp-role" data-i18n="exp2-role">대리</div>
+          <div class="exp-company" data-i18n="exp2-company">(주)웰컴소프트</div>
+        </div>
+
+      </div>
+    </section>
+
+    <hr class="sep">
+
+    <section id="about">
+      <div class="sec-head fade-up">
+        <span class="sec-label" data-i18n="sec-label-about">About</span>
+        <h2 class="sec-title" data-i18n="sec-title-about">소개</h2>
+      </div>
+      <p class="about-text fade-up" data-i18n-html="about-text">
+        안녕하세요, <strong>halfstone.Kim</strong>입니다.<br><br>
+        <strong>웹 개발</strong>과 일상·공부 기록을 이곳에 남기고 있습니다.
+        <strong>(주)웰컴소프트</strong>에서 대리로, <strong>에스더블유기술원</strong>에서
+        사원으로 근무하며 실무 경험을 쌓았습니다.<br><br>
+        JavaScript, React, Node.js 등 풀스택 웹 개발 기술과 함께
+        C++, C#을 활용한 <strong>1인 개발</strong>을 꿈꾸며 꾸준히 공부 중입니다.
+      </p>
+    </section>
+
+    <hr class="sep">
+
+    <!-- ── CONTACT ── -->
+    <section id="contact">
+      <div class="sec-head fade-up">
+        <span class="sec-label" data-i18n="sec-label-contact">Contact</span>
+        <h2 class="sec-title" data-i18n="sec-title-contact">연락하기</h2>
+      </div>
+      <form id="contact-form" class="contact-form fade-up" onsubmit="submitContact(event)">
+        <div class="cf-row">
+          <input type="text"  id="cf-name"  data-ph-ko="이름"  data-ph-en="Name"  placeholder="이름"  required>
+          <input type="email" id="cf-email" data-ph-ko="이메일" data-ph-en="Email" placeholder="이메일" required>
+        </div>
+        <textarea id="cf-msg" rows="5"
+          data-ph-ko="메시지를 입력하세요"
+          data-ph-en="Your message"
+          placeholder="메시지를 입력하세요" required></textarea>
+        <button type="submit" class="cf-submit" id="cf-btn" data-i18n="cf-send">보내기</button>
+        <p id="cf-status"></p>
+      </form>
+    </section>
+
+  </div>
+
+  <footer>
+    <span data-i18n="footer-copy">© 2026 halfstone.Kim</span>
+    <span data-i18n="footer-loc">경기도 · qkstjr0000@naver.com</span>
+  </footer>
+
+  <script>
+    // ── LOADING ANIMATION ──
+    (function() {
+      const logo = document.getElementById('loader-logo');
+      const bar  = document.getElementById('loader-bar');
+      const loader = document.getElementById('loader');
+      const text = '_KB';
+      let i = 0;
+      function typeLogo() {
+        if (i <= text.length) {
+          logo.textContent = text.slice(0, i) + (i < text.length ? '▋' : '');
+          i++;
+          setTimeout(typeLogo, i <= text.length ? 180 : 0);
+        } else {
+          logo.textContent = text;
+          setTimeout(() => {
+            bar.style.width = '100%';
+            setTimeout(() => {
+              loader.classList.add('done');
+              loader.addEventListener('transitionend', () => {
+                loader.style.display = 'none';
+              }, { once: true });
+            }, 680);
+          }, 180);
+        }
+      }
+      typeLogo();
+    })();
+
+    // ── HAMBURGER ──
+    function toggleNav() {
+      document.getElementById('main-nav').classList.toggle('nav-open');
+    }
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.getElementById('main-nav').classList.remove('nav-open');
+      });
+    });
+    document.addEventListener('click', e => {
+      const nav = document.getElementById('main-nav');
+      if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+        nav.classList.remove('nav-open');
+      }
+    });
+
+    // ── LANGUAGE TOGGLE ──
+    const I18N = {
+      ko: {
+        'nav-projects': '프로젝트', 'nav-games': '게임', 'nav-skills': '기술',
+        'nav-career': '경력', 'nav-about': '소개', 'nav-contact': '연락',
+        'hero-badge': 'Full-Stack Developer',
+        'hero-desc': '웹 개발과 소프트웨어 엔지니어링.<br>아이디어를 완성된 제품으로 만듭니다.',
+        'btn-work': '프로젝트 보기', 'btn-contact': '연락하기',
+        'sec-label-projects': 'Work',  'sec-title-projects': '프로젝트',
+        'sec-label-games':    'Play',  'sec-title-games':    '미니 게임',
+        'sec-label-skills':   'Stack', 'sec-title-skills':   '기술 스택',
+        'sec-label-career':   'Career','sec-title-career':   '경력',
+        'sec-label-about':    'About', 'sec-title-about':    '소개',
+        'sec-label-contact':  'Contact','sec-title-contact': '연락하기',
+        'proj1-title': '나만의 언어 생성기',
+        'proj1-desc':  '사용자가 자신만의 언어 변환 규칙을 정의하여 일반 텍스트를 암호화하거나 복호화할 수 있는 웹 기반 도구.',
+        'proj2-title': '포트폴리오 웹사이트',
+        'proj2-desc':  'Workfolio 기반의 개인 포트폴리오 사이트. 프로젝트, 블로그, AI 이미지, 음악·유튜브 콘텐츠를 한곳에서 관리.',
+        'proj3-title': '다음 프로젝트', 'proj3-desc': '1인 개발로 새로운 아이디어를 구상 중입니다. 곧 공개될 예정입니다.', 'proj3-tag': '기획 중',
+        'game-snake-title': '스네이크',
+        'game-snake-desc': '파워업 3종, 콤보 시스템, 파티클 효과와 8비트 사운드가 어우러진 IT 테마 스네이크 게임.',
+        'game-2048-desc':  '타임어택 모드, 업적 시스템, 5단 되돌리기와 힌트까지 갖춘 전략 퍼즐 게임.',
+        'game-type-title': '타이핑 연습',
+        'game-type-desc':  'WPM · 정확도 · 일관성을 실시간으로 측정하는 타이핑 연습 앱. 세 가지 텍스트 모드와 WPM 그래프 제공.',
+        'ftag-powerup': '파워업', 'ftag-particle': '파티클', 'ftag-mobile': '모바일',
+        'ftag-timeattack': '타임어택', 'ftag-achievements': '업적 9개',
+        'ftag-undo': '5단 되돌리기', 'ftag-hint': '힌트',
+        'ftag-modes': '단어 / 인용구 / 코드', 'ftag-wpm-chart': 'WPM 그래프', 'ftag-pb': '개인 최고',
+        'game-runner-title': '무한 러너', 'game-runner-desc': 'ERR, BUG, NULL, VOID 장애물을 피하는 IT 테마 무한 러너. 더블 점프와 슬라이드, 속도 증가, 콤보 시스템.',
+        'ftag-djump': '더블 점프', 'ftag-slide': '슬라이드', 'ftag-runner-combo': '콤보', 'ftag-speed': '속도 증가',
+        'game-break-title': '벽돌 깨기', 'game-break-desc': '다양한 벽돌 타입(강화·무적·폭발)과 파워업 드롭이 있는 IT 테마 브레이크아웃. 레이저, 멀티볼, 쉴드 등.',
+        'ftag-multiball': '멀티볼', 'ftag-laser': '레이저', 'ftag-explosive': '폭발 벽돌', 'ftag-powerups': '파워업',
+        'exp1-role': '사원', 'exp1-company': '에스더블유기술원', 'exp1-badge': '퇴사',
+        'exp2-role': '대리', 'exp2-company': '(주)웰컴소프트',
+        'about-text': '안녕하세요, <strong>halfstone.Kim</strong>입니다.<br><br><strong>웹 개발</strong>과 일상·공부 기록을 이곳에 남기고 있습니다. <strong>(주)웰컴소프트</strong>에서 대리로, <strong>에스더블유기술원</strong>에서 사원으로 근무하며 실무 경험을 쌓았습니다.<br><br>JavaScript, React, Node.js 등 풀스택 웹 개발 기술과 함께 C++, C#을 활용한 <strong>1인 개발</strong>을 꿈꾸며 꾸준히 공부 중입니다.',
+        'cf-send': '보내기',
+        'footer-copy': '© 2026 halfstone.Kim',
+        'footer-loc':  '경기도 · qkstjr0000@naver.com',
+      },
+      en: {
+        'nav-projects': 'Projects', 'nav-games': 'Games', 'nav-skills': 'Skills',
+        'nav-career': 'Career', 'nav-about': 'About', 'nav-contact': 'Contact',
+        'hero-badge': 'Full-Stack Developer',
+        'hero-desc': 'Web development & software engineering.<br>Turning ideas into finished products.',
+        'btn-work': 'View Projects', 'btn-contact': 'Get in Touch',
+        'sec-label-projects': 'Work',  'sec-title-projects': 'Projects',
+        'sec-label-games':    'Play',  'sec-title-games':    'Mini Games',
+        'sec-label-skills':   'Stack', 'sec-title-skills':   'Tech Stack',
+        'sec-label-career':   'Career','sec-title-career':   'Experience',
+        'sec-label-about':    'About', 'sec-title-about':    'About',
+        'sec-label-contact':  'Contact','sec-title-contact': 'Get in Touch',
+        'proj1-title': 'Custom Language Maker',
+        'proj1-desc':  'A web tool for defining personal cipher rules — encrypt or decode any text with character-level substitution or random alphabet encryption.',
+        'proj2-title': 'Portfolio Website',
+        'proj2-desc':  'Personal portfolio built on Workfolio. Manages projects, blog posts, AI-generated art, and YouTube content in one place.',
+        'proj3-title': 'Next Project', 'proj3-desc': 'A new solo idea in the works. Coming soon.', 'proj3-tag': 'Planning',
+        'game-snake-title': 'Snake',
+        'game-snake-desc': 'IT-themed Snake with 3 power-ups, a combo system, particle effects, and 8-bit Web Audio.',
+        'game-2048-desc':  'Strategic puzzle with time attack mode, 9 achievements, 5-level undo, and move hints.',
+        'game-type-title': 'Typing Practice',
+        'game-type-desc':  'Real-time WPM, accuracy & consistency tracking. Three text modes plus a live WPM chart.',
+        'ftag-powerup': 'Power-ups', 'ftag-particle': 'Particles', 'ftag-mobile': 'Mobile',
+        'ftag-timeattack': 'Time Attack', 'ftag-achievements': '9 Achievements',
+        'ftag-undo': '5× Undo', 'ftag-hint': 'Hint',
+        'ftag-modes': 'Words / Quotes / Code', 'ftag-wpm-chart': 'WPM Chart', 'ftag-pb': 'Personal Best',
+        'game-runner-title': 'Endless Runner', 'game-runner-desc': 'IT-themed endless runner — dodge ERR, BUG, NULL, VOID obstacles. Double jump, slide, speed ramp, and combos.',
+        'ftag-djump': 'Double Jump', 'ftag-slide': 'Slide', 'ftag-runner-combo': 'Combo', 'ftag-speed': 'Speed Ramp',
+        'game-break-title': 'Breakout', 'game-break-desc': 'IT-themed brick breaker with multi-HP, indestructible & explosive bricks. Power-ups: multi-ball, laser, wide paddle, shield.',
+        'ftag-multiball': 'Multi-ball', 'ftag-laser': 'Laser', 'ftag-explosive': 'Explosive', 'ftag-powerups': 'Power-ups',
+        'exp1-role': 'Staff', 'exp1-company': 'SW Technology Institute', 'exp1-badge': 'Left',
+        'exp2-role': 'Associate', 'exp2-company': 'Welcomesoft Co., Ltd.',
+        'about-text': "Hi, I'm <strong>halfstone.Kim</strong>.<br><br>I share my <strong>web development</strong> projects and daily learning here. I built hands-on experience as an Associate at <strong>Welcomesoft</strong> and Staff at <strong>SW Technology Institute</strong>.<br><br>I work across the stack with JavaScript, React, Node.js, C++, and C# — with a dream of shipping <strong>solo products</strong> that people actually use.",
+        'cf-send': 'Send',
+        'footer-copy': '© 2026 halfstone.Kim',
+        'footer-loc':  'Gyeonggi-do, Korea · qkstjr0000@naver.com',
+      }
+    };
+
+    const PHRASES = {
+      ko: ['1인 개발자', 'Web Engineer', 'React · Node.js · C++', 'Full-Stack Developer'],
+      en: ['Solo Developer', 'Web Engineer', 'React · Node.js · C++', 'Full-Stack Developer'],
+    };
+
+    let currentLang = localStorage.getItem('portfolio-lang') || 'ko';
+
+    function applyLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('portfolio-lang', lang);
+      document.documentElement.lang = lang;
+      document.getElementById('lang-btn').textContent = lang === 'ko' ? 'EN' : 'KO';
+
+      const dict = I18N[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key] !== undefined) el.textContent = dict[key];
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (dict[key] !== undefined) el.innerHTML = dict[key];
+      });
+
+      // Update form placeholders
+      document.querySelectorAll('[data-ph-ko]').forEach(el => {
+        el.placeholder = lang === 'ko' ? el.getAttribute('data-ph-ko') : el.getAttribute('data-ph-en');
+      });
+    }
+
+    function toggleLang() {
+      applyLang(currentLang === 'ko' ? 'en' : 'ko');
+    }
+
+    // Apply saved language on load (after loader)
+    if (currentLang === 'en') applyLang('en');
+
+    // ── PARTICLE NETWORK ──
+    const canvas = document.getElementById('particle-canvas');
+    const ctx    = canvas.getContext('2d');
+    let W, H;
+    const MOUSE = { x: -9999, y: -9999 };
+    const COUNT = 75;
+    let particles = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('mousemove', e => { MOUSE.x = e.clientX; MOUSE.y = e.clientY; });
+
+    class P {
+      constructor() {
+        this.x  = Math.random() * W;
+        this.y  = Math.random() * H;
+        this.vx = (Math.random() - 0.5) * 0.35;
+        this.vy = (Math.random() - 0.5) * 0.35;
+        this.r  = Math.random() * 1.8 + 0.6;
+        this.a  = Math.random() * 0.45 + 0.15;
+      }
+      step() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > W) this.vx *= -1;
+        if (this.y < 0 || this.y > H) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,212,255,${this.a})`;
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < COUNT; i++) particles.push(new P());
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d  = Math.hypot(dx, dy);
+          if (d < 140) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0,212,255,${(1 - d / 140) * 0.22})`;
+            ctx.lineWidth   = 0.5;
+            ctx.stroke();
+          }
+        }
+
+        const mdx = particles[i].x - MOUSE.x;
+        const mdy = particles[i].y - MOUSE.y;
+        const md  = Math.hypot(mdx, mdy);
+        if (md < 180) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(MOUSE.x, MOUSE.y);
+          ctx.strokeStyle = `rgba(139,92,246,${(1 - md / 180) * 0.45})`;
+          ctx.lineWidth   = 0.7;
+          ctx.stroke();
+        }
+      }
+
+      particles.forEach(p => { p.step(); p.draw(); });
+      requestAnimationFrame(frame);
+    }
+
+    frame();
+
+    // ── TYPING EFFECT ──
+    let pi = 0, ci = 0, del = false;
+    const typEl = document.getElementById('typing-text');
+
+    function tick() {
+      const phrases = PHRASES[currentLang];
+      const w = phrases[pi % phrases.length];
+      if (!del) {
+        typEl.textContent = w.slice(0, ++ci);
+        if (ci === w.length) { del = true; setTimeout(tick, 1800); return; }
+      } else {
+        typEl.textContent = w.slice(0, --ci);
+        if (ci === 0) { del = false; pi = (pi + 1) % phrases.length; }
+      }
+      setTimeout(tick, del ? 45 : 85);
+    }
+    tick();
+
+    // ── SCROLL REVEAL ──
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+    // ── CONTACT FORM ──
+    async function submitContact(e) {
+      e.preventDefault();
+      const btn    = document.getElementById('cf-btn');
+      const status = document.getElementById('cf-status');
+      const name   = document.getElementById('cf-name').value.trim();
+      const email  = document.getElementById('cf-email').value.trim();
+      const msg    = document.getElementById('cf-msg').value.trim();
+
+      btn.disabled = true;
+      status.className = '';
+      status.textContent = currentLang === 'ko' ? '전송 중...' : 'Sending...';
+
+      try {
+        const res = await fetch('https://formsubmit.co/ajax/qkstjr0000@naver.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ name, email, message: msg, _captcha: 'false' }),
+        });
+        if (res.ok) {
+          status.className = 'ok';
+          status.textContent = currentLang === 'ko' ? '✓ 메시지를 보냈습니다.' : '✓ Message sent!';
+          document.getElementById('contact-form').reset();
+        } else {
+          throw new Error('server');
+        }
+      } catch {
+        status.className = 'err';
+        status.textContent = currentLang === 'ko'
+          ? '전송 실패. 이메일로 직접 연락해 주세요.'
+          : 'Failed. Please email directly.';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>

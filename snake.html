@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake · halfstone.Kim</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #07071A; --card: #0D0D28; --border: #1E1E4A;
+      --text: #E0E0FF; --muted: #5858A0;
+      --cyan: #00D4FF; --purple: #8B5CF6; --red: #FF4444;
+      --gold: #FFD700; --green: #00FF88; --orange: #FF8C00;
+    }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1rem; padding: 1.5rem 1rem;
+      -webkit-font-smoothing: antialiased; user-select: none;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 500px;
+    }
+    .logo {
+      font-family: 'DM Mono', monospace; font-size: 0.78rem;
+      color: var(--cyan); text-decoration: none; transition: opacity 0.2s;
+    }
+    .logo:hover { opacity: 0.7; }
+    .scores { display: flex; gap: 1.8rem; }
+    .score-box { text-align: center; }
+    .score-label {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+      display: block; margin-bottom: 0.15rem;
+    }
+    .score-val { font-family: 'DM Mono', monospace; font-size: 1.35rem; color: var(--cyan); }
+    .score-val.hi { color: var(--purple); }
+    .score-val.combo { color: var(--gold); }
+
+    /* ── POWER-UP STATUS ── */
+    .powerup-status {
+      width: 100%; max-width: 500px; height: 28px;
+      display: flex; align-items: center; gap: 0.7rem;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .powerup-status.active { opacity: 1; }
+    .pu-icon { font-size: 1rem; }
+    .pu-label {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text);
+      min-width: 64px;
+    }
+    .pu-bar-bg {
+      flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden;
+    }
+    .pu-bar-fill {
+      height: 100%; border-radius: 99px; transition: width 0.1s linear;
+    }
+
+    /* ── CANVAS ── */
+    .canvas-wrap {
+      position: relative;
+      border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+      box-shadow: 0 0 40px rgba(0,212,255,0.07);
+    }
+    canvas { display: block; }
+
+    /* ── OVERLAYS ── */
+    .overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(7,7,26,0.9); backdrop-filter: blur(5px);
+      gap: 1rem; transition: opacity 0.25s;
+    }
+    .overlay.hidden { opacity: 0; pointer-events: none; }
+    .overlay-icon { font-size: 3rem; line-height: 1; }
+    .overlay-title { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
+    .overlay-sub {
+      font-family: 'DM Mono', monospace; font-size: 0.74rem;
+      color: var(--muted); text-align: center; line-height: 1.8;
+    }
+    .overlay-scores { display: flex; gap: 2.5rem; }
+    .ov-score { text-align: center; }
+    .ov-score .ov-lbl {
+      display: block; font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem;
+    }
+    .ov-score .ov-num { font-family: 'DM Mono', monospace; font-size: 1.6rem; color: var(--cyan); }
+    .ov-score .ov-num.hi { color: var(--purple); }
+    .ov-record {
+      font-family: 'DM Mono', monospace; font-size: 0.8rem; color: var(--gold);
+      min-height: 1.2em;
+    }
+    .btn {
+      padding: 0.65rem 2rem; background: var(--cyan); color: #000;
+      font-weight: 600; font-size: 0.88rem; border: none; border-radius: 6px;
+      cursor: pointer; letter-spacing: 0.04em;
+      transition: box-shadow 0.3s, transform 0.2s;
+    }
+    .btn:hover { box-shadow: 0 0 24px rgba(0,212,255,0.5); transform: translateY(-2px); }
+
+    /* PAUSE overlay */
+    .pause-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(7,7,26,0.7); backdrop-filter: blur(3px);
+      font-family: 'DM Mono', monospace; font-size: 1.2rem; letter-spacing: 0.1em;
+      color: var(--cyan); opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .pause-overlay.active { opacity: 1; }
+
+    /* ── BOTTOM UI ── */
+    .bottom-row {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 500px; gap: 1rem;
+    }
+
+    /* speed bar */
+    .speed-wrap { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
+    .speed-top { display: flex; justify-content: space-between; align-items: center; }
+    .speed-lbl {
+      font-family: 'DM Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    }
+    .speed-num {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--text);
+    }
+    .speed-bar-bg { height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .speed-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--cyan), var(--purple));
+      border-radius: 99px; transition: width 0.4s; box-shadow: 0 0 6px var(--cyan);
+    }
+
+    /* ── D-PAD (mobile) ── */
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 40px);
+      grid-template-rows: repeat(2, 40px);
+      gap: 4px;
+    }
+    .dpad-btn {
+      width: 40px; height: 40px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; color: var(--muted); cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dpad-btn:active, .dpad-btn.lit {
+      border-color: var(--cyan); color: var(--cyan);
+      box-shadow: 0 0 8px rgba(0,212,255,0.3);
+    }
+    .dpad-up    { grid-column: 2; grid-row: 1; }
+    .dpad-left  { grid-column: 1; grid-row: 2; }
+    .dpad-down  { grid-column: 2; grid-row: 2; }
+    .dpad-right { grid-column: 3; grid-row: 2; }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+
+    @media (max-width: 520px) {
+      canvas { width: 300px !important; height: 300px !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <a class="logo" href="index.html">← halfstone.Kim</a>
+    <div class="scores">
+      <div class="score-box">
+        <span class="score-label">Score</span>
+        <span class="score-val" id="s-score">0</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label">Combo</span>
+        <span class="score-val combo" id="s-combo">x1</span>
+      </div>
+      <div class="score-box">
+        <span class="score-label">Best</span>
+        <span class="score-val hi" id="s-hi">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POWER-UP STATUS -->
+  <div class="powerup-status" id="pu-status">
+    <span class="pu-icon" id="pu-icon">⭐</span>
+    <span class="pu-label" id="pu-label">STAR</span>
+    <div class="pu-bar-bg">
+      <div class="pu-bar-fill" id="pu-bar" style="width:100%"></div>
+    </div>
+  </div>
+
+  <!-- CANVAS -->
+  <div class="canvas-wrap">
+    <canvas id="game"></canvas>
+
+    <!-- START -->
+    <div class="overlay" id="ov-start">
+      <div class="overlay-icon">🐍</div>
+      <div class="overlay-title">Snake</div>
+      <div class="overlay-sub">
+        방향키 / WASD · P = 일시정지<br>
+        <span style="color:var(--gold)">⭐ 2배점수</span> &nbsp;
+        <span style="color:var(--cyan)">❄️ 슬로우</span> &nbsp;
+        <span style="color:var(--green)">🛡️ 무적</span>
+      </div>
+      <button class="btn" id="btn-start">시작하기</button>
+    </div>
+
+    <!-- GAME OVER -->
+    <div class="overlay hidden" id="ov-over">
+      <div class="overlay-title">Game Over</div>
+      <div class="overlay-scores">
+        <div class="ov-score">
+          <span class="ov-lbl">Score</span>
+          <span class="ov-num" id="ov-score">0</span>
+        </div>
+        <div class="ov-score">
+          <span class="ov-lbl">Best</span>
+          <span class="ov-num hi" id="ov-hi">0</span>
+        </div>
+      </div>
+      <div class="ov-record" id="ov-record"></div>
+      <button class="btn" id="btn-restart">다시 시작</button>
+    </div>
+
+    <!-- PAUSE -->
+    <div class="pause-overlay" id="ov-pause">PAUSED</div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+    <div class="speed-wrap">
+      <div class="speed-top">
+        <span class="speed-lbl">Speed</span>
+        <span class="speed-num" id="speed-num">Lv.1</span>
+      </div>
+      <div class="speed-bar-bg">
+        <div class="speed-bar-fill" id="speed-bar" style="width:5%"></div>
+      </div>
+    </div>
+    <div class="dpad">
+      <button class="dpad-btn dpad-up"    id="d-up">▲</button>
+      <button class="dpad-btn dpad-left"  id="d-left">◀</button>
+      <button class="dpad-btn dpad-down"  id="d-down">▼</button>
+      <button class="dpad-btn dpad-right" id="d-right">▶</button>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#FFD700"></div>⭐ 2배 점수</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00BFFF"></div>❄️ 슬로우</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00FF88"></div>🛡️ 무적</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF4444"></div>🍎 먹이</div>
+  </div>
+
+<script>
+// ── CONFIG ──
+const COLS = 25, ROWS = 25, CELL = 20;
+const canvas = document.getElementById('game');
+const ctx    = canvas.getContext('2d');
+canvas.width  = COLS * CELL;
+canvas.height = ROWS * CELL;
+
+const MAX_LV = 10, BASE_MS = 160, MIN_MS = 65;
+const COMBO_WINDOW = 2500; // ms to sustain combo
+
+// ── STATE ──
+let snake=[], dir={x:1,y:0}, nextDir={x:1,y:0}, food=null, particles=[], floats=[];
+let score, hiScore, comboCount, lastEatTime, foodEaten;
+let speedLv, loop, state;
+let powerup = null;        // {type, x, y, spawnAt}
+let activePU = null;       // {type, endsAt}
+let puSpawnTimer = null;
+let shakeFrames = 0;
+
+hiScore = parseInt(localStorage.getItem('snakeHi') || '0');
+document.getElementById('s-hi').textContent = hiScore;
+document.getElementById('ov-hi').textContent = hiScore;
+
+// ── POWERUP DEFS ──
+const PU = {
+  star:   { icon:'⭐', label:'2배 점수', color:'#FFD700', barColor:'#FFD700', duration:8000 },
+  slow:   { icon:'❄️', label:'슬로우',   color:'#00BFFF', barColor:'#00BFFF', duration:6000 },
+  shield: { icon:'🛡️', label:'무적',     color:'#00FF88', barColor:'#00FF88', duration:5000 },
+};
+
+// ── AUDIO ──
+let audioCtx;
+function ac() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function tone(freq, type='square', dur=0.1, vol=0.12, delay=0) {
+  try {
+    const a = ac(), o = a.createOscillator(), g = a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.type = type; o.frequency.value = freq;
+    const t = a.currentTime + delay;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur);
+  } catch(_) {}
+}
+const sfx = {
+  eat:    () => { tone(440,'square',0.07); tone(600,'square',0.07,0.1,0.06); },
+  pu:     () => { [523,659,784,1047].forEach((f,i) => tone(f,'sine',0.12,0.13,i*0.07)); },
+  die:    () => { [300,220,150].forEach((f,i) => tone(f,'sawtooth',0.18,0.18,i*0.1)); },
+  combo:  () => { tone(880,'sine',0.07,0.1); },
+  lv:     () => { [392,523,659].forEach((f,i) => tone(f,'sine',0.1,0.1,i*0.06)); },
+  pause:  () => { tone(330,'sine',0.08,0.08); },
+};
+
+// ── PARTICLES ──
+class Particle {
+  constructor(x,y,color) {
+    this.x = x; this.y = y;
+    this.vx = (Math.random()-0.5)*4;
+    this.vy = (Math.random()-0.5)*4 - 1;
+    this.alpha = 1;
+    this.r = Math.random()*3+1.5;
+    this.color = color;
+  }
+  update() { this.x+=this.vx; this.y+=this.vy; this.vy+=0.12; this.alpha-=0.04; }
+  get alive() { return this.alpha > 0; }
+}
+
+class FloatText {
+  constructor(x,y,text,color) {
+    this.x=x; this.y=y; this.text=text; this.color=color;
+    this.alpha=1; this.vy=-1.2;
+  }
+  update() { this.y+=this.vy; this.alpha-=0.025; }
+  get alive() { return this.alpha > 0; }
+}
+
+function burst(cx,cy,color,count=10) {
+  for(let i=0;i<count;i++) particles.push(new Particle(cx,cy,color));
+}
+
+// ── INIT ──
+function init() {
+  snake   = [{x:12,y:12},{x:11,y:12},{x:10,y:12}];
+  dir     = {x:1,y:0}; nextDir = {x:1,y:0};
+  score   = 0; comboCount = 1; lastEatTime = 0; foodEaten = 0;
+  speedLv = 1; particles = []; floats = [];
+  powerup = null; activePU = null;
+  shakeFrames = 0;
+
+  clearTimeout(puSpawnTimer);
+  schedulePUSpawn();
+  spawnFood();
+  updateUI();
+  hidePU();
+
+  state = 'playing';
+  clearInterval(loop);
+  loop = setInterval(tick, BASE_MS);
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  requestAnimationFrame(render);
+}
+
+// ── FOOD ──
+function spawnFood() {
+  let p;
+  do { p = {x:rnd(COLS), y:rnd(ROWS)}; }
+  while (occupied(p.x,p.y));
+  food = p;
+}
+
+function occupied(x,y) {
+  if (snake.some(s=>s.x===x&&s.y===y)) return true;
+  if (powerup && powerup.x===x && powerup.y===y) return true;
+  return false;
+}
+
+// ── POWER-UPS ──
+function schedulePUSpawn() {
+  const delay = 12000 + Math.random()*8000;
+  puSpawnTimer = setTimeout(() => {
+    if (state !== 'playing') return;
+    if (powerup) { schedulePUSpawn(); return; }
+    const types = Object.keys(PU);
+    const type  = types[rnd(types.length)];
+    let p;
+    do { p = {x:rnd(COLS), y:rnd(ROWS)}; } while(occupied(p.x,p.y));
+    powerup = {type, x:p.x, y:p.y, spawnAt:Date.now()};
+    // Disappear after 9s
+    setTimeout(()=>{ if(powerup && powerup.spawnAt === (powerup||{}).spawnAt) powerup=null; schedulePUSpawn(); }, 9000);
+  }, delay);
+}
+
+function collectPU() {
+  const puType = powerup.type;
+  const def = PU[puType];
+  activePU = {type: puType, endsAt: Date.now() + def.duration};
+  powerup  = null;
+  sfx.pu();
+  showPU(def);
+  schedulePUSpawn();
+
+  if (puType === 'slow') applySpeed();
+}
+
+function showPU(def) {
+  const st = document.getElementById('pu-status');
+  st.classList.add('active');
+  document.getElementById('pu-icon').textContent  = def.icon;
+  document.getElementById('pu-label').textContent = def.label;
+  document.getElementById('pu-bar').style.background = def.barColor;
+}
+
+function hidePU() {
+  document.getElementById('pu-status').classList.remove('active');
+}
+
+// ── TICK ──
+function tick() {
+  if (state !== 'playing') return;
+
+  // Expire power-up
+  if (activePU && Date.now() >= activePU.endsAt) {
+    const wasType = activePU.type;
+    activePU = null;
+    hidePU();
+    if (wasType === 'slow') applySpeed();
+  }
+
+  dir = nextDir;
+  const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+  // Wall check (shield = wrap)
+  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+    if (activePU && activePU.type === 'shield') {
+      head.x = (head.x + COLS) % COLS;
+      head.y = (head.y + ROWS) % ROWS;
+    } else { die(); return; }
+  }
+
+  // Self collision (shield = ignore; exclude tail if not eating — tail vacates this tick)
+  if (!(activePU && activePU.type === 'shield')) {
+    const willEat = head.x === food?.x && head.y === food?.y;
+    const checkBody = willEat ? snake : snake.slice(0, snake.length - 1);
+    if (checkBody.some(s => s.x === head.x && s.y === head.y)) { die(); return; }
+  }
+
+  snake.unshift(head);
+
+  // Eat food
+  if (head.x === food.x && head.y === food.y) {
+    const now = Date.now();
+    if (now - lastEatTime < COMBO_WINDOW) {
+      comboCount = Math.min(comboCount + 1, 8);
+    } else { comboCount = 1; }
+    lastEatTime = now;
+
+    const pts = (activePU && activePU.type === 'star') ? 2 * comboCount : comboCount;
+    score += pts;
+    sfx.eat();
+    if (comboCount > 1) sfx.combo();
+
+    burst(head.x*CELL+CELL/2, head.y*CELL+CELL/2, '#FF4444', 12);
+    floats.push(new FloatText(
+      head.x*CELL+CELL/2, head.y*CELL,
+      '+'+pts, comboCount > 1 ? '#FFD700' : '#E0E0FF'
+    ));
+
+    spawnFood();
+    updateUI();
+
+    // Speed up every 4 food
+    foodEaten++;
+    if (foodEaten % 4 === 0 && speedLv < MAX_LV) {
+      speedLv++;
+      sfx.lv();
+      updateUI();
+      applySpeed();
+    }
+  } else {
+    snake.pop();
+  }
+
+  // Collect power-up
+  if (powerup && head.x === powerup.x && head.y === powerup.y) {
+    burst(head.x*CELL+CELL/2, head.y*CELL+CELL/2, PU[powerup.type].color, 18);
+    floats.push(new FloatText(head.x*CELL+CELL/2, head.y*CELL, PU[powerup.type].icon, PU[powerup.type].color));
+    collectPU();
+  }
+}
+
+function applySpeed() {
+  const slow = activePU && activePU.type === 'slow';
+  const ms   = slow
+    ? Math.max(MIN_MS, BASE_MS - (speedLv-1)*10) + 60
+    : Math.max(MIN_MS, BASE_MS - (speedLv-1)*10);
+  clearInterval(loop);
+  loop = setInterval(tick, ms);
+}
+
+function die() {
+  clearInterval(loop);
+  clearTimeout(puSpawnTimer);
+  shakeFrames = 14;
+  sfx.die();
+  state = 'over';
+
+  if (score > hiScore) {
+    hiScore = score;
+    localStorage.setItem('snakeHi', hiScore);
+    document.getElementById('s-hi').textContent  = hiScore;
+    document.getElementById('ov-hi').textContent = hiScore;
+    document.getElementById('ov-record').textContent = '🎉 신기록!';
+  } else {
+    document.getElementById('ov-record').textContent = '';
+  }
+  document.getElementById('ov-score').textContent = score;
+  setTimeout(() => document.getElementById('ov-over').classList.remove('hidden'), 600);
+}
+
+// ── RENDER ──
+let foodPulse = 0, puPulse = 0, rafId;
+function render() {
+  rafId = requestAnimationFrame(render);
+  foodPulse += 0.07;
+  puPulse   += 0.12;
+
+  // Screen shake
+  let sx=0, sy=0;
+  if (shakeFrames > 0) {
+    sx = (Math.random()-0.5)*8;
+    sy = (Math.random()-0.5)*8;
+    shakeFrames--;
+  }
+
+  ctx.save();
+  ctx.translate(sx, sy);
+
+  // BG
+  ctx.fillStyle = '#07071A';
+  ctx.fillRect(-10,-10, canvas.width+20, canvas.height+20);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(30,30,74,0.65)';
+  ctx.lineWidth = 0.5;
+  for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*CELL,0);ctx.lineTo(x*CELL,canvas.height);ctx.stroke();}
+  for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*CELL);ctx.lineTo(canvas.width,y*CELL);ctx.stroke();}
+
+  // Shield glow border
+  if (activePU && activePU.type === 'shield') {
+    const glow = (Math.sin(puPulse)+1)/2;
+    ctx.strokeStyle = `rgba(0,255,136,${0.3+glow*0.3})`;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(1,1,canvas.width-2,canvas.height-2);
+  }
+
+  // Food
+  if (food) {
+    const fx = food.x*CELL+CELL/2, fy = food.y*CELL+CELL/2;
+    const p  = (Math.sin(foodPulse)+1)/2;
+    ctx.save();
+    ctx.shadowColor='#FF4444'; ctx.shadowBlur = 10+p*12;
+    ctx.beginPath(); ctx.arc(fx,fy,CELL*0.3+p*1.5,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,${60+p*40},60,0.95)`; ctx.fill();
+    ctx.restore();
+  }
+
+  // Power-up item
+  if (powerup) {
+    const def  = PU[powerup.type];
+    const px   = powerup.x*CELL+CELL/2, py = powerup.y*CELL+CELL/2;
+    const age  = (Date.now()-powerup.spawnAt)/9000;
+    const blink= age > 0.7 ? (Math.sin(puPulse*3)>0 ? 1:0) : 1;
+    ctx.save();
+    ctx.shadowColor = def.color; ctx.shadowBlur = 12+(Math.sin(puPulse)+1)*6;
+    ctx.globalAlpha = blink;
+    ctx.beginPath(); ctx.arc(px, py, CELL*0.38, 0, Math.PI*2);
+    ctx.fillStyle = def.color+'22'; ctx.fill();
+    ctx.strokeStyle = def.color; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = blink;
+    ctx.font = `${CELL*0.68}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(def.icon, px, py);
+    ctx.restore();
+  }
+
+  // Snake
+  snake.forEach((seg,i) => {
+    const x=seg.x*CELL+1, y=seg.y*CELL+1, s=CELL-2;
+    const t = i/Math.max(snake.length-1,1);
+    ctx.save();
+    if (i===0) {
+      const shield = activePU && activePU.type==='shield';
+      ctx.shadowColor = shield ? '#00FF88' : '#00D4FF';
+      ctx.shadowBlur  = shield ? 18 : 14;
+      ctx.fillStyle   = shield ? '#00FF88' : '#00D4FF';
+    } else {
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1 - t*0.35;
+      const r=Math.round(0+t*139), g=Math.round(212-t*120), b=Math.round(255-t*9);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+    }
+    ctx.beginPath(); ctx.roundRect(x,y,s,s,i===0?5:3); ctx.fill();
+    ctx.restore();
+  });
+  ctx.shadowBlur = 0;
+
+  // Eyes
+  if (snake.length > 0) {
+    const hx=snake[0].x*CELL, hy=snake[0].y*CELL;
+    ctx.fillStyle='#07071A';
+    const offs = dir.x!==0
+      ? [[CELL*0.6,CELL*0.3],[CELL*0.6,CELL*0.7]]
+      : [[CELL*0.3,CELL*0.6],[CELL*0.7,CELL*0.6]];
+    offs.forEach(([ex,ey]) => {
+      ctx.beginPath(); ctx.arc(hx+ex, hy+ey, 2.2, 0, Math.PI*2); ctx.fill();
+    });
+  }
+
+  // Particles
+  particles = particles.filter(p => p.alive);
+  particles.forEach(p => {
+    p.update();
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.color; ctx.fill();
+    ctx.restore();
+  });
+
+  // Float texts
+  floats = floats.filter(f => f.alive);
+  floats.forEach(f => {
+    f.update();
+    ctx.save();
+    ctx.globalAlpha = f.alpha;
+    ctx.font = "bold 13px 'DM Mono', monospace";
+    ctx.textAlign='center'; ctx.fillStyle=f.color;
+    ctx.fillText(f.text, f.x, f.y); ctx.restore();
+  });
+
+  ctx.restore(); // end shake
+
+  // Power-up bar update
+  if (activePU) {
+    const def = PU[activePU.type];
+    const rem = Math.max(0,(activePU.endsAt-Date.now())/def.duration*100);
+    document.getElementById('pu-bar').style.width = rem+'%';
+  }
+}
+
+// ── UI ──
+function updateUI() {
+  document.getElementById('s-score').textContent = score;
+  document.getElementById('s-combo').textContent = comboCount > 1 ? 'x'+comboCount : 'x1';
+  document.getElementById('speed-num').textContent = 'Lv.'+speedLv;
+  document.getElementById('speed-bar').style.width = (speedLv/MAX_LV*100)+'%';
+}
+
+// ── CONTROLS ──
+const keyDir = {
+  ArrowUp:{x:0,y:-1}, ArrowDown:{x:0,y:1}, ArrowLeft:{x:-1,y:0}, ArrowRight:{x:1,y:0},
+  w:{x:0,y:-1}, s:{x:0,y:1}, a:{x:-1,y:0}, d:{x:1,y:0},
+  W:{x:0,y:-1}, S:{x:0,y:1}, A:{x:-1,y:0}, D:{x:1,y:0},
+};
+const keyName = { ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right' };
+const dBtns = { up:document.getElementById('d-up'),down:document.getElementById('d-down'),left:document.getElementById('d-left'),right:document.getElementById('d-right') };
+
+function pressDir(nd, name) {
+  if (state !== 'playing') return;
+  if (nd.x !== -dir.x || nd.y !== -dir.y) nextDir = nd;
+  Object.values(dBtns).forEach(b=>b.classList.remove('lit'));
+  if (name && dBtns[name]) dBtns[name].classList.add('lit');
+}
+
+document.addEventListener('keydown', e => {
+  if (keyDir[e.key]) { e.preventDefault(); pressDir(keyDir[e.key], keyName[e.key]); }
+  if ((e.key==='p'||e.key==='P'||e.key==='Escape') && (state==='playing'||state==='paused')) togglePause();
+  if ((e.key===' '||e.key==='Enter') && state==='idle') startGame();
+});
+
+Object.entries({up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}}).forEach(([name,nd])=>{
+  dBtns[name].addEventListener('pointerdown', e=>{e.preventDefault(); pressDir(nd,name);});
+});
+
+// ── PAUSE ──
+function togglePause() {
+  if (state==='playing') {
+    state='paused'; clearInterval(loop); clearTimeout(puSpawnTimer);
+    document.getElementById('ov-pause').classList.add('active');
+    sfx.pause();
+  } else if (state==='paused') {
+    state='playing'; applySpeed(); schedulePUSpawn();
+    document.getElementById('ov-pause').classList.remove('active');
+    sfx.pause();
+  }
+}
+
+// ── SWIPE ──
+let touchStart = null;
+canvas.addEventListener('touchstart', e=>{ e.preventDefault(); touchStart={x:e.touches[0].clientX,y:e.touches[0].clientY}; },{passive:false});
+canvas.addEventListener('touchend', e=>{
+  if (!touchStart) return;
+  const dx=e.changedTouches[0].clientX-touchStart.x;
+  const dy=e.changedTouches[0].clientY-touchStart.y;
+  if (Math.abs(dx)<10&&Math.abs(dy)<10) return;
+  if (Math.abs(dx)>Math.abs(dy)) pressDir({x:dx>0?1:-1,y:0}, dx>0?'right':'left');
+  else pressDir({x:0,y:dy>0?1:-1}, dy>0?'down':'up');
+  touchStart=null;
+},{passive:false});
+
+// ── BUTTONS ──
+function startGame() {
+  document.getElementById('ov-start').classList.add('hidden');
+  init();
+}
+function restartGame() {
+  document.getElementById('ov-over').classList.add('hidden');
+  init();
+}
+
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-restart').addEventListener('click', restartGame);
+
+function rnd(n) { return Math.floor(Math.random()*n); }
+
+// Initial canvas fill
+ctx.fillStyle='#07071A'; ctx.fillRect(0,0,canvas.width,canvas.height);
+state='idle';
+requestAnimationFrame(render);
+</script>
+</body>
+</html>
