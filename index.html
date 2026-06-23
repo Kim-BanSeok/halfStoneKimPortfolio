@@ -892,6 +892,36 @@
     .bp-paddle { width: 50%; height: 8px; background: linear-gradient(90deg,rgba(255,255,255,.9),rgba(0,212,255,.8)); border-radius: 4px; box-shadow: 0 0 12px rgba(0,212,255,.5); margin-top: 12px; }
     .bp-ball { width: 9px; height: 9px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(0,212,255,.8); margin-bottom: 4px; }
 
+    /* rhythm card */
+    .games-grid .game-card:nth-child(6) { transition-delay: 0.5s; }
+    .rhythm-card:hover { border-color: rgba(139,92,246,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(139,92,246,.12); }
+    .rhythm-card:hover .game-arrow { color: var(--purple); transform: translate(3px,-3px); }
+    .rhythm-card .ftag { border: 1px solid rgba(139,92,246,.25); color: var(--purple); background: rgba(139,92,246,.05); }
+    .rhythm-card .game-badge { color: var(--purple); }
+    .rh-lane {
+      width: 40px; height: 134px;
+      border: 1px solid rgba(255,255,255,.07); border-radius: 4px;
+      background: rgba(0,0,0,.2); position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      align-items: center; padding-bottom: 4px;
+    }
+    .rh-note {
+      position: absolute; top: -18px;
+      width: 32px; height: 14px; border-radius: 3px;
+      animation: rh-fall 1.6s linear infinite;
+    }
+    @keyframes rh-fall {
+      0%   { top: -18px; opacity: 1; }
+      88%  { opacity: 1; }
+      100% { top: 118px; opacity: 0; }
+    }
+    .rh-key {
+      width: 32px; height: 20px; border: 1px solid;
+      border-radius: 3px; display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace; font-size: 0.7rem; font-weight: 600;
+      background: rgba(255,255,255,.03); position: relative; z-index: 1;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       #loader { display: none !important; }
       .fade-up { opacity: 1; transform: none; transition: none; }
@@ -1226,6 +1256,46 @@
           </div>
         </a>
 
+
+        <a class="game-card rhythm-card fade-up" href="rhythm.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.08) 0%,transparent 70%);flex-direction:row;align-items:center;justify-content:center;gap:6px;padding-top:16px;">
+            <div class="rh-lane">
+              <div class="rh-note" style="animation-delay:0s;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.7);"></div>
+              <div class="rh-note" style="animation-delay:0.85s;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.7);"></div>
+              <div class="rh-key" style="border-color:rgba(0,212,255,.4);color:var(--cyan);">D</div>
+            </div>
+            <div class="rh-lane">
+              <div class="rh-note" style="animation-delay:0.35s;background:var(--purple);box-shadow:0 0 8px rgba(139,92,246,.7);"></div>
+              <div class="rh-note" style="animation-delay:1.2s;background:var(--purple);box-shadow:0 0 8px rgba(139,92,246,.7);"></div>
+              <div class="rh-key" style="border-color:rgba(139,92,246,.4);color:var(--purple);">F</div>
+            </div>
+            <div class="rh-lane">
+              <div class="rh-note" style="animation-delay:0.6s;background:var(--purple);box-shadow:0 0 8px rgba(139,92,246,.7);"></div>
+              <div class="rh-note" style="animation-delay:1.45s;background:var(--purple);box-shadow:0 0 8px rgba(139,92,246,.7);"></div>
+              <div class="rh-key" style="border-color:rgba(139,92,246,.4);color:var(--purple);">J</div>
+            </div>
+            <div class="rh-lane">
+              <div class="rh-note" style="animation-delay:0.2s;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.7);"></div>
+              <div class="rh-note" style="animation-delay:1.05s;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.7);"></div>
+              <div class="rh-key" style="border-color:rgba(0,212,255,.4);color:var(--cyan);">K</div>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge">♪ RHYTHM</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-rhythm-title">리듬 게임</div>
+            <p class="game-desc" data-i18n="game-rhythm-desc">4레인 낙하 노트 리듬 게임. BOOT.EXE / NULL_PTR / KERNEL_PANIC 3곡과 Web Audio 절차적 사운드.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-songs">3곡</span>
+              <span class="ftag" data-i18n="ftag-lanes">4레인</span>
+              <span class="ftag" data-i18n="ftag-judgment">판정 4종</span>
+              <span class="ftag">Web Audio</span>
+            </div>
+          </div>
+        </a>
+
       </div>
     </section>
 
@@ -1433,6 +1503,8 @@
         'ftag-djump': '더블 점프', 'ftag-slide': '슬라이드', 'ftag-runner-combo': '콤보', 'ftag-speed': '속도 증가',
         'game-break-title': '벽돌 깨기', 'game-break-desc': '다양한 벽돌 타입(강화·무적·폭발)과 파워업 드롭이 있는 IT 테마 브레이크아웃. 레이저, 멀티볼, 쉴드 등.',
         'ftag-multiball': '멀티볼', 'ftag-laser': '레이저', 'ftag-explosive': '폭발 벽돌', 'ftag-powerups': '파워업',
+        'game-rhythm-title': '리듬 게임', 'game-rhythm-desc': '4레인 낙하 노트 리듬 게임. BOOT.EXE / NULL_PTR / KERNEL_PANIC 3곡과 Web Audio 절차적 사운드.',
+        'ftag-songs': '3곡', 'ftag-lanes': '4레인', 'ftag-judgment': '판정 4종',
         'exp1-role': '사원', 'exp1-company': '에스더블유기술원', 'exp1-badge': '퇴사',
         'exp2-role': '대리', 'exp2-company': '(주)웰컴소프트',
         'about-text': '안녕하세요, <strong>halfstone.Kim</strong>입니다.<br><br><strong>웹 개발</strong>과 일상·공부 기록을 이곳에 남기고 있습니다. <strong>(주)웰컴소프트</strong>에서 대리로, <strong>에스더블유기술원</strong>에서 사원으로 근무하며 실무 경험을 쌓았습니다.<br><br>JavaScript, React, Node.js 등 풀스택 웹 개발 기술과 함께 C++, C#을 활용한 <strong>1인 개발</strong>을 꿈꾸며 꾸준히 공부 중입니다.',
@@ -1470,6 +1542,8 @@
         'ftag-djump': 'Double Jump', 'ftag-slide': 'Slide', 'ftag-runner-combo': 'Combo', 'ftag-speed': 'Speed Ramp',
         'game-break-title': 'Breakout', 'game-break-desc': 'IT-themed brick breaker with multi-HP, indestructible & explosive bricks. Power-ups: multi-ball, laser, wide paddle, shield.',
         'ftag-multiball': 'Multi-ball', 'ftag-laser': 'Laser', 'ftag-explosive': 'Explosive', 'ftag-powerups': 'Power-ups',
+        'game-rhythm-title': 'Rhythm', 'game-rhythm-desc': '4-lane falling-note rhythm game. Three songs — BOOT.EXE, NULL_PTR, KERNEL_PANIC — with procedural Web Audio.',
+        'ftag-songs': '3 Songs', 'ftag-lanes': '4 Lanes', 'ftag-judgment': '4 Judgments',
         'exp1-role': 'Staff', 'exp1-company': 'SW Technology Institute', 'exp1-badge': 'Left',
         'exp2-role': 'Associate', 'exp2-company': 'Welcomesoft Co., Ltd.',
         'about-text': "Hi, I'm <strong>halfstone.Kim</strong>.<br><br>I share my <strong>web development</strong> projects and daily learning here. I built hands-on experience as an Associate at <strong>Welcomesoft</strong> and Staff at <strong>SW Technology Institute</strong>.<br><br>I work across the stack with JavaScript, React, Node.js, C++, and C# — with a dream of shipping <strong>solo products</strong> that people actually use.",
