@@ -1087,8 +1087,8 @@ document.addEventListener('keyup',e=>{
 });
 const wrap=document.getElementById('cv-wrap'),touches={};
 wrap.addEventListener('touchstart',e=>{
-  e.preventDefault();
   if(STATE==='select') return;
+  e.preventDefault();
   if(STATE==='result'){startSong(song);return;}
   [...e.changedTouches].forEach(touch=>{
     const rect=wrap.getBoundingClientRect(),x=touch.clientX-rect.left;
@@ -1096,6 +1096,7 @@ wrap.addEventListener('touchstart',e=>{
   });
 },{passive:false});
 wrap.addEventListener('touchend',e=>{
+  if(STATE==='select') return;
   e.preventDefault();
   [...e.changedTouches].forEach(touch=>{
     const l=touches[touch.identifier];if(l!==undefined){kd[l]=false;delete touches[touch.identifier];}
