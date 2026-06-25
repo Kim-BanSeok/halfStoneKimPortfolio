@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <title>type.run · halfstone.Kim</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap" rel="stylesheet">
   <style>
@@ -46,7 +46,12 @@
     .sl{display:block;font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.16em;
       text-transform:uppercase;color:var(--muted);margin-bottom:.2rem;}
     .sv{font-family:'DM Mono',monospace;font-size:2.4rem;font-weight:500;line-height:1;color:var(--cyan);}
-    #s-acc{color:var(--purple);}
+    #s-wpm{transition:color .15s;}
+    #s-wpm.flash{color:#fff;text-shadow:0 0 18px rgba(0,212,255,.9);}
+    #s-acc{color:var(--purple);transition:color .3s;}
+    #s-acc.acc-high{color:var(--green);}
+    #s-acc.acc-mid{color:#FFD700;}
+    #s-acc.acc-low{color:#FF8C00;}
     #s-timer{color:var(--muted);}
     #s-timer.act{color:var(--text);}
     @keyframes urg{0%,100%{opacity:1}50%{opacity:.35}}
@@ -89,7 +94,7 @@
     .tw{position:relative;z-index:1;width:min(760px,94vw);}
     .tc{height:132px;overflow:hidden;cursor:text;position:relative;border-radius:8px;}
     .tw.blur .ti{filter:blur(4px);opacity:.2;}
-    .tw.blur .tc::after{content:'클릭하여 타이핑 시작';position:absolute;inset:0;
+    .tw.blur .tc::after{content:'탭 / 클릭하여 시작';position:absolute;inset:0;
       display:flex;align-items:center;justify-content:center;
       font-family:'DM Mono',monospace;font-size:.8rem;letter-spacing:.12em;color:var(--muted);}
     .ti{transition:transform .12s ease;will-change:transform;}
@@ -97,16 +102,16 @@
       letter-spacing:.01em;white-space:pre-wrap;word-break:break-all;}
 
     /* CHARS */
-    .c{color:var(--muted);}
-    .c.ok{color:var(--text);}
-    .c.err{color:#FF5555;background:rgba(255,85,85,.1);border-radius:2px;}
-    .c.cur{background:rgba(0,212,255,.85);color:#020214;border-radius:2px;animation:bk .75s step-end infinite;}
-    .c.err-cur{background:rgba(255,85,85,.85);color:#fff;border-radius:2px;animation:bk .75s step-end infinite;}
-    .c.spc.cur{background:transparent;border-bottom:2.5px solid var(--cyan);animation:bk .75s step-end infinite;}
+    .c{color:#8080C0;}
+    .c.ok{color:var(--cyan);text-shadow:0 0 8px rgba(0,212,255,.45);}
+    .c.err{color:#FF4444;text-decoration:underline;text-underline-offset:3px;text-shadow:0 0 8px rgba(255,68,68,.5);background:rgba(255,68,68,.08);border-radius:2px;}
+    .c.cur{background:rgba(0,212,255,.9);color:#020214;border-radius:2px;animation:bk .65s ease-in-out infinite;box-shadow:0 0 8px rgba(0,212,255,.6);}
+    .c.err-cur{background:rgba(255,68,68,.9);color:#fff;border-radius:2px;animation:bk .65s ease-in-out infinite;box-shadow:0 0 8px rgba(255,68,68,.55);}
+    .c.spc.cur{background:transparent;border-bottom:2.5px solid var(--cyan);animation:bk .65s ease-in-out infinite;box-shadow:none;}
     .c.composing{color:var(--gold);text-decoration:underline;text-underline-offset:3px;}
-    @keyframes bk{0%,100%{opacity:1}50%{opacity:.05}}
+    @keyframes bk{0%,100%{opacity:1}50%{opacity:.08}}
 
-    #hi{position:absolute;opacity:0;top:0;left:0;width:0;height:0;pointer-events:none;font-size:16px;}
+    #hi{position:absolute;opacity:0;top:0;left:0;width:1px;height:1px;pointer-events:none;font-size:16px;}
 
     /* HELPERS */
     .caps-warn{font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.08em;
@@ -126,23 +131,27 @@
     .r-ww{text-align:center;}
     .r-wl{display:block;font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.16em;
       text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;}
-    .r-wv{font-family:'DM Mono',monospace;font-size:5rem;font-weight:500;color:var(--cyan);line-height:1;}
+    .r-wv{font-family:'DM Mono',monospace;font-size:5rem;font-weight:500;color:var(--cyan);line-height:1;
+      text-shadow:0 0 30px rgba(0,212,255,.55),0 0 60px rgba(0,212,255,.2);}
     .r-new{display:block;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold);margin-top:.3rem;min-height:1.2em;}
+    .r-new.new-best{color:var(--gold);text-shadow:0 0 12px rgba(255,215,0,.6);animation:newbest 1.2s ease-in-out infinite alternate;}
+    @keyframes newbest{0%{opacity:.7;text-shadow:0 0 8px rgba(255,215,0,.4);}100%{opacity:1;text-shadow:0 0 20px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.3);}}
 
     .r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;width:min(480px,90vw);}
-    .r-cell{background:var(--card);border:1px solid var(--border);border-radius:8px;
-      padding:.75rem .6rem;text-align:center;}
+    .r-cell{background:rgba(13,13,40,.8);border:1px solid rgba(0,212,255,.18);border-radius:8px;
+      padding:.75rem .6rem;text-align:center;transition:border-color .2s;}
+    .r-cell:hover{border-color:rgba(0,212,255,.4);}
     .r-cv{display:block;font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--text);margin-bottom:.18rem;}
     .r-cl{display:block;font-family:'DM Mono',monospace;font-size:.47rem;letter-spacing:.12em;
       text-transform:uppercase;color:var(--muted);}
 
     .r-chw{width:min(480px,90vw);}
     .r-chl{font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.12em;
-      text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+      text-transform:uppercase;color:rgba(0,212,255,.5);margin-bottom:.4rem;}
     .r-chart{display:flex;align-items:flex-end;gap:2px;height:58px;
-      background:var(--card);border:1px solid var(--border);border-radius:6px;
-      padding:5px;overflow:hidden;}
-    .r-bar{flex:1;background:var(--cyan);border-radius:2px 2px 0 0;opacity:.65;min-height:2px;}
+      background:var(--card);border:1px solid rgba(0,212,255,.25);border-radius:6px;
+      padding:5px;overflow:hidden;position:relative;}
+    .r-bar{flex:1;background:linear-gradient(to top,rgba(0,212,255,.9),rgba(0,212,255,.4));border-radius:2px 2px 0 0;min-height:2px;box-shadow:0 0 4px rgba(0,212,255,.3);}
 
     /* RACE RESULT */
     .race-res{width:min(480px,90vw);background:var(--card);border:1px solid var(--border);
@@ -155,6 +164,7 @@
     .rr-wpm{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--cyan);}
 
     .r-btns{display:flex;gap:.7rem;}
+    .ok-banner{font-family:'DM Mono',monospace;font-size:.63rem;line-height:1.75;padding:.5rem .85rem;border-radius:5px;text-align:left;white-space:pre;letter-spacing:.03em;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.22);color:#00D4FF;text-shadow:0 0 8px rgba(0,212,255,.3);}
     .btn{padding:.6rem 1.8rem;background:var(--cyan);color:#000;font-weight:600;
       font-size:.85rem;border:none;border-radius:6px;cursor:pointer;letter-spacing:.04em;
       transition:box-shadow .2s,transform .2s;}
@@ -178,11 +188,11 @@
       text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;}
     /* WPM trend */
     .trend-chart{display:flex;align-items:flex-end;gap:3px;height:80px;
-      background:var(--dim);border-radius:5px;padding:5px;overflow:hidden;}
-    .tc-bar{flex:1;background:var(--cyan);border-radius:2px 2px 0 0;opacity:.7;min-height:2px;
-      cursor:default;transition:opacity .2s;}
-    .tc-bar:hover{opacity:1;}
-    .tc-bar.no-data{background:var(--border);opacity:.4;}
+      background:rgba(10,10,30,.7);border:1px solid rgba(0,212,255,.12);border-radius:5px;padding:5px;overflow:hidden;}
+    .tc-bar{flex:1;background:linear-gradient(to top,rgba(0,212,255,.9),rgba(0,212,255,.35));border-radius:2px 2px 0 0;min-height:2px;
+      cursor:default;transition:opacity .2s,box-shadow .2s;box-shadow:0 0 3px rgba(0,212,255,.25);}
+    .tc-bar:hover{opacity:.85;box-shadow:0 0 8px rgba(0,212,255,.55);}
+    .tc-bar.no-data{background:var(--border);opacity:.3;box-shadow:none;}
     /* Error table */
     .err-list{display:flex;flex-direction:column;gap:.4rem;}
     .err-row{display:flex;align-items:center;gap:.6rem;}
@@ -223,7 +233,7 @@
 <canvas id="bgc"></canvas>
 
 <nav>
-  <a class="nl" href="index.html">← halfstone.Kim</a>
+  <a class="nl" href="index.html#games">← 게임 목록</a>
   <div class="nt">type<span class="ac">.run</span></div>
   <div class="nav-r">
     <button class="icon-btn" id="btn-dash" title="통계 대시보드">📊</button>
@@ -300,6 +310,10 @@
 
 <!-- ── RESULTS ── -->
 <div class="ov hidden" id="res">
+  <div class="ok-banner">PROCESS_COMPLETE
+keyboard_input.exe  finished
+wpm_analyzer        : done
+exit_code           : 0</div>
   <div class="r-ww">
     <span class="r-wl">WPM</span>
     <span class="r-wv" id="r-wpm">0</span>
@@ -601,6 +615,13 @@ function doBackspace(){
 function updateAccUI(){
   const acc=totalPressed>0?Math.round(okCount/totalPressed*100):null;
   $('s-acc').textContent=acc!==null?acc+'%':'–';
+  const el=$('s-acc');
+  el.classList.remove('acc-high','acc-mid','acc-low');
+  if(acc!==null){
+    if(acc>=95) el.classList.add('acc-high');
+    else if(acc>=80) el.classList.add('acc-mid');
+    else el.classList.add('acc-low');
+  }
 }
 
 function extendText(){
@@ -638,7 +659,13 @@ function startTest(){
     const elapsed=Math.floor((Date.now()-t0)/1000);
     timeLeft=dur-elapsed;
     $('s-timer').textContent=Math.max(0,timeLeft);
-    const wpm=calcWPM(); $('s-wpm').textContent=wpm;
+    const wpm=calcWPM();
+    const wpmEl=$('s-wpm');
+    if(wpmEl.textContent!==String(wpm)&&wpm>0){
+      wpmEl.textContent=wpm;
+      wpmEl.classList.add('flash');
+      setTimeout(()=>wpmEl.classList.remove('flash'),160);
+    }
     wpmLog.push(wpm);
     if(timeLeft<=5&&timeLeft>0){ sfx.tick(); $('s-timer').classList.add('urg'); }
     if(timeLeft<=0){ clearInterval(timerInt); endTest(); }
@@ -675,8 +702,12 @@ function endTest(){
 
   // Results UI
   $('r-wpm').textContent=wpm;
-  $('r-new').textContent=newPB?'🎉 신기록!':'';
-  $('r-acc').textContent=acc+'%';
+  const rNew=$('r-new');
+  rNew.textContent=newPB?'🎉 신기록!':'';
+  rNew.classList.toggle('new-best',newPB);
+  const rAccEl=$('r-acc');
+  rAccEl.textContent=acc+'%';
+  rAccEl.style.color=acc>=95?'var(--green)':acc>=80?'var(--gold)':'#FF8C00';
   $('r-raw').textContent=raw;
   $('r-chars').textContent=okCount+'/'+errCount;
   $('r-time').textContent=elapsed+'s';
@@ -865,6 +896,7 @@ document.addEventListener('keyup',e=>{
 });
 
 $('tc').addEventListener('click',focus);
+$('tc').addEventListener('touchstart',e=>{e.preventDefault();focus();},{passive:false});
 hi.addEventListener('focus',()=>$('tw').classList.remove('blur'));
 hi.addEventListener('blur',()=>{ if(!done&&$('res').classList.contains('hidden')) $('tw').classList.add('blur'); });
 

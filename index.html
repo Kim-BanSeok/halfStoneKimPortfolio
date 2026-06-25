@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>halfstone.Kim | Developer</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -362,6 +362,113 @@
       100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
     }
 
+    /* ── HERO GRID (2-column) ── */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 4rem;
+      align-items: center;
+      width: 100%;
+      max-width: 1120px;
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .hero-left .glitch-wrap { font-size: clamp(2rem, 4.4vw, 4.4rem); }
+    .hero-left .hero-sub    { justify-content: flex-start; }
+    .hero-left .hero-buttons { justify-content: flex-start; }
+    .hero-left .hero-socials { justify-content: flex-start; }
+    .hero-right { display: flex; align-items: center; justify-content: center; }
+
+    /* terminal widget */
+    .hero-terminal {
+      width: 100%; max-width: 440px;
+      background: rgba(11,11,34,0.92);
+      border: 1px solid rgba(30,30,74,0.9);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 0 40px rgba(0,212,255,0.06);
+    }
+    .ht-bar {
+      background: rgba(7,7,26,0.98);
+      border-bottom: 1px solid var(--border);
+      padding: 0.56rem 0.9rem;
+      display: flex; align-items: center; gap: 0.45rem;
+    }
+    .ht-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .ht-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; color: var(--muted);
+      letter-spacing: 0.08em; margin-left: 0.5rem;
+    }
+    .ht-body {
+      padding: 1.1rem 1.2rem 1.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem; line-height: 1.9;
+      min-height: 210px;
+    }
+    .ht-cursor {
+      display: inline-block; width: 7px; height: 0.85em;
+      background: var(--cyan); vertical-align: middle;
+      animation: blink 0.75s step-end infinite; margin-left: 1px;
+    }
+
+    /* hero stats */
+    .hero-stats {
+      display: flex; gap: 2.2rem;
+      margin-top: 2rem; padding-top: 1.6rem;
+      border-top: 1px solid rgba(30,30,74,0.8);
+    }
+    .hs-item { display: flex; flex-direction: column; gap: 0.1rem; }
+    .hs-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.55rem; font-weight: 500;
+      color: var(--cyan); line-height: 1;
+    }
+    .hs-label {
+      font-size: 0.66rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    /* system monitor */
+    .hero-sysmon {
+      width:100%;max-width:440px;
+      background:rgba(11,11,34,0.92);
+      border:1px solid rgba(30,30,74,0.9);
+      border-radius:10px;overflow:hidden;
+      box-shadow:0 16px 40px rgba(0,0,0,0.45),0 0 30px rgba(0,212,255,0.04);
+      margin-top:0.7rem;
+    }
+    .sm-head {
+      background:rgba(7,7,26,0.98);border-bottom:1px solid var(--border);
+      padding:0.5rem 0.9rem;display:flex;align-items:center;gap:0.45rem;
+    }
+    .sm-body { padding:0.85rem 1.2rem 0.7rem; }
+    .sm-row { display:flex;align-items:center;gap:0.55rem;margin-bottom:0.48rem; }
+    .sm-lbl { font-family:'DM Mono',monospace;font-size:0.64rem;color:var(--muted);width:2.8rem;flex-shrink:0; }
+    .sm-track { flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden; }
+    .sm-fill { height:100%;border-radius:2px;transition:width 1.6s cubic-bezier(.4,0,.2,1),background 1s; }
+    .sm-pct { font-family:'DM Mono',monospace;font-size:0.64rem;width:2.6rem;text-align:right;flex-shrink:0;transition:color 1s; }
+    .sm-net-row { display:flex;align-items:center;gap:0.55rem;margin-top:0.2rem; }
+    .sm-net { font-family:'DM Mono',monospace;font-size:0.64rem;color:var(--muted);flex:1; }
+    .sm-net span { color:var(--cyan); }
+    .sm-footer {
+      padding:0.3rem 1.2rem 0.75rem;
+      font-family:'DM Mono',monospace;font-size:0.6rem;
+      color:rgba(50,50,90,0.9);display:flex;justify-content:space-between;
+    }
+    .sm-footer .sm-pid { color:rgba(0,212,255,0.4); }
+
+    /* shooter card */
+    .shooter-card:hover { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.1); }
+    .shooter-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
+    .shooter-card .ftag { border: 1px solid rgba(0,212,255,.25); color: var(--cyan); background: rgba(0,212,255,.05); }
+    .shooter-card .game-badge { color: var(--cyan); }
+    .games-grid .game-card:nth-child(7) { transition-delay: 0.6s; }
+
     /* ── SECTION WRAPPER ── */
     .section-wrap { position: relative; z-index: 1; }
 
@@ -443,7 +550,7 @@
       position: absolute;
       inset: 0;
       border-radius: 12px;
-      background: radial-gradient(circle at 50% 0%, rgba(0,212,255,0.06), transparent 60%);
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(0,212,255,0.13), transparent 55%);
       opacity: 0;
       transition: opacity 0.35s;
     }
@@ -782,17 +889,17 @@
       font-family: 'DM Mono', monospace;
       font-size: 0.72rem; font-weight: 600;
     }
-    .mt.empty { background: rgba(255,255,255,.03); }
-    .mt.v2    { background:#1a1a4a; color:#aab; }
-    .mt.v4    { background:#1e1a4e; color:#bcb; }
-    .mt.v8    { background:#2a1f5e; color:#00D4FF; }
-    .mt.v16   { background:#1f2860; color:#00D4FF; }
-    .mt.v32   { background:#1e3070; color:#00D4FF; font-size:.65rem; }
-    .mt.v64   { background:#1c3878; color:#8B5CF6; font-size:.65rem; }
-    .mt.v128  { background:#1a3f82; color:#8B5CF6; font-size:.6rem; }
-    .mt.v256  { background:#183880; color:#c4a0ff; font-size:.6rem; }
-    .mt.v512  { background:#c49c2a; color:#fff; font-size:.55rem; }
-    .mt.v1024 { background:#c46f2a; color:#fff; font-size:.5rem; }
+    .mt.empty { background: rgba(14,14,40,.7); border:1px solid rgba(30,30,80,.6); }
+    .mt.v2    { background:rgba(20,20,50,.95); color:#8080C0; }
+    .mt.v4    { background:rgba(30,20,60,.95); color:#A080D0; }
+    .mt.v8    { background:#1A1A40; color:#00D4FF; box-shadow:0 0 6px rgba(0,212,255,.15); }
+    .mt.v16   { background:#1E1044; color:#00D4FF; box-shadow:0 0 6px rgba(0,212,255,.2); }
+    .mt.v32   { background:#1E3070; color:#8B5CF6; font-size:.65rem; }
+    .mt.v64   { background:#1c3878; color:#A78BFA; font-size:.65rem; box-shadow:0 0 6px rgba(139,92,246,.2); }
+    .mt.v128  { background:#2a2560; color:#c4a0ff; font-size:.6rem; box-shadow:0 0 8px rgba(139,92,246,.3); }
+    .mt.v256  { background:#3a2a70; color:#c4a0ff; font-size:.6rem; box-shadow:0 0 10px rgba(139,92,246,.35); }
+    .mt.v512  { background:#3a2800; color:#FFD700; font-size:.55rem; box-shadow:0 0 8px rgba(255,215,0,.3); }
+    .mt.v1024 { background:#4a3200; color:#FFD700; font-size:.5rem; box-shadow:0 0 12px rgba(255,215,0,.4); }
 
     .game-info { padding: 1.2rem 1.4rem 1.4rem; display: flex; flex-direction: column; gap: 0.55rem; }
     .game-info-top { display: flex; justify-content: space-between; align-items: center; }
@@ -889,8 +996,10 @@
       width: 100%; padding: 0 6px;
     }
     .bp-brick { height: 12px; border-radius: 2px; opacity: .85; }
-    .bp-paddle { width: 50%; height: 8px; background: linear-gradient(90deg,rgba(255,255,255,.9),rgba(0,212,255,.8)); border-radius: 4px; box-shadow: 0 0 12px rgba(0,212,255,.5); margin-top: 12px; }
-    .bp-ball { width: 9px; height: 9px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(0,212,255,.8); margin-bottom: 4px; }
+    .bp-paddle { width: 50%; height: 8px; background: linear-gradient(90deg,rgba(255,255,255,.9),rgba(0,212,255,.8)); border-radius: 4px; box-shadow: 0 0 12px rgba(0,212,255,.5); margin-top: 12px; animation: bp-slide 2s ease-in-out infinite; }
+    .bp-ball { width: 9px; height: 9px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(0,212,255,.8); margin-bottom: 4px; animation: bp-float 2s ease-in-out infinite; }
+    @keyframes bp-float { 0%,100%{transform:translate(0,0)} 33%{transform:translate(10px,-28px)} 66%{transform:translate(-8px,-14px)} }
+    @keyframes bp-slide { 0%,100%{transform:translateX(0)} 33%{transform:translateX(12px)} 66%{transform:translateX(-10px)} }
 
     /* rhythm card */
     .games-grid .game-card:nth-child(6) { transition-delay: 0.5s; }
@@ -928,6 +1037,42 @@
       .glitch-wrap::before, .glitch-wrap::after { display: none; }
     }
 
+    /* ── TAB SYSTEM ── */
+    #tab-wrap { display: none; }
+    #tab-wrap.tab-on { display: block; }
+    #main-hero.tab-on { display: none; }
+    .scroll-hint { display: none; }
+
+    hr.sep { display: none; }
+
+    .tab-panel { display: none; }
+    .tab-panel.tab-on {
+      display: block;
+      animation: tab-in .26s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes tab-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .nav-links a.tab-on { color: var(--cyan); }
+    .nav-links a { position: relative; }
+    .nav-links a.tab-on::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0; right: 0;
+      height: 1px;
+      background: var(--cyan);
+      border-radius: 1px;
+    }
+
+    .tab-panel .fade-up {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .38s ease, transform .38s ease;
+    }
+    .tab-panel .fade-up.visible { opacity: 1; transform: none; }
+
     @media (max-width: 768px) {
       nav {
         padding: 1rem 1.5rem;
@@ -961,7 +1106,262 @@
       footer { flex-direction: column; gap: 0.8rem; padding: 1.5rem; text-align: center; }
       .hero-desc { font-size: 0.88rem; }
       .glitch-wrap { font-size: clamp(3.5rem, 16vw, 8rem); }
+      .hero-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero-left { align-items: center; text-align: center; }
+      .hero-left .glitch-wrap { font-size: clamp(3.5rem, 16vw, 8rem); }
+      .hero-left .hero-sub,
+      .hero-left .hero-buttons,
+      .hero-left .hero-socials { justify-content: center; }
+      .hero-right { display: none; }
+      .hero-stats { justify-content: center; }
+      #cursor-outer, #cursor-inner { display: none; }
+      #sec-dots { display: none; }
+      #cmd-trigger { display: none; }
     }
+
+    /* ── CUSTOM CURSOR ── */
+    body.custom-cursor, body.custom-cursor * { cursor: none !important; }
+    #cursor-outer {
+      position: fixed; pointer-events: none; z-index: 9999;
+      width: 30px; height: 30px;
+      border: 1.5px solid rgba(0,212,255,.65); border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .18s ease, height .18s ease, border-color .2s;
+    }
+    #cursor-inner {
+      position: fixed; pointer-events: none; z-index: 9999;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+      transform: translate(-50%,-50%);
+      transition: width .08s, height .08s;
+    }
+    body.cursor-hover #cursor-outer { width: 46px; height: 46px; border-color: rgba(0,212,255,.42); }
+    body.cursor-hover #cursor-inner { width: 8px; height: 8px; }
+    body.cursor-click #cursor-outer { width: 22px; height: 22px; border-color: var(--cyan); }
+
+    /* ── COMMAND PALETTE ── */
+    #cmd-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      display: none; align-items: flex-start; justify-content: center;
+      padding-top: 13vh;
+    }
+    #cmd-overlay.open { display: flex; }
+    #cmd-box {
+      width: min(92vw, 580px);
+      background: rgba(13,13,40,.98);
+      border: 1px solid rgba(30,30,74,.9);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,.7), 0 0 60px rgba(0,212,255,.05);
+      animation: cmd-in .18s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes cmd-in { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:none} }
+    #cmd-input-wrap {
+      display: flex; align-items: center; gap: .7rem;
+      padding: .9rem 1.1rem; border-bottom: 1px solid var(--border);
+    }
+    #cmd-search-icon { color: var(--muted); font-size: 1rem; flex-shrink: 0; }
+    #cmd-input {
+      flex: 1; background: none; border: none; outline: none;
+      font-family: 'DM Mono', monospace; font-size: .88rem;
+      color: var(--text); caret-color: var(--cyan);
+    }
+    #cmd-input::placeholder { color: var(--muted); }
+    #cmd-kbd {
+      font-family: 'DM Mono', monospace; font-size: .6rem;
+      padding: .15rem .42rem; border: 1px solid var(--border);
+      border-radius: 4px; color: var(--muted); white-space: nowrap;
+    }
+    #cmd-list { max-height: 360px; overflow-y: auto; padding: .3rem 0; }
+    #cmd-list::-webkit-scrollbar { width: 3px; }
+    #cmd-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .cmd-group {
+      font-family: 'DM Mono', monospace; font-size: .58rem;
+      text-transform: uppercase; letter-spacing: .14em;
+      color: var(--muted); padding: .55rem 1.1rem .22rem;
+    }
+    .cmd-item {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .5rem 1.1rem; cursor: pointer;
+      font-size: .84rem; color: var(--text);
+      transition: background .08s; position: relative;
+    }
+    .cmd-item:hover, .cmd-item.active { background: rgba(0,212,255,.07); }
+    .cmd-item.active::before {
+      content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+      width: 2px; background: var(--cyan); border-radius: 1px;
+    }
+    .cmd-icon { font-size: .86rem; opacity: .65; width: 1.1rem; text-align: center; flex-shrink: 0; }
+    .cmd-label { flex: 1; }
+    .cmd-hint { font-family: 'DM Mono', monospace; font-size: .62rem; color: var(--muted); flex-shrink: 0; }
+    #cmd-empty { text-align: center; padding: 2.2rem 1rem; font-family: 'DM Mono', monospace; font-size: .78rem; color: var(--muted); }
+    #cmd-footer { border-top: 1px solid var(--border); padding: .4rem 1.1rem; display: flex; gap: 1.2rem; }
+    .cmd-foot-key { font-family: 'DM Mono', monospace; font-size: .6rem; color: var(--muted); display: flex; align-items: center; gap: .3rem; }
+    .cmd-foot-key kbd { padding: .1rem .35rem; border: 1px solid var(--border); border-radius: 3px; font-size: .58rem; }
+    #cmd-trigger {
+      font-family: 'DM Mono', monospace; font-size: .65rem; font-weight: 500;
+      letter-spacing: .06em; padding: .28rem .65rem;
+      border: 1px solid var(--border); border-radius: 4px;
+      background: none; color: var(--muted); cursor: pointer;
+      transition: border-color .2s, color .2s; white-space: nowrap;
+    }
+    #cmd-trigger:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ── SCROLL PROGRESS ── */
+    #scroll-prog {
+      position: fixed; top: 0; left: 0; z-index: 200;
+      height: 2px; width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      transition: width .1s linear;
+      box-shadow: 0 0 8px rgba(0,212,255,.5);
+    }
+
+    /* ── PROJECT FILTER ── */
+    .proj-filter {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .pf-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.32rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .pf-btn:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .pf-btn.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(0,212,255,0.07);
+    }
+    .proj-card {
+      transition: transform 0.35s, border-color 0.35s, box-shadow 0.35s, opacity 0.25s;
+    }
+    .proj-card.pf-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ── THEME TOGGLE ── */
+    #theme-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      padding: 0.28rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #theme-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    :root[data-theme="light"] {
+      --bg:      #F0F2F8;
+      --surface: #E4E8F5;
+      --card:    #E4E8F5;
+      --border:  #C0C8E0;
+      --text:    #0D0D2A;
+      --muted:   #6870A0;
+    }
+    :root[data-theme="light"] body {
+      background: var(--bg);
+      color: var(--text);
+    }
+    :root[data-theme="light"] nav {
+      background: rgba(240,242,248,0.92);
+    }
+    :root[data-theme="light"] #loader {
+      background: var(--bg);
+    }
+    :root[data-theme="light"] .hero-terminal {
+      background: rgba(228,232,245,0.95);
+      border-color: var(--border);
+    }
+    :root[data-theme="light"] .ht-bar {
+      background: rgba(240,242,248,0.98);
+    }
+    :root[data-theme="light"] #cmd-box {
+      background: rgba(240,242,248,0.98);
+    }
+    :root[data-theme="light"] #cmd-input {
+      color: var(--text);
+    }
+    :root[data-theme="light"] .cmd-item {
+      color: var(--text);
+    }
+    :root[data-theme="light"] .contact-form input,
+    :root[data-theme="light"] .contact-form textarea {
+      background: var(--card);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    :root[data-theme="light"] .sec-dot::after {
+      color: var(--text);
+      background: var(--card);
+      border-color: var(--border);
+    }
+
+    /* ── SKILLS GRID (progress bars) ── */
+    .skills-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:1.5rem; margin-top:2rem; }
+    .skill-cat-card { background:rgba(11,11,34,0.7); border:1px solid var(--border); border-radius:8px; padding:1.2rem 1.4rem; }
+    .sk-cat-label { font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--cyan); margin-bottom:1rem; opacity:0.8; }
+    .sk-row { display:flex; align-items:center; gap:0.7rem; margin-bottom:0.6rem; }
+    .sk-name { font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--text); width:90px; flex-shrink:0; }
+    .sk-bar { flex:1; height:3px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; }
+    .sk-fill { height:100%; width:var(--w); background:var(--col); border-radius:2px;
+               transform:scaleX(0); transform-origin:left; transition:transform 1.2s cubic-bezier(0.4,0,0.2,1); }
+    .sk-fill.revealed { transform:scaleX(1); }
+
+    /* ── ABOUT TERMINAL ── */
+    .about-terminal { margin-top:2rem; background:rgba(11,11,34,0.7); border:1px solid var(--border); border-radius:8px; overflow:hidden; max-width:520px; }
+    .abt-bar { background:rgba(7,7,26,0.98); border-bottom:1px solid var(--border); padding:0.5rem 0.9rem; display:flex; align-items:center; gap:0.45rem; }
+    .abt-body { padding:1rem 1.2rem 1.3rem; font-family:'DM Mono',monospace; font-size:0.78rem; line-height:1.9; }
+    .abt-cmd  { color:var(--cyan); }
+    .abt-out  { color:var(--muted); padding-left:0.5rem; }
+    .abt-out strong { color:var(--text); }
+
+    /* ── SECTION DOTS ── */
+    #sec-dots {
+      position: fixed; right: 1.4rem; top: 50%;
+      transform: translateY(-50%); z-index: 100;
+      display: flex; flex-direction: column; gap: .65rem;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    #sec-dots.visible { opacity: 1; pointer-events: auto; }
+    .sec-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      border: 1px solid var(--muted); background: transparent;
+      cursor: pointer; transition: all .22s; position: relative;
+    }
+    .sec-dot:hover { border-color: var(--cyan); transform: scale(1.35); }
+    .sec-dot.active { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,212,255,.7); }
+    .sec-dot::after {
+      content: attr(data-label);
+      position: absolute; right: calc(100% + .55rem); top: 50%;
+      transform: translateY(-50%);
+      font-family: 'DM Mono', monospace; font-size: .6rem;
+      color: var(--text); background: var(--card); border: 1px solid var(--border);
+      padding: .16rem .42rem; border-radius: 4px; white-space: nowrap;
+      opacity: 0; pointer-events: none; transition: opacity .15s;
+    }
+    .sec-dot:hover::after { opacity: 1; }
   </style>
 </head>
 <body>
@@ -987,6 +1387,8 @@
       <li><a href="#contact"  data-i18n="nav-contact">연락</a></li>
     </ul>
     <div class="nav-controls">
+      <button id="cmd-trigger" onclick="openCmd()">⌘K</button>
+      <button id="theme-btn" onclick="toggleTheme()">[dark]</button>
       <button id="lang-btn" onclick="toggleLang()">EN</button>
       <button id="ham" onclick="toggleNav()" aria-label="메뉴">
         <span></span><span></span><span></span>
@@ -995,36 +1397,102 @@
   </nav>
 
   <!-- ── HERO ── -->
-  <div class="hero">
-    <div class="hero-badge">
-      <span class="pulse-dot"></span>
-      <span data-i18n="hero-badge">Full-Stack Developer</span>
-    </div>
+  <div class="hero" id="main-hero">
+    <div class="hero-grid">
 
-    <div class="glitch-wrap" data-text="halfstone.Kim">
-      <span class="gtext">halfstone.Kim</span>
-    </div>
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          <span data-i18n="hero-badge">Full-Stack Developer</span>
+        </div>
 
-    <div class="hero-sub">
-      <span id="typing-text"></span><span class="typing-cursor"></span>
-    </div>
+        <div class="glitch-wrap" data-text="halfstone.Kim">
+          <span class="gtext">halfstone.Kim</span>
+        </div>
 
-    <p class="hero-desc" data-i18n-html="hero-desc">
-      웹 개발과 소프트웨어 엔지니어링.<br>
-      아이디어를 완성된 제품으로 만듭니다.
-    </p>
+        <div class="hero-sub">
+          <span id="typing-text"></span><span class="typing-cursor"></span>
+        </div>
 
-    <div class="hero-buttons">
-      <a href="#projects" class="btn-primary" data-i18n="btn-work">프로젝트 보기</a>
-      <a href="#contact" class="btn-ghost" data-i18n="btn-contact">연락하기</a>
-    </div>
+        <p class="hero-desc" data-i18n-html="hero-desc">
+          웹 개발과 소프트웨어 엔지니어링.<br>
+          아이디어를 완성된 제품으로 만듭니다.
+        </p>
 
-    <div class="hero-socials">
-      <a href="https://github.com/Kim-BanSeok" target="_blank">GitHub</a>
-      <a href="https://www.youtube.com/@부지런이투데이" target="_blank">YouTube</a>
-      <a href="https://blog.naver.com/teddybearmagazine" target="_blank">Blog</a>
-      <a href="https://teddybearjobstory.tistory.com" target="_blank">Tistory</a>
-      <a href="https://www.instagram.com/teddybear_magazine_world" target="_blank">Instagram</a>
+        <div class="hero-buttons">
+          <a href="#projects" class="btn-primary" data-i18n="btn-work">프로젝트 보기</a>
+          <a href="#contact" class="btn-ghost" data-i18n="btn-contact">연락하기</a>
+        </div>
+
+        <div class="hero-socials">
+          <a href="https://github.com/Kim-BanSeok" target="_blank">GitHub</a>
+          <a href="https://www.youtube.com/@부지런이투데이" target="_blank">YouTube</a>
+          <a href="https://blog.naver.com/teddybearmagazine" target="_blank">Blog</a>
+          <a href="https://teddybearjobstory.tistory.com" target="_blank">Tistory</a>
+          <a href="https://www.instagram.com/teddybear_magazine_world" target="_blank">Instagram</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hs-item">
+            <span class="hs-num">7</span>
+            <span class="hs-label" data-i18n="hs-projects">프로젝트</span>
+          </div>
+          <div class="hs-item">
+            <span class="hs-num">7</span>
+            <span class="hs-label" data-i18n="hs-games">게임</span>
+          </div>
+          <div class="hs-item">
+            <span class="hs-num">5+</span>
+            <span class="hs-label" data-i18n="hs-years">경력 연수</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-terminal">
+          <div class="ht-bar">
+            <span class="ht-dot" style="background:#FF5F57"></span>
+            <span class="ht-dot" style="background:#FFBD2E"></span>
+            <span class="ht-dot" style="background:#28C840"></span>
+            <span class="ht-title">halfstone ~ terminal</span>
+          </div>
+          <div class="ht-body" id="ht-body"></div>
+        </div>
+        <div class="hero-sysmon">
+          <div class="sm-head">
+            <span class="ht-dot" style="background:#FF5F57"></span>
+            <span class="ht-dot" style="background:#FFBD2E"></span>
+            <span class="ht-dot" style="background:#28C840"></span>
+            <span class="ht-title">sys.monitor — halfstone.local</span>
+          </div>
+          <div class="sm-body">
+            <div class="sm-row">
+              <span class="sm-lbl">CPU</span>
+              <div class="sm-track"><div class="sm-fill" id="sm-cpu-bar" style="width:65%;background:var(--cyan)"></div></div>
+              <span class="sm-pct" id="sm-cpu-val" style="color:var(--cyan)">65%</span>
+            </div>
+            <div class="sm-row">
+              <span class="sm-lbl">MEM</span>
+              <div class="sm-track"><div class="sm-fill" id="sm-mem-bar" style="width:52%;background:var(--purple)"></div></div>
+              <span class="sm-pct" id="sm-mem-val" style="color:var(--purple)">52%</span>
+            </div>
+            <div class="sm-row" style="margin-bottom:0">
+              <span class="sm-lbl">DISK</span>
+              <div class="sm-track"><div class="sm-fill" id="sm-disk-bar" style="width:78%;background:#00FF88"></div></div>
+              <span class="sm-pct" id="sm-disk-val" style="color:#00FF88">78%</span>
+            </div>
+            <div class="sm-net-row">
+              <span class="sm-lbl">NET</span>
+              <span class="sm-net">↑ <span id="sm-net-up">2.4</span> MB/s &nbsp;·&nbsp; ↓ <span id="sm-net-down">0.8</span> MB/s</span>
+            </div>
+          </div>
+          <div class="sm-footer">
+            <span id="sm-uptime">UPTIME 00:00:00</span>
+            <span>PID <span class="sm-pid">4488</span></span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="scroll-hint">
@@ -1034,63 +1502,77 @@
   </div>
 
   <!-- ── CONTENT ── -->
-  <div class="section-wrap">
+  <div class="section-wrap" id="tab-wrap">
 
     <hr class="sep">
 
-    <section id="projects">
+    <section id="projects" class="tab-panel">
       <div class="sec-head fade-up">
         <span class="sec-label" data-i18n="sec-label-projects">Work</span>
         <h2 class="sec-title" data-i18n="sec-title-projects">프로젝트</h2>
       </div>
+      <div class="proj-filter">
+        <button class="pf-btn active" data-filter="all">전체</button>
+        <button class="pf-btn" data-filter="game">게임</button>
+        <button class="pf-btn" data-filter="app">앱/툴</button>
+      </div>
       <div class="projects-grid">
 
-        <a class="proj-card fade-up" href="#" target="_blank">
-          <div class="proj-card-top">
-            <span class="proj-num">01</span>
-            <span class="proj-arrow">↗</span>
-          </div>
+        <a class="proj-card fade-up" href="https://lanage-convert.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">01</span><span class="proj-arrow">↗</span></div>
           <div class="proj-title" data-i18n="proj1-title">나만의 언어 생성기</div>
-          <p class="proj-desc" data-i18n="proj1-desc">사용자가 자신만의 언어 변환 규칙을 정의하여 일반 텍스트를 암호화하거나 복호화할 수 있는 웹 기반 도구. 간단한 문자 치환부터 알파벳 랜덤 암호화까지 지원.</p>
-          <div class="proj-tags">
-            <span class="ptag">Next.js</span>
-            <span class="ptag">React</span>
-            <span class="ptag">Tailwind CSS</span>
-            <span class="ptag">Vercel</span>
-          </div>
+          <p class="proj-desc" data-i18n="proj1-desc">직접 변환 규칙을 정의해 텍스트를 암호화·복호화하는 개인 맞춤형 언어 생성 PWA.</p>
+          <div class="proj-tags"><span class="ptag">Next.js 15</span><span class="ptag">React 18</span><span class="ptag">Tailwind CSS</span><span class="ptag">Vercel</span></div>
         </a>
 
-        <a class="proj-card fade-up" href="#" target="_blank">
-          <div class="proj-card-top">
-            <span class="proj-num">02</span>
-            <span class="proj-arrow">↗</span>
-          </div>
-          <div class="proj-title" data-i18n="proj2-title">포트폴리오 웹사이트</div>
-          <p class="proj-desc" data-i18n="proj2-desc">Workfolio 기반의 개인 포트폴리오 사이트. 프로젝트, 블로그, AI 이미지, 음악·유튜브 콘텐츠를 한곳에서 관리.</p>
-          <div class="proj-tags">
-            <span class="ptag">Next.js</span>
-            <span class="ptag">Supabase</span>
-            <span class="ptag">Vercel</span>
-          </div>
+        <a class="proj-card fade-up" href="https://phone-drop.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">02</span><span class="proj-arrow">↗</span></div>
+          <div class="proj-title" data-i18n="proj2-title">PhoneDrop</div>
+          <p class="proj-desc" data-i18n="proj2-desc">PC에서 입력하거나 엑셀로 업로드한 연락처를 vCard로 변환, QR코드 스캔 한 번으로 모바일에 동기화.</p>
+          <div class="proj-tags"><span class="ptag">JavaScript</span><span class="ptag">QR Code</span><span class="ptag">vCard</span><span class="ptag">Vercel</span></div>
         </a>
 
-        <div class="proj-card fade-up">
-          <div class="proj-card-top">
-            <span class="proj-num">03</span>
-          </div>
-          <div class="proj-title" data-i18n="proj3-title">다음 프로젝트</div>
-          <p class="proj-desc" data-i18n="proj3-desc">1인 개발로 새로운 아이디어를 구상 중입니다. 곧 공개될 예정입니다.</p>
-          <div class="proj-tags">
-            <span class="ptag" data-i18n="proj3-tag">기획 중</span>
-          </div>
-        </div>
+        <a class="proj-card fade-up" href="https://chemi-check.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">03</span><span class="proj-arrow">↗</span></div>
+          <div class="proj-title" data-i18n="proj3-title">케미체크</div>
+          <p class="proj-desc" data-i18n="proj3-desc">MBTI, 여행, 음식, 데이트 스타일 등 다양한 영역에서 두 사람의 관계 궁합을 분석하는 심리 테스트 앱.</p>
+          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">JavaScript</span><span class="ptag">Vercel</span></div>
+        </a>
+
+        <a class="proj-card fade-up" href="https://seller-margin-lab.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">04</span><span class="proj-arrow">↗</span></div>
+          <div class="proj-title" data-i18n="proj4-title">셀러 실마진 계산기</div>
+          <p class="proj-desc" data-i18n="proj4-desc">원가·수수료·배송비를 입력하면 실수익률과 마진을 즉시 계산해주는 온라인 셀러 전용 도구.</p>
+          <div class="proj-tags"><span class="ptag">JavaScript</span><span class="ptag">HTML/CSS</span><span class="ptag">Vercel</span></div>
+        </a>
+
+        <a class="proj-card fade-up" href="https://dreampedia-web.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">05</span><span class="proj-arrow">↗</span></div>
+          <div class="proj-title" data-i18n="proj5-title">Dreampedia</div>
+          <p class="proj-desc" data-i18n="proj5-desc">동물, 돈, 신체, 자연 등 카테고리별로 꿈 해몽 정보를 검색하는 한국어 꿈 백과사전.</p>
+          <div class="proj-tags"><span class="ptag">JavaScript</span><span class="ptag">HTML/CSS</span><span class="ptag">Vercel</span></div>
+        </a>
+
+        <a class="proj-card fade-up" href="https://salarycalculator-five.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">06</span><span class="proj-arrow">↗</span></div>
+          <div class="proj-title" data-i18n="proj6-title">급여마스터</div>
+          <p class="proj-desc" data-i18n="proj6-desc">직원 급여, 4대보험, 세금을 자동 계산하는 급여 관리 도구.</p>
+          <div class="proj-tags"><span class="ptag">JavaScript</span><span class="ptag">HTML/CSS</span><span class="ptag">Vercel</span></div>
+        </a>
+
+        <a class="proj-card fade-up" href="https://read-all-bible.vercel.app/" target="_blank" data-cat="app">
+          <div class="proj-card-top"><span class="proj-num">07</span><span class="proj-arrow">↗</span></div>
+          <div class="proj-title" data-i18n="proj7-title">ReadAll Bible</div>
+          <p class="proj-desc" data-i18n="proj7-desc">1년 완독 프로그램으로 매일 성경을 읽고 진도를 체크하는 신앙 성장 플랫폼.</p>
+          <div class="proj-tags"><span class="ptag">JavaScript</span><span class="ptag">HTML/CSS</span><span class="ptag">Vercel</span></div>
+        </a>
 
       </div>
     </section>
 
     <hr class="sep">
 
-    <section id="games">
+    <section id="games" class="tab-panel">
       <div class="sec-head fade-up">
         <span class="sec-label" data-i18n="sec-label-games">Play</span>
         <h2 class="sec-title" data-i18n="sec-title-games">미니 게임</h2>
@@ -1311,12 +1793,32 @@
           </div>
         </a>
 
+        <a class="game-card shooter-card fade-up" href="shooter.html">
+          <div class="game-preview" style="padding:0;overflow:hidden;">
+            <canvas id="shooter-prev" style="width:100%;height:100%;display:block;"></canvas>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge">⚡ SHOOT</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-shooter-title">슈팅 게임</div>
+            <p class="game-desc" data-i18n="game-shooter-desc">탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 웨이브 클리어.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-waves">웨이브</span>
+              <span class="ftag" data-i18n="ftag-boss">보스전</span>
+              <span class="ftag" data-i18n="ftag-powerup">파워업 4종</span>
+              <span class="ftag">Canvas 2D</span>
+            </div>
+          </div>
+        </a>
+
       </div>
     </section>
 
     <hr class="sep">
 
-    <section id="skills">
+    <section id="skills" class="tab-panel">
       <div class="sec-head fade-up">
         <span class="sec-label" data-i18n="sec-label-skills">Stack</span>
         <h2 class="sec-title" data-i18n="sec-title-skills">기술 스택</h2>
@@ -1368,11 +1870,42 @@
           <span class="chip">Slack</span>
         </div>
       </div>
+
+      <h3 class="sec-title fade-up" style="font-size:1.1rem;margin-top:3rem;margin-bottom:0.2rem;">TECH_STACK<span class="cur" style="color:var(--cyan)">_</span></h3>
+      <div class="skills-grid fade-up" id="skills-bar-grid">
+        <div class="skill-cat-card">
+          <div class="sk-cat-label">// Frontend</div>
+          <div class="skill-bars">
+            <div class="sk-row"><span class="sk-name">React</span><div class="sk-bar"><div class="sk-fill" style="--w:90%;--col:#00D4FF"></div></div></div>
+            <div class="sk-row"><span class="sk-name">TypeScript</span><div class="sk-bar"><div class="sk-fill" style="--w:85%;--col:#00D4FF"></div></div></div>
+            <div class="sk-row"><span class="sk-name">Next.js</span><div class="sk-bar"><div class="sk-fill" style="--w:80%;--col:#00D4FF"></div></div></div>
+            <div class="sk-row"><span class="sk-name">CSS/Tailwind</span><div class="sk-bar"><div class="sk-fill" style="--w:88%;--col:#00D4FF"></div></div></div>
+          </div>
+        </div>
+        <div class="skill-cat-card">
+          <div class="sk-cat-label">// Backend</div>
+          <div class="skill-bars">
+            <div class="sk-row"><span class="sk-name">Node.js</span><div class="sk-bar"><div class="sk-fill" style="--w:85%;--col:#8B5CF6"></div></div></div>
+            <div class="sk-row"><span class="sk-name">Python</span><div class="sk-bar"><div class="sk-fill" style="--w:75%;--col:#8B5CF6"></div></div></div>
+            <div class="sk-row"><span class="sk-name">PostgreSQL</span><div class="sk-bar"><div class="sk-fill" style="--w:78%;--col:#8B5CF6"></div></div></div>
+            <div class="sk-row"><span class="sk-name">REST API</span><div class="sk-bar"><div class="sk-fill" style="--w:90%;--col:#8B5CF6"></div></div></div>
+          </div>
+        </div>
+        <div class="skill-cat-card">
+          <div class="sk-cat-label">// Tools &amp; DevOps</div>
+          <div class="skill-bars">
+            <div class="sk-row"><span class="sk-name">Git</span><div class="sk-bar"><div class="sk-fill" style="--w:92%;--col:#FFD700"></div></div></div>
+            <div class="sk-row"><span class="sk-name">Docker</span><div class="sk-bar"><div class="sk-fill" style="--w:70%;--col:#FFD700"></div></div></div>
+            <div class="sk-row"><span class="sk-name">Figma</span><div class="sk-bar"><div class="sk-fill" style="--w:65%;--col:#FFD700"></div></div></div>
+            <div class="sk-row"><span class="sk-name">Linux</span><div class="sk-bar"><div class="sk-fill" style="--w:72%;--col:#FFD700"></div></div></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <hr class="sep">
 
-    <section id="experience">
+    <section id="experience" class="tab-panel">
       <div class="sec-head fade-up">
         <span class="sec-label" data-i18n="sec-label-career">Career</span>
         <h2 class="sec-title" data-i18n="sec-title-career">경력</h2>
@@ -1397,7 +1930,7 @@
 
     <hr class="sep">
 
-    <section id="about">
+    <section id="about" class="tab-panel">
       <div class="sec-head fade-up">
         <span class="sec-label" data-i18n="sec-label-about">About</span>
         <h2 class="sec-title" data-i18n="sec-title-about">소개</h2>
@@ -1410,12 +1943,29 @@
         JavaScript, React, Node.js 등 풀스택 웹 개발 기술과 함께
         C++, C#을 활용한 <strong>1인 개발</strong>을 꿈꾸며 꾸준히 공부 중입니다.
       </p>
+
+      <div class="about-terminal fade-up">
+        <div class="abt-bar">
+          <span class="ht-dot" style="background:#FF5F57"></span>
+          <span class="ht-dot" style="background:#FFBD2E"></span>
+          <span class="ht-dot" style="background:#28C840"></span>
+          <span class="ht-title">halfstone ~ terminal</span>
+        </div>
+        <div class="abt-body">
+          <div class="abt-cmd">$ whoami</div>
+          <div class="abt-out"><strong>halfstone.Kim</strong> — 풀스택 웹 개발자</div>
+          <div class="abt-cmd">$ cat philosophy.txt</div>
+          <div class="abt-out">1인 개발로 아이디어를 프로덕트로 만드는 것을 좋아합니다.</div>
+          <div class="abt-cmd">$ echo $GOAL</div>
+          <div class="abt-out">solo product · ship fast · iterate</div>
+        </div>
+      </div>
     </section>
 
     <hr class="sep">
 
     <!-- ── CONTACT ── -->
-    <section id="contact">
+    <section id="contact" class="tab-panel">
       <div class="sec-head fade-up">
         <span class="sec-label" data-i18n="sec-label-contact">Contact</span>
         <h2 class="sec-title" data-i18n="sec-title-contact">연락하기</h2>
@@ -1438,8 +1988,37 @@
 
   <footer>
     <span data-i18n="footer-copy">© 2026 halfstone.Kim</span>
-    <span data-i18n="footer-loc">경기도 · qkstjr0000@naver.com</span>
+    <span data-i18n="footer-loc">경기도 · qkstjr0000@gmail.com</span>
   </footer>
+
+  <div id="cursor-outer"></div>
+  <div id="cursor-inner"></div>
+  <div id="scroll-prog"></div>
+
+  <div id="sec-dots">
+    <div class="sec-dot" data-tab="#projects" data-label="프로젝트"></div>
+    <div class="sec-dot" data-tab="#games"    data-label="게임"></div>
+    <div class="sec-dot" data-tab="#skills"   data-label="기술"></div>
+    <div class="sec-dot" data-tab="#experience" data-label="경력"></div>
+    <div class="sec-dot" data-tab="#about"    data-label="소개"></div>
+    <div class="sec-dot" data-tab="#contact"  data-label="연락"></div>
+  </div>
+
+  <div id="cmd-overlay">
+    <div id="cmd-box">
+      <div id="cmd-input-wrap">
+        <span id="cmd-search-icon">⌘</span>
+        <input id="cmd-input" type="text" placeholder="검색 또는 이동..." autocomplete="off" spellcheck="false">
+        <span id="cmd-kbd">ESC</span>
+      </div>
+      <div id="cmd-list"></div>
+      <div id="cmd-footer">
+        <span class="cmd-foot-key"><kbd>↑↓</kbd> 이동</span>
+        <span class="cmd-foot-key"><kbd>↵</kbd> 실행</span>
+        <span class="cmd-foot-key"><kbd>ESC</kbd> 닫기</span>
+      </div>
+    </div>
+  </div>
 
   <script>
     // ── LOADING ANIMATION ──
@@ -1474,17 +2053,86 @@
     function toggleNav() {
       document.getElementById('main-nav').classList.toggle('nav-open');
     }
-    document.querySelectorAll('.nav-links a').forEach(a => {
-      a.addEventListener('click', () => {
-        document.getElementById('main-nav').classList.remove('nav-open');
-      });
-    });
     document.addEventListener('click', e => {
       const nav = document.getElementById('main-nav');
       if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
         nav.classList.remove('nav-open');
       }
     });
+
+    // ── TAB SYSTEM ──
+    function switchTab(hash) {
+      document.getElementById('main-nav').classList.remove('nav-open');
+      const hero = document.getElementById('main-hero');
+      const wrap = document.getElementById('tab-wrap');
+
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('tab-on'));
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('tab-on'));
+
+      if (!hash || hash === '#') {
+        hero.classList.remove('tab-on');
+        wrap.classList.remove('tab-on');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        const dotsEl = document.getElementById('sec-dots');
+        if (dotsEl) dotsEl.classList.remove('visible');
+        const prog = document.getElementById('scroll-prog');
+        if (prog) prog.style.width = '0%';
+        return;
+      }
+
+      const panel = document.querySelector(hash);
+      if (!panel) return;
+
+      hero.classList.add('tab-on');
+      wrap.classList.add('tab-on');
+      panel.classList.add('tab-on');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      const link = document.querySelector(`.nav-links a[href="${hash}"]`);
+      if (link) link.classList.add('tab-on');
+
+      panel.querySelectorAll('.fade-up').forEach((el, i) => {
+        el.classList.remove('visible');
+        setTimeout(() => el.classList.add('visible'), 30 + i * 50);
+      });
+
+      const dotsEl = document.getElementById('sec-dots');
+      if (dotsEl) {
+        dotsEl.classList.add('visible');
+        dotsEl.querySelectorAll('.sec-dot').forEach(d => {
+          d.classList.toggle('active', d.getAttribute('data-tab') === hash);
+        });
+      }
+      const prog = document.getElementById('scroll-prog');
+      if (prog) prog.style.width = '0%';
+    }
+
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const hash = a.getAttribute('href');
+        history.pushState(null, '', location.pathname + hash);
+        switchTab(hash);
+      });
+    });
+
+    document.querySelector('.nav-logo').addEventListener('click', e => {
+      e.preventDefault();
+      history.pushState(null, '', location.pathname);
+      switchTab('');
+    });
+
+    document.querySelectorAll('.hero-buttons a[href^="#"], .hero-socials a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const hash = a.getAttribute('href');
+        history.pushState(null, '', location.pathname + hash);
+        switchTab(hash);
+      });
+    });
+
+    window.addEventListener('popstate', () => switchTab(location.hash));
+    switchTab(location.hash);
 
     // ── LANGUAGE TOGGLE ──
     const I18N = {
@@ -1501,10 +2149,14 @@
         'sec-label-about':    'About', 'sec-title-about':    '소개',
         'sec-label-contact':  'Contact','sec-title-contact': '연락하기',
         'proj1-title': '나만의 언어 생성기',
-        'proj1-desc':  '사용자가 자신만의 언어 변환 규칙을 정의하여 일반 텍스트를 암호화하거나 복호화할 수 있는 웹 기반 도구.',
-        'proj2-title': '포트폴리오 웹사이트',
-        'proj2-desc':  'Workfolio 기반의 개인 포트폴리오 사이트. 프로젝트, 블로그, AI 이미지, 음악·유튜브 콘텐츠를 한곳에서 관리.',
-        'proj3-title': '다음 프로젝트', 'proj3-desc': '1인 개발로 새로운 아이디어를 구상 중입니다. 곧 공개될 예정입니다.', 'proj3-tag': '기획 중',
+        'proj1-desc':  '직접 변환 규칙을 정의해 텍스트를 암호화·복호화하는 개인 맞춤형 언어 생성 PWA.',
+        'proj2-title': 'PhoneDrop',
+        'proj2-desc':  'PC에서 입력하거나 엑셀로 업로드한 연락처를 vCard로 변환, QR코드 스캔 한 번으로 모바일에 동기화.',
+        'proj3-title': '케미체크', 'proj3-desc': 'MBTI, 여행, 음식, 데이트 스타일 등 다양한 영역에서 두 사람의 관계 궁합을 분석하는 심리 테스트 앱.',
+        'proj4-title': '셀러 실마진 계산기', 'proj4-desc': '원가·수수료·배송비를 입력하면 실수익률과 마진을 즉시 계산해주는 온라인 셀러 전용 도구.',
+        'proj5-title': 'Dreampedia', 'proj5-desc': '동물, 돈, 신체, 자연 등 카테고리별로 꿈 해몽 정보를 검색하는 한국어 꿈 백과사전.',
+        'proj6-title': '급여마스터', 'proj6-desc': '직원 급여, 4대보험, 세금을 자동 계산하는 급여 관리 도구.',
+        'proj7-title': 'ReadAll Bible', 'proj7-desc': '1년 완독 프로그램으로 매일 성경을 읽고 진도를 체크하는 신앙 성장 플랫폼.',
         'game-snake-title': '스네이크',
         'game-snake-desc': '파워업 3종, 콤보 시스템, 파티클 효과와 8비트 사운드가 어우러진 IT 테마 스네이크 게임.',
         'game-2048-desc':  '타임어택 모드, 업적 시스템, 5단 되돌리기와 힌트까지 갖춘 전략 퍼즐 게임.',
@@ -1520,12 +2172,15 @@
         'ftag-multiball': '멀티볼', 'ftag-laser': '레이저', 'ftag-explosive': '폭발 벽돌', 'ftag-powerups': '파워업',
         'game-rhythm-title': '리듬 게임', 'game-rhythm-desc': '7레인 O2JAM 스타일 리듬 게임. 30곡 (EASY·MEDIUM·HARD)과 Web Audio 절차적 사운드.',
         'ftag-songs': '30곡', 'ftag-lanes': '7레인', 'ftag-judgment': '판정 4종',
+        'game-shooter-title': '슈팅 게임', 'game-shooter-desc': '탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 웨이브 클리어.',
+        'ftag-waves': '웨이브', 'ftag-boss': '보스전', 'ftag-powerup': '파워업 4종',
         'exp1-role': '사원', 'exp1-company': '에스더블유기술원', 'exp1-badge': '퇴사',
         'exp2-role': '대리', 'exp2-company': '(주)웰컴소프트',
         'about-text': '안녕하세요, <strong>halfstone.Kim</strong>입니다.<br><br><strong>웹 개발</strong>과 일상·공부 기록을 이곳에 남기고 있습니다. <strong>(주)웰컴소프트</strong>에서 대리로, <strong>에스더블유기술원</strong>에서 사원으로 근무하며 실무 경험을 쌓았습니다.<br><br>JavaScript, React, Node.js 등 풀스택 웹 개발 기술과 함께 C++, C#을 활용한 <strong>1인 개발</strong>을 꿈꾸며 꾸준히 공부 중입니다.',
+        'hs-projects': '프로젝트', 'hs-games': '게임', 'hs-years': '경력 연수',
         'cf-send': '보내기',
         'footer-copy': '© 2026 halfstone.Kim',
-        'footer-loc':  '경기도 · qkstjr0000@naver.com',
+        'footer-loc':  '경기도 · qkstjr0000@gmail.com',
       },
       en: {
         'nav-projects': 'Projects', 'nav-games': 'Games', 'nav-skills': 'Skills',
@@ -1540,10 +2195,14 @@
         'sec-label-about':    'About', 'sec-title-about':    'About',
         'sec-label-contact':  'Contact','sec-title-contact': 'Get in Touch',
         'proj1-title': 'Custom Language Maker',
-        'proj1-desc':  'A web tool for defining personal cipher rules — encrypt or decode any text with character-level substitution or random alphabet encryption.',
-        'proj2-title': 'Portfolio Website',
-        'proj2-desc':  'Personal portfolio built on Workfolio. Manages projects, blog posts, AI-generated art, and YouTube content in one place.',
-        'proj3-title': 'Next Project', 'proj3-desc': 'A new solo idea in the works. Coming soon.', 'proj3-tag': 'Planning',
+        'proj1-desc':  'Define your own cipher rules and convert text in real time. A PWA with custom letter mappings and encryption.',
+        'proj2-title': 'PhoneDrop',
+        'proj2-desc':  'Convert contacts to vCard, then sync to mobile via a single QR code scan. Supports manual entry and Excel upload.',
+        'proj3-title': 'ChemiCheck', 'proj3-desc': 'A couples compatibility quiz covering MBTI, travel style, food preferences, dating habits, and more.',
+        'proj4-title': 'Seller Margin Lab', 'proj4-desc': 'Enter cost, commission, and shipping to instantly calculate your actual profit margin as an online seller.',
+        'proj5-title': 'Dreampedia', 'proj5-desc': 'Korean dream interpretation encyclopedia — search by category (animals, money, nature, and more).',
+        'proj6-title': 'Salary Master', 'proj6-desc': 'Automatically calculates monthly salary, insurance deductions, and taxes for Korean employees.',
+        'proj7-title': 'ReadAll Bible', 'proj7-desc': 'A 1-year Bible reading plan — read daily and track your progress toward completing the full Bible.',
         'game-snake-title': 'Snake',
         'game-snake-desc': 'IT-themed Snake with 3 power-ups, a combo system, particle effects, and 8-bit Web Audio.',
         'game-2048-desc':  'Strategic puzzle with time attack mode, 9 achievements, 5-level undo, and move hints.',
@@ -1559,12 +2218,15 @@
         'ftag-multiball': 'Multi-ball', 'ftag-laser': 'Laser', 'ftag-explosive': 'Explosive', 'ftag-powerups': 'Power-ups',
         'game-rhythm-title': 'Rhythm', 'game-rhythm-desc': '7-lane O2JAM-style rhythm game. 30 tracks across EASY / MEDIUM / HARD with procedural Web Audio.',
         'ftag-songs': '30 Songs', 'ftag-lanes': '7 Lanes', 'ftag-judgment': '4 Judgments',
+        'game-shooter-title': 'Shooter', 'game-shooter-desc': 'Bullet-hell shooter FIREWALL.EXE. 5 enemy types, boss every 5 waves, 4 power-ups.',
+        'ftag-waves': 'Waves', 'ftag-boss': 'Boss Fight', 'ftag-powerup': '4 Power-ups',
         'exp1-role': 'Staff', 'exp1-company': 'SW Technology Institute', 'exp1-badge': 'Left',
         'exp2-role': 'Associate', 'exp2-company': 'Welcomesoft Co., Ltd.',
         'about-text': "Hi, I'm <strong>halfstone.Kim</strong>.<br><br>I share my <strong>web development</strong> projects and daily learning here. I built hands-on experience as an Associate at <strong>Welcomesoft</strong> and Staff at <strong>SW Technology Institute</strong>.<br><br>I work across the stack with JavaScript, React, Node.js, C++, and C# — with a dream of shipping <strong>solo products</strong> that people actually use.",
+        'hs-projects': 'Projects', 'hs-games': 'Games', 'hs-years': 'Yrs Exp',
         'cf-send': 'Send',
         'footer-copy': '© 2026 halfstone.Kim',
-        'footer-loc':  'Gyeonggi-do, Korea · qkstjr0000@naver.com',
+        'footer-loc':  'Gyeonggi-do, Korea · qkstjr0000@gmail.com',
       }
     };
 
@@ -1701,12 +2363,342 @@
     }
     tick();
 
-    // ── SCROLL REVEAL ──
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+    // ── CUSTOM CURSOR ──
+    (function() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      const outer = document.getElementById('cursor-outer');
+      const inner = document.getElementById('cursor-inner');
+      document.body.classList.add('custom-cursor');
+      let mx = window.innerWidth/2, my = window.innerHeight/2, ox = mx, oy = my;
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        inner.style.left = mx + 'px'; inner.style.top = my + 'px';
+      });
+      (function trail() {
+        ox += (mx - ox) * 0.14; oy += (my - oy) * 0.14;
+        outer.style.left = ox + 'px'; outer.style.top = oy + 'px';
+        requestAnimationFrame(trail);
+      })();
+      document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+      document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+      function bindHover(sel) {
+        document.querySelectorAll(sel).forEach(el => {
+          el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+          el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+      }
+      bindHover('a, button, .proj-card, .game-card, .cmd-item, .sec-dot, .chip, .skill-row');
+    })();
+
+    // ── 3D CARD TILT ──
+    (function() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      document.querySelectorAll('.proj-card, .game-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+          card.style.transition = 'border-color .35s, box-shadow .35s';
+        });
+        card.addEventListener('mousemove', e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width;
+          const y = (e.clientY - r.top)  / r.height;
+          const rx = (y - .5) * -9;
+          const ry = (x - .5) *  9;
+          card.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(8px)`;
+          card.style.setProperty('--mx', (x * 100) + '%');
+          card.style.setProperty('--my', (y * 100) + '%');
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = '';
+          card.style.transition = 'transform .55s ease, border-color .35s, box-shadow .35s';
+          setTimeout(() => { card.style.transition = ''; }, 560);
+        });
+      });
+    })();
+
+    // ── SCROLL PROGRESS ──
+    (function() {
+      const bar = document.getElementById('scroll-prog');
+      if (!bar) return;
+      window.addEventListener('scroll', () => {
+        const total = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (total > 0 ? Math.min(window.scrollY / total * 100, 100) : 0) + '%';
+      }, {passive: true});
+    })();
+
+    // ── SECTION DOTS CLICK ──
+    document.querySelectorAll('.sec-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const tab = dot.getAttribute('data-tab');
+        history.pushState(null, '', location.pathname + tab);
+        switchTab(tab);
+      });
+    });
+
+    // ── COMMAND PALETTE ──
+    (function() {
+      const overlay = document.getElementById('cmd-overlay');
+      const input   = document.getElementById('cmd-input');
+      const list    = document.getElementById('cmd-list');
+      if (!overlay) return;
+
+      const NAV = [
+        {icon:'→', label:'프로젝트',  hint:'#projects',   fn:()=>nav('#projects')},
+        {icon:'→', label:'게임',       hint:'#games',      fn:()=>nav('#games')},
+        {icon:'→', label:'기술 스택',  hint:'#skills',     fn:()=>nav('#skills')},
+        {icon:'→', label:'경력',       hint:'#experience', fn:()=>nav('#experience')},
+        {icon:'→', label:'소개',       hint:'#about',      fn:()=>nav('#about')},
+        {icon:'→', label:'연락',       hint:'#contact',    fn:()=>nav('#contact')},
+        {icon:'⌂', label:'홈으로',     hint:'hero',        fn:()=>{ history.pushState(null,'',location.pathname); switchTab(''); }},
+      ];
+      const PROJECTS = [
+        {icon:'↗', label:'나만의 언어 생성기', hint:'lanage-convert.vercel.app', fn:()=>window.open('https://lanage-convert.vercel.app/','_blank')},
+        {icon:'↗', label:'PhoneDrop',          hint:'phone-drop.vercel.app',     fn:()=>window.open('https://phone-drop.vercel.app/','_blank')},
+        {icon:'↗', label:'케미체크',            hint:'chemi-check.vercel.app',    fn:()=>window.open('https://chemi-check.vercel.app/','_blank')},
+        {icon:'↗', label:'셀러 실마진 계산기', hint:'seller-margin-lab.vercel.app', fn:()=>window.open('https://seller-margin-lab.vercel.app/','_blank')},
+        {icon:'↗', label:'Dreampedia',          hint:'dreampedia-web.vercel.app', fn:()=>window.open('https://dreampedia-web.vercel.app/','_blank')},
+        {icon:'↗', label:'급여마스터',          hint:'salarycalculator-five.vercel.app', fn:()=>window.open('https://salarycalculator-five.vercel.app/','_blank')},
+        {icon:'↗', label:'ReadAll Bible',       hint:'read-all-bible.vercel.app', fn:()=>window.open('https://read-all-bible.vercel.app/','_blank')},
+      ];
+      const GAMES = [
+        {icon:'▶', label:'스네이크',    hint:'snake.html',    fn:()=>window.open('snake.html','_blank')},
+        {icon:'▶', label:'2048',        hint:'2048.html',     fn:()=>window.open('2048.html','_blank')},
+        {icon:'▶', label:'타이핑 연습', hint:'type.html',     fn:()=>window.open('type.html','_blank')},
+        {icon:'▶', label:'무한 러너',   hint:'runner.html',   fn:()=>window.open('runner.html','_blank')},
+        {icon:'▶', label:'벽돌 깨기',   hint:'breakout.html', fn:()=>window.open('breakout.html','_blank')},
+        {icon:'▶', label:'리듬 게임',   hint:'rhythm.html',   fn:()=>window.open('rhythm.html','_blank')},
+        {icon:'▶', label:'슈팅 게임',   hint:'shooter.html',  fn:()=>window.open('shooter.html','_blank')},
+      ];
+      const ALL = [
+        ...NAV.map(c=>({...c, group:'Navigate'})),
+        ...PROJECTS.map(c=>({...c, group:'Projects'})),
+        ...GAMES.map(c=>({...c, group:'Games'})),
+      ];
+
+      function nav(hash) { history.pushState(null,'',location.pathname+hash); switchTab(hash); }
+
+      let activeIdx = 0, filtered = [];
+
+      function openCmd() { overlay.classList.add('open'); input.value=''; render(''); requestAnimationFrame(()=>input.focus()); }
+      window.openCmd = openCmd;
+      function closeCmd() { overlay.classList.remove('open'); }
+
+      function render(q) {
+        const lq = q.toLowerCase();
+        filtered = lq ? ALL.filter(c => (c.label+c.hint+c.group).toLowerCase().includes(lq)) : ALL;
+        activeIdx = 0;
+        list.innerHTML = '';
+        if (!filtered.length) { list.innerHTML = '<div id="cmd-empty">결과 없음</div>'; return; }
+        let lastGroup = null;
+        filtered.forEach((cmd, i) => {
+          if (cmd.group !== lastGroup) {
+            const g = document.createElement('div');
+            g.className = 'cmd-group'; g.textContent = cmd.group;
+            list.appendChild(g); lastGroup = cmd.group;
+          }
+          const el = document.createElement('div');
+          el.className = 'cmd-item' + (i === 0 ? ' active' : '');
+          el.innerHTML = `<span class="cmd-icon">${cmd.icon}</span><span class="cmd-label">${cmd.label}</span><span class="cmd-hint">${cmd.hint}</span>`;
+          el.addEventListener('click', () => { cmd.fn(); closeCmd(); });
+          el.addEventListener('mouseenter', () => setActive(i));
+          list.appendChild(el);
+        });
+      }
+
+      function setActive(i) {
+        activeIdx = Math.max(0, Math.min(i, filtered.length - 1));
+        list.querySelectorAll('.cmd-item').forEach((el, idx) => {
+          el.classList.toggle('active', idx === activeIdx);
+          if (idx === activeIdx) el.scrollIntoView({block:'nearest'});
+        });
+      }
+
+      document.addEventListener('keydown', e => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          overlay.classList.contains('open') ? closeCmd() : openCmd(); return;
+        }
+        if (!overlay.classList.contains('open')) return;
+        if (e.key === 'Escape') { closeCmd(); return; }
+        if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIdx + 1); return; }
+        if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(activeIdx - 1); return; }
+        if (e.key === 'Enter')     { e.preventDefault(); const items = list.querySelectorAll('.cmd-item'); if (items[activeIdx]) { filtered[activeIdx].fn(); closeCmd(); } }
+      });
+      input.addEventListener('input', () => render(input.value));
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeCmd(); });
+    })();
+
+    // ── HERO TERMINAL ──
+    (function() {
+      const body = document.getElementById('ht-body');
+      if (!body) return;
+      const script = [
+        {type:'cmd', text:'$ whoami'},
+        {type:'out', text:'halfstone.Kim'},
+        {type:'cmd', text:'$ cat stack.txt'},
+        {type:'out', text:'React · Next.js · Node.js · C++'},
+        {type:'cmd', text:'$ ls projects/ | wc -l'},
+        {type:'out', text:'7 deployed · Vercel'},
+        {type:'cmd', text:'$ echo $STATUS'},
+        {type:'out', text:'● available for work'},
+      ];
+      let i = 0;
+      const cur = document.createElement('span');
+      cur.className = 'ht-cursor';
+      function run() {
+        if (i >= script.length) { body.appendChild(cur); return; }
+        const {type, text} = script[i];
+        const el = document.createElement('div');
+        el.style.cssText = type === 'cmd'
+          ? 'color:#E0E0FF'
+          : 'color:#5858A0;padding-left:.5rem;margin-bottom:.38rem;';
+        body.appendChild(el);
+        if (type === 'out') {
+          el.textContent = text;
+          i++;
+          setTimeout(run, 210);
+        } else {
+          let c = 0; el.appendChild(cur);
+          const iv = setInterval(() => {
+            el.textContent = text.slice(0, ++c);
+            el.appendChild(cur);
+            if (c >= text.length) { clearInterval(iv); cur.remove(); i++; setTimeout(run, 320); }
+          }, 50 + Math.random() * 20 | 0);
+        }
+      }
+      setTimeout(run, 1000);
+    })();
+
+    // ── SHOOTER PREVIEW CANVAS ──
+    (function() {
+      const cv = document.getElementById('shooter-prev');
+      if (!cv) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) { obs.disconnect(); startShooter(); }
+      }, {threshold: 0.1});
+      obs.observe(cv);
+      function startShooter() {
+        const rect = cv.getBoundingClientRect();
+        cv.width  = rect.width  * dpr;
+        cv.height = rect.height * dpr;
+        const ctx = cv.getContext('2d');
+        const W = cv.width, H = cv.height;
+        const stars = Array.from({length: 42}, () => ({
+          x: Math.random()*W, y: Math.random()*H,
+          s: (Math.random()*1.3+0.3)*dpr, v: (Math.random()*0.8+0.3)*dpr, a: Math.random()*10
+        }));
+        const enemies = [
+          {x:W*.18, y:H*.1,  vx: .5*dpr, min:W*.02, max:W*.44, col:'#FF4466'},
+          {x:W*.5,  y:H*.07, vx:-.4*dpr, min:W*.28, max:W*.72, col:'#CC44FF'},
+          {x:W*.82, y:H*.1,  vx:-.5*dpr, min:W*.56, max:W*.98, col:'#FF4466'},
+          {x:W*.33, y:H*.24, vx: .4*dpr, min:W*.08, max:W*.58, col:'#FF9900'},
+          {x:W*.67, y:H*.24, vx:-.4*dpr, min:W*.42, max:W*.92, col:'#FF4466'},
+        ];
+        const bullets = [];
+        let t = 0, fr = 0;
+        function drawShip(x, y, sz, col) {
+          ctx.fillStyle = col; ctx.shadowColor = col; ctx.shadowBlur = 10*dpr;
+          ctx.beginPath();
+          ctx.moveTo(x, y-sz); ctx.lineTo(x-sz*.72, y+sz*.55);
+          ctx.lineTo(x-sz*.22, y+sz*.1); ctx.lineTo(x, y+sz*.42);
+          ctx.lineTo(x+sz*.22, y+sz*.1); ctx.lineTo(x+sz*.72, y+sz*.55);
+          ctx.closePath(); ctx.fill(); ctx.shadowBlur = 0;
+        }
+        function drawEnemy(x, y, col) {
+          ctx.strokeStyle = col; ctx.lineWidth = 1.8*dpr;
+          ctx.shadowColor = col; ctx.shadowBlur = 8*dpr;
+          ctx.beginPath();
+          ctx.moveTo(x-8*dpr, y-8*dpr); ctx.lineTo(x+8*dpr, y+8*dpr);
+          ctx.moveTo(x+8*dpr, y-8*dpr); ctx.lineTo(x-8*dpr, y+8*dpr);
+          ctx.stroke();
+          ctx.beginPath(); ctx.arc(x, y, 3*dpr, 0, Math.PI*2);
+          ctx.fillStyle = col; ctx.fill(); ctx.shadowBlur = 0;
+        }
+        function loop() {
+          ctx.fillStyle = '#07071A'; ctx.fillRect(0,0,W,H);
+          stars.forEach(s => {
+            s.y += s.v; if (s.y > H) { s.y = 0; s.x = Math.random()*W; }
+            ctx.globalAlpha = 0.2 + Math.sin(t*3+s.a)*.15;
+            ctx.fillStyle = '#E0E0FF';
+            ctx.beginPath(); ctx.arc(s.x,s.y,s.s,0,Math.PI*2); ctx.fill();
+          });
+          ctx.globalAlpha = 1;
+          const px = W*.5 + Math.sin(t*1.3)*18*dpr, py = H*.84;
+          drawShip(px, py, 13*dpr, '#00D4FF');
+          ctx.globalAlpha = .32; ctx.fillStyle = '#00D4FF';
+          ctx.shadowColor = '#00D4FF'; ctx.shadowBlur = 14*dpr;
+          ctx.beginPath(); ctx.arc(px, py+12*dpr, 5*dpr, 0, Math.PI*2); ctx.fill();
+          ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+          if (fr%24===0) { bullets.push({x:px-7*dpr,y:py,vy:-5.5*dpr}); bullets.push({x:px+7*dpr,y:py,vy:-5.5*dpr}); }
+          for (let k=bullets.length-1; k>=0; k--) {
+            const b=bullets[k]; b.y+=b.vy;
+            ctx.strokeStyle='#00D4FF'; ctx.lineWidth=2.2*dpr;
+            ctx.shadowColor='#00D4FF'; ctx.shadowBlur=6*dpr;
+            ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(b.x,b.y+11*dpr); ctx.stroke();
+            ctx.shadowBlur=0;
+            if (b.y<-15) bullets.splice(k,1);
+          }
+          enemies.forEach(e => {
+            e.x += e.vx; if (e.x>e.max||e.x<e.min) e.vx*=-1;
+            drawEnemy(e.x, e.y, e.col);
+          });
+          t+=.022; fr++;
+          requestAnimationFrame(loop);
+        }
+        loop();
+      }
+    })();
+
+    // ── SKILLS BAR REVEAL ──
+    (function() {
+      const grid = document.getElementById('skills-bar-grid');
+      if (!grid) return;
+      const fills = grid.querySelectorAll('.sk-fill');
+      const obs = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+          fills.forEach((el, i) => {
+            setTimeout(() => el.classList.add('revealed'), i * 80);
+          });
+          obs.disconnect();
+        }
+      }, { threshold: 0.15 });
+      obs.observe(grid);
+    })();
+
+    // ── SYSTEM MONITOR ──
+    (function(){
+      let cpu=65,mem=52,disk=78,uptS=0;
+      function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+      function rnd(v,amp,lo,hi){return clamp(v+(Math.random()-.5)*amp,lo,hi);}
+      function p2(n){return String(Math.floor(n)).padStart(2,'0');}
+      function setBar(barId,valId,pct,col){
+        const b=document.getElementById(barId),v=document.getElementById(valId);
+        if(!b||!v)return;
+        b.style.width=pct.toFixed(0)+'%';b.style.background=col;
+        v.textContent=pct.toFixed(0)+'%';v.style.color=col;
+      }
+      function update(){
+        cpu=rnd(cpu,16,8,95);
+        mem=rnd(mem,7,25,88);
+        disk=rnd(disk,2,68,94);
+        const cpuCol=cpu>80?'#FF4444':cpu>65?'#FFD700':'#00D4FF';
+        const memCol=mem>78?'#FF6644':mem>60?'#FFB800':'#8B5CF6';
+        setBar('sm-cpu-bar','sm-cpu-val',cpu,cpuCol);
+        setBar('sm-mem-bar','sm-mem-val',mem,memCol);
+        setBar('sm-disk-bar','sm-disk-val',disk,'#00FF88');
+        const u=document.getElementById('sm-net-up'),d=document.getElementById('sm-net-down');
+        if(u)u.textContent=(Math.random()*5.5+0.3).toFixed(1);
+        if(d)d.textContent=(Math.random()*2.2+0.1).toFixed(1);
+      }
+      function tick(){
+        uptS++;
+        const el=document.getElementById('sm-uptime');
+        if(el)el.textContent='UPTIME '+p2(uptS/3600|0)+':'+p2((uptS/60|0)%60)+':'+p2(uptS%60);
+      }
+      setInterval(update,1800);
+      setInterval(tick,1000);
+    })();
 
     // ── CONTACT FORM ──
     async function submitContact(e) {
@@ -1722,7 +2714,7 @@
       status.textContent = currentLang === 'ko' ? '전송 중...' : 'Sending...';
 
       try {
-        const res = await fetch('https://formsubmit.co/ajax/qkstjr0000@naver.com', {
+        const res = await fetch('https://formsubmit.co/ajax/qkstjr0000@gmail.com', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({ name, email, message: msg, _captcha: 'false' }),
@@ -1743,6 +2735,44 @@
         btn.disabled = false;
       }
     }
+    // ── PROJECT FILTER ──
+    (function() {
+      document.querySelectorAll('.pf-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          const filter = this.getAttribute('data-filter');
+          document.querySelectorAll('.proj-card').forEach(card => {
+            if (filter === 'all' || card.getAttribute('data-cat') === filter) {
+              card.classList.remove('pf-hidden');
+            } else {
+              card.classList.add('pf-hidden');
+            }
+          });
+        });
+      });
+    })();
+
+    // ── THEME TOGGLE ──
+    (function() {
+      const btn = document.getElementById('theme-btn');
+      let theme = localStorage.getItem('portfolio-theme') || 'dark';
+      function applyTheme(t) {
+        theme = t;
+        localStorage.setItem('portfolio-theme', t);
+        if (t === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+          btn.textContent = '[light]';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          btn.textContent = '[dark]';
+        }
+      }
+      applyTheme(theme);
+      btn.addEventListener('click', function() {
+        applyTheme(theme === 'dark' ? 'light' : 'dark');
+      });
+    })();
   </script>
 
 </body>

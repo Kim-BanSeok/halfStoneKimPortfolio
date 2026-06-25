@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <title>Breakout | halfstone.Kim</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -48,15 +48,45 @@
     .pu-chip.shield { border-color:rgba(255,215,0,.5); color:#FFD700; }
 
     .m-hint { position:absolute; bottom:12px; right:14px; font-size:.6rem; color:rgba(88,88,160,.5); letter-spacing:.08em; pointer-events:none; }
+
+    .touch-hint { display:none; }
+    @media(hover:none)and(pointer:coarse){ .touch-hint{display:block;font-size:0.65rem;color:rgba(0,212,255,0.45);text-align:center;padding:0.3rem;font-family:'DM Mono',monospace;} }
+
+    /* ── GAME OVER ERROR BLOCK ── */
+    .ov-error-block {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      line-height: 1.75;
+      color: #FF4444;
+      background: rgba(255,68,68,0.06);
+      border: 1px solid rgba(255,68,68,0.25);
+      border-left: 3px solid #FF4444;
+      border-radius: 4px;
+      padding: .55rem .85rem;
+      text-align: left;
+      letter-spacing: .04em;
+      white-space: pre;
+      text-shadow: 0 0 8px rgba(255,68,68,0.45);
+    }
+    .ov-error-block .err-head {
+      color: #FF4444;
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .06em;
+    }
+    .ov-error-block .err-sep { color: rgba(255,102,68,.5); }
+    .ov-error-block .err-key { color: #FF6644; }
+    .ov-error-block .err-val { color: #FF4444; }
   </style>
 </head>
 <body>
   <div class="top-bar">
-    <a href="index.html" class="back-link">← halfstone.Kim</a>
+    <a href="index.html#games" class="back-link">← 게임 목록</a>
     <span class="top-title">BREAKOUT</span>
     <div class="top-right">BEST&nbsp;<span id="ui-best">0</span></div>
   </div>
 
+  <div class="touch-hint">DRAG to move paddle</div>
   <div id="cv-wrap">
     <canvas id="cv"></canvas>
 
@@ -72,6 +102,12 @@
     </div>
 
     <div class="overlay" id="scr-over">
+      <div class="ov-error-block"><span class="err-head">NULL_POINTER_EXCEPTION</span>
+<span class="err-sep">── error report ───────</span>
+<span class="err-key">Thread:</span> <span class="err-val">game_loop</span>
+<span class="err-key">Error :</span> <span class="err-val">BUFFER_OVERFLOW</span>
+<span class="err-key">Code  :</span> <span class="err-val">0xBADC0DE</span>
+<span class="err-sep">───────────────────────</span></div>
       <div class="ov-label">GAME OVER</div>
       <div class="ov-score-big" id="over-score">0</div>
       <div class="ov-best">BEST &nbsp;<em id="over-best">0</em></div>
@@ -354,6 +390,27 @@ function drawBg() {
   ctx.fillStyle = '#07071A';
   ctx.fillRect(0,0,W,H);
   for (let y=0; y<H; y+=4) { ctx.fillStyle='rgba(0,0,0,.04)'; ctx.fillRect(0,y,W,1); }
+
+  const HEX_SIZE = 28;
+  const HEX_W = HEX_SIZE * 2;
+  const HEX_H = Math.sqrt(3) * HEX_SIZE;
+  ctx.strokeStyle = 'rgba(0,212,255,0.025)';
+  ctx.lineWidth = 1;
+  for (let row = -1; row < H / HEX_H + 2; row++) {
+    for (let col = -1; col < W / (HEX_W * 0.75) + 2; col++) {
+      const hx = col * HEX_W * 0.75;
+      const hy = row * HEX_H + (col % 2 === 0 ? 0 : HEX_H / 2);
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = Math.PI / 3 * i - Math.PI / 6;
+        const px2 = hx + HEX_SIZE * Math.cos(angle);
+        const py2 = hy + HEX_SIZE * Math.sin(angle);
+        if (i === 0) ctx.moveTo(px2, py2); else ctx.lineTo(px2, py2);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }
 }
 
 function drawHUD() {
@@ -394,8 +451,24 @@ function drawHUD() {
   ctx.shadowBlur = 0; ctx.textAlign = 'left';
 }
 
+function getCrackSeeds(b) {
+  if (!b._crackSeeds) {
+    const seeds = [];
+    const rng = (seed) => { let x = Math.sin(seed + b.col * 17 + b.row * 31) * 43758.5453; return x - Math.floor(x); };
+    for (let i = 0; i < 3; i++) {
+      seeds.push({
+        x1: rng(i * 3)     * (BW - 6) + b.x + 3,
+        y1: rng(i * 3 + 1) * (BH - 4) + b.y + 2,
+        x2: rng(i * 3 + 2) * (BW - 6) + b.x + 3,
+        y2: rng(i * 3 + 3) * (BH - 4) + b.y + 2,
+      });
+    }
+    b._crackSeeds = seeds;
+  }
+  return b._crackSeeds;
+}
+
 function drawBricks(dt) {
-  const fadeIn = Math.min(1, levelT / 0.55);
   bricks.forEach(b => {
     if (b.dead) return;
     const row_delay = b.row * 0.06;
@@ -411,17 +484,38 @@ function drawBricks(dt) {
     ctx.save();
     ctx.globalAlpha = a;
     ctx.translate(bx, by); ctx.scale(scale, scale); ctx.translate(-bx, -by);
-    ctx.shadowColor = glow; ctx.shadowBlur = 10; ctx.fillStyle = col;
+
+    ctx.shadowColor = glow;
+    ctx.shadowBlur = b.type === 3 ? 6 : (b.hitT > 0 ? 18 : 10);
+    ctx.fillStyle = col;
     rr(b.x+1, b.y+1, BW-2, BH-2, 3);
 
-    // Crack on strong brick after first hit
-    if (b.type===2 && b.hits===1) {
-      ctx.fillStyle = 'rgba(0,0,0,.35)';
-      ctx.fillRect(b.x+BW*.3, b.y+2, 2, BH-4);
-      ctx.fillRect(b.x+BW*.6, b.y+2, 2, BH-4);
+    ctx.shadowBlur = 0;
+
+    const hlH = Math.floor((BH - 2) * 0.36);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(b.x+3, b.y+2);
+    ctx.lineTo(b.x+BW-3, b.y+2);
+    ctx.lineTo(b.x+BW-6, b.y+2+hlH);
+    ctx.lineTo(b.x+6, b.y+2+hlH);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fill();
+    ctx.restore();
+
+    if (b.type === 2 && b.hits >= 1) {
+      const cracks = getCrackSeeds(b);
+      ctx.strokeStyle = 'rgba(0,0,0,0.65)';
+      ctx.lineWidth = 1;
+      cracks.forEach(c => {
+        ctx.beginPath();
+        ctx.moveTo(c.x1, c.y1);
+        ctx.lineTo(c.x2, c.y2);
+        ctx.stroke();
+      });
     }
 
-    ctx.shadowBlur = 0;
     ctx.fillStyle = b.type===3 ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,.5)';
     ctx.font = `600 ${BW>55?9:8}px DM Mono,monospace`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -433,15 +527,48 @@ function drawBricks(dt) {
 function drawPaddle() {
   const pw = pu.wide > 0 ? paddle.w * 1.55 : paddle.w;
   const px = paddle.x - pw/2;
-  const grad = ctx.createLinearGradient(px, paddle.y, px, paddle.y+paddle.h);
-  grad.addColorStop(0, 'rgba(255,255,255,.95)');
-  grad.addColorStop(1, 'rgba(0,212,255,.8)');
-  ctx.shadowColor = 'rgba(0,212,255,.7)'; ctx.shadowBlur = pu.laser>0?16:10;
-  ctx.fillStyle = pu.laser>0 ? '#FF5555' : grad;
+  const isLaser = pu.laser > 0;
+
+  ctx.save();
+  ctx.shadowColor = isLaser ? 'rgba(255,85,85,.8)' : 'rgba(0,212,255,.75)';
+  ctx.shadowBlur = 15;
+
+  if (isLaser) {
+    const laserGrad = ctx.createLinearGradient(px, 0, px+pw, 0);
+    laserGrad.addColorStop(0, 'rgba(255,85,85,0)');
+    laserGrad.addColorStop(0.2, 'rgba(255,85,85,.9)');
+    laserGrad.addColorStop(0.5, '#FF8888');
+    laserGrad.addColorStop(0.8, 'rgba(255,85,85,.9)');
+    laserGrad.addColorStop(1, 'rgba(255,85,85,0)');
+    ctx.fillStyle = laserGrad;
+  } else {
+    const grad = ctx.createLinearGradient(px, 0, px+pw, 0);
+    grad.addColorStop(0, 'rgba(0,212,255,0)');
+    grad.addColorStop(0.18, 'rgba(0,212,255,.75)');
+    grad.addColorStop(0.5, 'rgba(255,255,255,.98)');
+    grad.addColorStop(0.82, 'rgba(0,212,255,.75)');
+    grad.addColorStop(1, 'rgba(0,212,255,0)');
+    ctx.fillStyle = grad;
+  }
   rr(px, paddle.y, pw, paddle.h, 4);
   ctx.shadowBlur = 0;
 
-  // Shield bar
+  const flameCol = isLaser ? 'rgba(255,85,85,' : 'rgba(0,212,255,';
+  const flameCount = Math.floor(pw / 14);
+  for (let i = 0; i < flameCount; i++) {
+    const fx = px + (i + 0.5) * (pw / flameCount);
+    const fh = 5 + Math.sin(performance.now() * 0.012 + i * 1.7) * 4;
+    const flameGrad = ctx.createRadialGradient(fx, paddle.y + paddle.h, 0, fx, paddle.y + paddle.h, fh + 4);
+    flameGrad.addColorStop(0, flameCol + '0.7)');
+    flameGrad.addColorStop(0.5, flameCol + '0.25)');
+    flameGrad.addColorStop(1, flameCol + '0)');
+    ctx.fillStyle = flameGrad;
+    ctx.beginPath();
+    ctx.arc(fx, paddle.y + paddle.h, fh, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
   if (pu.shield) {
     const sy = paddle.y - 48;
     ctx.strokeStyle = 'rgba(255,215,0,.8)';
@@ -457,20 +584,30 @@ function drawBalls(dt) {
   balls.forEach(b => {
     b.trail.push({x:b.x, y:b.y});
     if (b.trail.length > 9) b.trail.shift();
-    // Trail
-    b.trail.forEach((p,i) => {
-      const a = (i+1)/b.trail.length * 0.45;
-      const r = BALL_R * ((i+1)/b.trail.length) * 0.7;
-      ctx.globalAlpha = a;
+    const trailLen = Math.min(b.trail.length, 5);
+    const trailStart = b.trail.length - trailLen;
+    for (let i = trailStart; i < b.trail.length - 1; i++) {
+      const p = b.trail[i];
+      const frac = (i - trailStart + 1) / trailLen;
+      ctx.save();
+      ctx.globalAlpha = frac * 0.35;
+      ctx.shadowColor = '#00D4FF';
+      ctx.shadowBlur = 8;
       ctx.fillStyle = '#00D4FF';
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-    // Ball
-    ctx.shadowColor = '#00D4FF'; ctx.shadowBlur = 14;
-    ctx.fillStyle = '#fff';
+      const tr = BALL_R * frac * 0.65;
+      ctx.beginPath(); ctx.arc(p.x, p.y, tr, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.shadowColor = '#00D4FF';
+    ctx.shadowBlur = 20;
+    const ballGrad = ctx.createRadialGradient(b.x - BALL_R*0.3, b.y - BALL_R*0.3, BALL_R*0.1, b.x, b.y, BALL_R);
+    ballGrad.addColorStop(0, '#ffffff');
+    ballGrad.addColorStop(0.45, '#7EEEFF');
+    ballGrad.addColorStop(1, '#00D4FF');
+    ctx.fillStyle = ballGrad;
     ctx.beginPath(); ctx.arc(b.x, b.y, BALL_R, 0, Math.PI*2); ctx.fill();
-    ctx.shadowBlur = 0;
+    ctx.restore();
   });
 }
 
@@ -488,10 +625,17 @@ function drawDrops(dt) {
 
 function drawLasers() {
   lasers.forEach(l => {
-    ctx.shadowColor='rgba(255,85,85,.8)'; ctx.shadowBlur=10;
-    ctx.strokeStyle='#FF5555'; ctx.lineWidth=2.5;
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,85,85,1)';
+    ctx.shadowBlur = 22;
+    ctx.strokeStyle = '#FF5555';
+    ctx.lineWidth = 2.5;
     ctx.beginPath(); ctx.moveTo(l.x, l.y); ctx.lineTo(l.x, l.y-18); ctx.stroke();
-    ctx.shadowBlur=0;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = 'rgba(255,180,180,0.7)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(l.x, l.y); ctx.lineTo(l.x, l.y-18); ctx.stroke();
+    ctx.restore();
   });
 }
 
@@ -648,10 +792,17 @@ function gameLoop(ts) {
   drawDrops(dt);
   if (STATE!=='aiming') drawBalls(dt);
   else { // aiming: draw ball on paddle, blinking
-    ctx.globalAlpha = 0.5+0.5*Math.sin(frameN*0.18);
-    ctx.shadowColor='#00D4FF'; ctx.shadowBlur=12; ctx.fillStyle='#fff';
+    const aimAlpha = 0.5+0.5*Math.sin(frameN*0.18);
+    ctx.save();
+    ctx.globalAlpha = aimAlpha;
+    ctx.shadowColor = '#00D4FF'; ctx.shadowBlur = 20;
+    const aimGrad = ctx.createRadialGradient(paddle.x - BALL_R*0.3, paddle.y-BALL_R-2 - BALL_R*0.3, BALL_R*0.1, paddle.x, paddle.y-BALL_R-2, BALL_R);
+    aimGrad.addColorStop(0, '#ffffff');
+    aimGrad.addColorStop(0.45, '#7EEEFF');
+    aimGrad.addColorStop(1, '#00D4FF');
+    ctx.fillStyle = aimGrad;
     ctx.beginPath(); ctx.arc(paddle.x, paddle.y-BALL_R-2, BALL_R, 0, Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0; ctx.globalAlpha=1;
+    ctx.restore();
   }
   drawPaddle();
   drawLasers();

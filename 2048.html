@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <title>2048 · halfstone.Kim</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap" rel="stylesheet">
   <style>
@@ -24,12 +24,19 @@
     .header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:450px;}
     .logo{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--cyan);text-decoration:none;}
     .logo:hover{opacity:.7;}
-    .scores{display:flex;gap:1.2rem;}
-    .score-box{text-align:center;}
+    .scores{display:flex;gap:.6rem;}
     .score-lbl{display:block;font-family:'DM Mono',monospace;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.12rem;}
-    .score-val{font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--cyan);}
-    .score-val.hi{color:var(--purple);}
-    .score-val.mv{color:var(--muted);font-size:1rem;}
+    .score-val{font-family:'DM Mono',monospace;font-size:1.3rem;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.4);}
+    .score-val.hi{color:var(--purple);text-shadow:0 0 12px rgba(139,92,246,.45);}
+    .score-val.mv{color:var(--muted);font-size:1rem;text-shadow:none;}
+    .score-box{
+      text-align:center;padding:.3rem .6rem;
+      border:1px solid rgba(0,212,255,.1);border-radius:6px;
+      background:rgba(13,13,40,.6);
+      transition:border-color .3s,box-shadow .3s;
+    }
+    .score-box:first-child{border-color:rgba(0,212,255,.18);box-shadow:0 0 12px rgba(0,212,255,.08);}
+    .score-box:last-child{border-color:rgba(139,92,246,.18);box-shadow:0 0 12px rgba(139,92,246,.08);}
 
     /* ── MODE SELECT ── */
     .mode-row{display:flex;gap:.5rem;width:100%;max-width:450px;}
@@ -60,36 +67,92 @@
     /* ── BOARD ── */
     .board{
       position:relative;width:450px;height:450px;
-      background:var(--surface);border-radius:12px;border:1px solid var(--border);
-      box-shadow:0 0 40px rgba(0,212,255,.06);overflow:hidden;
+      background:linear-gradient(160deg,#0D0D28 0%,#080820 100%);
+      border-radius:14px;
+      border:1px solid rgba(0,212,255,.14);
+      box-shadow:0 0 0 1px rgba(139,92,246,.06),0 8px 48px rgba(0,0,0,.5),0 0 60px rgba(0,212,255,.07);
+      overflow:hidden;
     }
     @keyframes shake{0%,100%{transform:none;}20%{transform:translate(-6px,4px);}40%{transform:translate(6px,-4px);}60%{transform:translate(-4px,6px);}80%{transform:translate(4px,-2px);}};
     .board.shake{animation:shake .35s ease;}
 
-    .bg-cell{position:absolute;width:100px;height:100px;border-radius:6px;background:rgba(30,30,74,.45);}
+    .bg-cell{
+      position:absolute;width:100px;height:100px;border-radius:8px;
+      background:rgba(14,14,40,.7);
+      border:1px solid rgba(30,30,80,.6);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    }
 
     /* ── TILES ── */
     .tile{
-      position:absolute;width:100px;height:100px;border-radius:6px;
+      position:absolute;width:100px;height:100px;border-radius:8px;
       display:flex;align-items:center;justify-content:center;
       font-family:'DM Mono',monospace;font-weight:700;font-size:1.8rem;z-index:2;
+      transition:left 120ms ease, top 120ms ease;
     }
-    .tile.v2    {background:#1a1a38;color:#9090c8;box-shadow:0 2px 8px rgba(0,0,0,.3);}
-    .tile.v4    {background:#1a2a4e;color:#b0c8e8;box-shadow:0 2px 8px rgba(0,0,0,.3);}
-    .tile.v8    {background:#0a3858;color:#00D4FF;box-shadow:0 4px 16px rgba(0,212,255,.2);}
-    .tile.v16   {background:#0a4a6e;color:#00D4FF;box-shadow:0 4px 18px rgba(0,212,255,.25);}
-    .tile.v32   {background:#1a3880;color:#88b8ff;box-shadow:0 4px 20px rgba(136,184,255,.25);}
-    .tile.v64   {background:#2a1890;color:#aa90ff;box-shadow:0 4px 22px rgba(170,144,255,.3);}
-    .tile.v128  {background:#4a18a0;color:#cc9fff;font-size:1.4rem;box-shadow:0 6px 24px rgba(139,92,246,.35);}
-    .tile.v256  {background:#6a0898;color:#FFD700;font-size:1.3rem;box-shadow:0 6px 26px rgba(255,215,0,.25);}
-    .tile.v512  {background:#882800;color:#FFD700;font-size:1.3rem;box-shadow:0 6px 28px rgba(255,215,0,.3);}
-    .tile.v1024 {background:#904000;color:#FFD700;font-size:1.05rem;box-shadow:0 8px 32px rgba(255,215,0,.35);}
-    .tile.v2048 {background:var(--gold);color:#000;font-size:1.05rem;box-shadow:0 8px 40px rgba(255,215,0,.6);}
-    .tile.vmax  {background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;font-size:.9rem;box-shadow:0 8px 40px rgba(139,92,246,.5);}
-    @keyframes appear{0%{transform:scale(0);}60%{transform:scale(1.12);}100%{transform:scale(1);}};
+    .tile.v2{
+      background:rgba(20,20,50,.9);color:#8080C0;
+      box-shadow:0 2px 6px rgba(0,0,0,.4),inset 0 1px 0 rgba(128,128,192,.08);
+    }
+    .tile.v4{
+      background:rgba(30,20,60,.9);color:#A080D0;
+      box-shadow:0 2px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(160,128,208,.1);
+    }
+    .tile.v8{
+      background:#1A1A40;color:#00D4FF;
+      box-shadow:0 4px 14px rgba(0,212,255,.2),0 0 0 1px rgba(0,212,255,.08),inset 0 1px 0 rgba(0,212,255,.1);
+      text-shadow:0 0 10px rgba(0,212,255,.5);
+    }
+    .tile.v16{
+      background:#1E1044;color:#00D4FF;
+      box-shadow:0 4px 18px rgba(0,212,255,.28),0 0 0 1px rgba(0,212,255,.12),inset 0 1px 0 rgba(0,212,255,.12);
+      text-shadow:0 0 14px rgba(0,212,255,.7);
+    }
+    .tile.v32{
+      background:#1a2060;color:#8FA8FF;
+      box-shadow:0 4px 20px rgba(143,168,255,.28),0 0 0 1px rgba(139,92,246,.15),inset 0 1px 0 rgba(143,168,255,.1);
+      text-shadow:0 0 10px rgba(143,168,255,.5);
+    }
+    .tile.v64{
+      background:#201070;color:#B090FF;
+      box-shadow:0 4px 24px rgba(176,144,255,.35),0 0 0 1px rgba(139,92,246,.2),inset 0 1px 0 rgba(176,144,255,.12);
+      text-shadow:0 0 14px rgba(176,144,255,.65);
+    }
+    .tile.v128{
+      background:linear-gradient(145deg,#2d1280,#3d1a90);color:#CC9FFF;font-size:1.4rem;
+      box-shadow:0 6px 28px rgba(139,92,246,.45),0 0 0 1px rgba(139,92,246,.3),inset 0 1px 0 rgba(204,159,255,.15);
+      text-shadow:0 0 16px rgba(139,92,246,.8);
+    }
+    .tile.v256{
+      background:linear-gradient(145deg,#3a0a80,#500a90);color:#FFD700;font-size:1.3rem;
+      box-shadow:0 6px 30px rgba(255,215,0,.3),0 0 0 1px rgba(255,215,0,.15),inset 0 1px 0 rgba(255,215,0,.12);
+      text-shadow:0 0 16px rgba(255,215,0,.7);
+    }
+    .tile.v512{
+      background:linear-gradient(145deg,#602000,#7a2800);color:#FFD700;font-size:1.3rem;
+      box-shadow:0 6px 32px rgba(255,215,0,.38),0 0 0 1px rgba(255,215,0,.2),inset 0 1px 0 rgba(255,215,0,.15);
+      text-shadow:0 0 18px rgba(255,215,0,.8);
+    }
+    .tile.v1024{
+      background:linear-gradient(145deg,#783000,#944000);color:#FFE44D;font-size:1.05rem;
+      box-shadow:0 8px 36px rgba(255,215,0,.48),0 0 0 1px rgba(255,215,0,.28),inset 0 1px 0 rgba(255,228,77,.2);
+      text-shadow:0 0 20px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.4);
+    }
+    .tile.v2048{
+      background:linear-gradient(145deg,#B8860B,#FFD700);color:#000;font-size:1.05rem;
+      box-shadow:0 8px 44px rgba(255,215,0,.7),0 0 0 2px rgba(255,215,0,.5),0 0 60px rgba(255,215,0,.25);
+      text-shadow:0 1px 0 rgba(255,255,255,.3);
+    }
+    .tile.vmax{
+      background:linear-gradient(135deg,#00a8cc,#6b2fd4);color:#fff;font-size:.9rem;
+      box-shadow:0 8px 44px rgba(139,92,246,.6),0 0 0 2px rgba(0,212,255,.4),0 0 60px rgba(0,212,255,.2);
+      text-shadow:0 0 20px rgba(255,255,255,.8);
+    }
+    @keyframes appear{0%{transform:scale(0);opacity:0;}60%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}};
+    @keyframes merge{0%{transform:scale(1);}30%{transform:scale(1.22);}65%{transform:scale(.96);}100%{transform:scale(1);}};
     @keyframes pop   {0%{transform:scale(1);}40%{transform:scale(1.18);}100%{transform:scale(1);}};
-    .anim-appear{animation:appear .18s ease forwards;}
-    .anim-pop   {animation:pop    .15s ease;}
+    .anim-appear{animation:appear .2s cubic-bezier(.34,1.56,.64,1) forwards;}
+    .anim-pop   {animation:merge  .18s cubic-bezier(.34,1.4,.64,1);}
 
     /* ── HINT ARROW ── */
     .hint-arrow{
@@ -125,6 +188,26 @@
     .ov-sc .on{font-family:'DM Mono',monospace;font-size:1.5rem;color:var(--cyan);}
     .ov-sc .on.hi{color:var(--purple);}
     .ov-rec{font-family:'DM Mono',monospace;font-size:.8rem;color:var(--gold);min-height:1.2em;}
+
+    /* ── IT ERROR / SUCCESS BANNER ── */
+    .err-banner{
+      font-family:'DM Mono',monospace;font-size:.65rem;line-height:1.7;
+      padding:.55rem .85rem;border-radius:5px;text-align:left;
+      white-space:pre;letter-spacing:.03em;
+      background:rgba(255,68,68,.06);
+      border:1px solid rgba(255,68,68,.28);
+      color:#FF4444;
+      text-shadow:0 0 8px rgba(255,68,68,.35);
+    }
+    .ok-banner{
+      font-family:'DM Mono',monospace;font-size:.65rem;line-height:1.7;
+      padding:.55rem .85rem;border-radius:5px;text-align:left;
+      white-space:pre;letter-spacing:.03em;
+      background:rgba(0,255,136,.05);
+      border:1px solid rgba(0,255,136,.25);
+      color:#00FF88;
+      text-shadow:0 0 8px rgba(0,255,136,.3);
+    }
     .btn{padding:.55rem 1.6rem;background:var(--cyan);color:#000;font-weight:600;font-size:.85rem;border:none;border-radius:6px;cursor:pointer;letter-spacing:.04em;transition:box-shadow .3s,transform .2s;}
     .btn:hover{box-shadow:0 0 20px rgba(0,212,255,.5);transform:translateY(-2px);}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
@@ -155,11 +238,13 @@
     .stats-row{
       display:flex;align-items:center;gap:1rem;
       width:100%;max-width:450px;
-      background:var(--card);border:1px solid var(--border);
+      background:var(--card);
+      border:1px solid rgba(0,212,255,.12);
       border-radius:8px;padding:.7rem 1rem;
+      box-shadow:0 0 20px rgba(0,212,255,.04);
     }
     .stat-item{flex:1;text-align:center;}
-    .stat-val{font-family:'DM Mono',monospace;font-size:.95rem;color:var(--cyan);}
+    .stat-val{font-family:'DM Mono',monospace;font-size:.95rem;color:var(--cyan);text-shadow:0 0 10px rgba(0,212,255,.3);}
     .stat-lbl{font-family:'DM Mono',monospace;font-size:.48rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.1rem;}
     .btn-ach{
       padding:.4rem .8rem;border:1px solid var(--gold);border-radius:5px;
@@ -196,18 +281,21 @@
 
     @media(max-width:480px){
       .board{width:320px;height:320px;}
-      .bg-cell,.tile{width:70px;height:70px;}
+      .bg-cell,.tile{width:70px;height:70px;border-radius:6px;}
       .tile{font-size:1.2rem;}
       .tile.v128,.tile.v256,.tile.v512{font-size:1rem;}
       .tile.v1024,.tile.v2048,.tile.vmax{font-size:.78rem;}
       .ach-grid{grid-template-columns:1fr;}
+      .score-box{padding:.2rem .4rem;}
     }
+    .touch-hint { display:none; }
+    @media(hover:none)and(pointer:coarse){ .touch-hint{display:block;font-size:0.65rem;color:rgba(0,212,255,0.45);text-align:center;padding:0.3rem;font-family:'DM Mono',monospace;} }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <a class="logo" href="index.html">← halfstone.Kim</a>
+    <a class="logo" href="index.html#games">← 게임 목록</a>
     <div class="scores">
       <div class="score-box"><span class="score-lbl">Score</span><span class="score-val" id="s-score">0</span></div>
       <div class="score-box"><span class="score-lbl">Moves</span><span class="score-val mv" id="s-moves">0</span></div>
@@ -249,6 +337,10 @@
       <button class="btn" id="btn-start">시작하기</button>
     </div>
     <div class="overlay hidden" id="ov-win">
+      <div class="ok-banner">PROCESS_COMPLETE
+tile_merger.exe  exited normally
+target_value   : 2048
+exit_code      : 0</div>
       <div class="ov-title" style="color:var(--gold)">2048! 🎉</div>
       <div class="ov-scores">
         <div class="ov-sc"><span class="ol">Score</span><span class="on" id="win-score">0</span></div>
@@ -261,6 +353,10 @@
       </div>
     </div>
     <div class="overlay hidden" id="ov-lose">
+      <div class="err-banner">HEAP_OVERFLOW_EXCEPTION
+Process: 2048.exe aborted
+Reason : ARITHMETIC_OVERFLOW
+Code   : 0xFFFFFFFF</div>
       <div class="ov-title">Game Over</div>
       <div class="ov-scores">
         <div class="ov-sc"><span class="ol">Score</span><span class="on" id="lose-score">0</span></div>
@@ -270,6 +366,10 @@
       <button class="btn" id="btn-lose-new">다시 시작</button>
     </div>
     <div class="overlay hidden" id="ov-time">
+      <div class="err-banner">HEAP_OVERFLOW_EXCEPTION
+Process: 2048.exe aborted
+Reason : ARITHMETIC_OVERFLOW
+Code   : 0xFFFFFFFF</div>
       <div class="ov-title" style="color:var(--cyan)">⏱ 시간 종료!</div>
       <div class="ov-scores">
         <div class="ov-sc"><span class="ol">Score</span><span class="on" id="ta-score">0</span></div>
@@ -287,6 +387,7 @@
     <button class="btn btn-ghost" id="btn-new">새 게임</button>
   </div>
   <div class="hint">Z = 되돌리기 · H = 힌트</div>
+  <div class="touch-hint">SWIPE to merge</div>
 
   <!-- STATS -->
   <div class="stats-row">

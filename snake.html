@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <title>Snake · halfstone.Kim</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,600&display=swap" rel="stylesheet">
   <style>
@@ -105,6 +105,32 @@
     }
     .btn:hover { box-shadow: 0 0 24px rgba(0,212,255,0.5); transform: translateY(-2px); }
 
+    /* ── GAME OVER ERROR BLOCK ── */
+    .ov-error-block {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      line-height: 1.7;
+      color: #FF4444;
+      background: rgba(255,68,68,0.06);
+      border: 1px solid rgba(255,68,68,0.25);
+      border-left: 3px solid #FF4444;
+      border-radius: 4px;
+      padding: 0.6rem 0.9rem;
+      text-align: left;
+      letter-spacing: 0.04em;
+      white-space: pre;
+      text-shadow: 0 0 8px rgba(255,68,68,0.5);
+    }
+    .ov-error-block .err-head {
+      color: #FF4444;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+    .ov-error-block .err-sep { color: rgba(255,102,68,0.5); }
+    .ov-error-block .err-key { color: #FF6644; }
+    .ov-error-block .err-val { color: #FF4444; }
+
     /* PAUSE overlay */
     .pause-overlay {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -139,12 +165,12 @@
     /* ── D-PAD (mobile) ── */
     .dpad {
       display: grid;
-      grid-template-columns: repeat(3, 40px);
-      grid-template-rows: repeat(2, 40px);
+      grid-template-columns: repeat(3, 48px);
+      grid-template-rows: repeat(2, 48px);
       gap: 4px;
     }
     .dpad-btn {
-      width: 40px; height: 40px;
+      width: 48px; height: 48px;
       background: var(--card); border: 1px solid var(--border);
       border-radius: 6px; display: flex; align-items: center; justify-content: center;
       font-size: 0.8rem; color: var(--muted); cursor: pointer;
@@ -175,13 +201,15 @@
     @media (max-width: 520px) {
       canvas { width: 300px !important; height: 300px !important; }
     }
+    .touch-hint { display:none; }
+    @media(hover:none)and(pointer:coarse){ .touch-hint{display:block;font-size:0.65rem;color:rgba(0,212,255,0.45);text-align:center;padding:0.3rem;font-family:'DM Mono',monospace;} }
   </style>
 </head>
 <body>
 
   <!-- HEADER -->
   <div class="header">
-    <a class="logo" href="index.html">← halfstone.Kim</a>
+    <a class="logo" href="index.html#games">← 게임 목록</a>
     <div class="scores">
       <div class="score-box">
         <span class="score-label">Score</span>
@@ -226,6 +254,12 @@
 
     <!-- GAME OVER -->
     <div class="overlay hidden" id="ov-over">
+      <div class="ov-error-block"><span class="err-head">INFINITE_LOOP_DETECTED</span>
+<span class="err-sep">── process killed ─────</span>
+<span class="err-key">PID   :</span> <span class="err-val">snake.exe</span>
+<span class="err-key">Signal:</span> <span class="err-val">MEMORY_CORRUPTION</span>
+<span class="err-key">Addr  :</span> <span class="err-val">0xC0FFEE42</span>
+<span class="err-sep">───────────────────────</span></div>
       <div class="overlay-title">Game Over</div>
       <div class="overlay-scores">
         <div class="ov-score">
@@ -263,6 +297,8 @@
       <button class="dpad-btn dpad-right" id="d-right">▶</button>
     </div>
   </div>
+
+  <div class="touch-hint">SWIPE to move</div>
 
   <!-- LEGEND -->
   <div class="legend">
@@ -558,8 +594,8 @@ function render() {
   ctx.fillRect(-10,-10, canvas.width+20, canvas.height+20);
 
   // Grid
-  ctx.strokeStyle = 'rgba(30,30,74,0.65)';
-  ctx.lineWidth = 0.5;
+  ctx.strokeStyle = 'rgba(0,212,255,0.03)';
+  ctx.lineWidth = 1;
   for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*CELL,0);ctx.lineTo(x*CELL,canvas.height);ctx.stroke();}
   for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*CELL);ctx.lineTo(canvas.width,y*CELL);ctx.stroke();}
 
@@ -574,11 +610,17 @@ function render() {
   // Food
   if (food) {
     const fx = food.x*CELL+CELL/2, fy = food.y*CELL+CELL/2;
-    const p  = (Math.sin(foodPulse)+1)/2;
+    const p  = (Math.sin(performance.now()/400)+1)/2;
+    const r  = CELL*0.3 + p*1.8;
     ctx.save();
-    ctx.shadowColor='#FF4444'; ctx.shadowBlur = 10+p*12;
-    ctx.beginPath(); ctx.arc(fx,fy,CELL*0.3+p*1.5,0,Math.PI*2);
-    ctx.fillStyle=`rgba(255,${60+p*40},60,0.95)`; ctx.fill();
+    ctx.shadowColor = '#FF4444';
+    ctx.shadowBlur  = 18 + p*10;
+    const rg = ctx.createRadialGradient(fx, fy, 0, fx, fy, r);
+    rg.addColorStop(0,   `rgba(255,180,160,${0.9+p*0.1})`);
+    rg.addColorStop(0.4, `rgba(255,${60+p*40},60,${0.85+p*0.1})`);
+    rg.addColorStop(1,   'rgba(255,40,40,0)');
+    ctx.beginPath(); ctx.arc(fx, fy, r, 0, Math.PI*2);
+    ctx.fillStyle = rg; ctx.fill();
     ctx.restore();
   }
 
@@ -588,12 +630,21 @@ function render() {
     const px   = powerup.x*CELL+CELL/2, py = powerup.y*CELL+CELL/2;
     const age  = (Date.now()-powerup.spawnAt)/9000;
     const blink= age > 0.7 ? (Math.sin(puPulse*3)>0 ? 1:0) : 1;
+    const glow = (Math.sin(puPulse)+1)/2;
+    const puR  = CELL*0.42;
     ctx.save();
-    ctx.shadowColor = def.color; ctx.shadowBlur = 12+(Math.sin(puPulse)+1)*6;
     ctx.globalAlpha = blink;
-    ctx.beginPath(); ctx.arc(px, py, CELL*0.38, 0, Math.PI*2);
-    ctx.fillStyle = def.color+'22'; ctx.fill();
-    ctx.strokeStyle = def.color; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.shadowColor = def.color;
+    ctx.shadowBlur  = 14 + glow*12;
+    const puGrad = ctx.createRadialGradient(px, py, 0, px, py, puR);
+    puGrad.addColorStop(0,   def.color+'55');
+    puGrad.addColorStop(0.6, def.color+'22');
+    puGrad.addColorStop(1,   def.color+'00');
+    ctx.beginPath(); ctx.arc(px, py, puR, 0, Math.PI*2);
+    ctx.fillStyle = puGrad; ctx.fill();
+    ctx.strokeStyle = def.color;
+    ctx.lineWidth = 1.5 + glow*0.5;
+    ctx.stroke();
     ctx.restore();
     ctx.save();
     ctx.globalAlpha = blink;
@@ -607,19 +658,23 @@ function render() {
   snake.forEach((seg,i) => {
     const x=seg.x*CELL+1, y=seg.y*CELL+1, s=CELL-2;
     const t = i/Math.max(snake.length-1,1);
+    const shield = activePU && activePU.type==='shield';
     ctx.save();
     if (i===0) {
-      const shield = activePU && activePU.type==='shield';
-      ctx.shadowColor = shield ? '#00FF88' : '#00D4FF';
-      ctx.shadowBlur  = shield ? 18 : 14;
-      ctx.fillStyle   = shield ? '#00FF88' : '#00D4FF';
+      const headColor = shield ? '#00FF88' : '#00D4FF';
+      ctx.shadowColor = headColor;
+      ctx.shadowBlur  = 20;
+      ctx.fillStyle   = headColor;
     } else {
       ctx.shadowBlur = 0;
-      ctx.globalAlpha = 1 - t*0.35;
-      const r=Math.round(0+t*139), g=Math.round(212-t*120), b=Math.round(255-t*9);
+      const r = 0;
+      const g = Math.round(212 - t*154);
+      const b = Math.round(255 - t*181);
       ctx.fillStyle = `rgb(${r},${g},${b})`;
     }
-    ctx.beginPath(); ctx.roundRect(x,y,s,s,i===0?5:3); ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(x, y, s, s, i===0 ? 5 : 3);
+    ctx.fill();
     ctx.restore();
   });
   ctx.shadowBlur = 0;
@@ -627,12 +682,18 @@ function render() {
   // Eyes
   if (snake.length > 0) {
     const hx=snake[0].x*CELL, hy=snake[0].y*CELL;
-    ctx.fillStyle='#07071A';
-    const offs = dir.x!==0
-      ? [[CELL*0.6,CELL*0.3],[CELL*0.6,CELL*0.7]]
-      : [[CELL*0.3,CELL*0.6],[CELL*0.7,CELL*0.6]];
+    let offs;
+    if (dir.x===1)       offs = [[CELL*0.72,CELL*0.28],[CELL*0.72,CELL*0.68]];
+    else if (dir.x===-1) offs = [[CELL*0.28,CELL*0.28],[CELL*0.28,CELL*0.68]];
+    else if (dir.y===-1) offs = [[CELL*0.28,CELL*0.28],[CELL*0.68,CELL*0.28]];
+    else                 offs = [[CELL*0.28,CELL*0.72],[CELL*0.68,CELL*0.72]];
+    ctx.fillStyle = '#FFFFFF';
     offs.forEach(([ex,ey]) => {
-      ctx.beginPath(); ctx.arc(hx+ex, hy+ey, 2.2, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(hx+ex, hy+ey, 2.5, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.fillStyle = '#07071A';
+    offs.forEach(([ex,ey]) => {
+      ctx.beginPath(); ctx.arc(hx+ex+dir.x*0.8, hy+ey+dir.y*0.8, 1.2, 0, Math.PI*2); ctx.fill();
     });
   }
 

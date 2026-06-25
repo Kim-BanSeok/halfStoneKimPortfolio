@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <title>IT Runner | halfstone.Kim</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
@@ -147,17 +147,49 @@
       font-size:.7rem; letter-spacing:.08em; cursor:pointer; transition:border-color .2s,color .2s;
     }
     .am-close:hover { border-color:var(--cyan); color:var(--cyan); }
+    .ov-btn-ghost {
+      padding:.45rem 1.4rem; background:none; border:1px solid var(--border);
+      border-radius:6px; color:var(--muted); font-family:'DM Mono',monospace;
+      font-size:.7rem; letter-spacing:.1em; cursor:pointer; transition:border-color .2s,color .2s;
+    }
+    .ov-btn-ghost:hover { border-color:var(--purple); color:var(--purple); }
 
     /* ── MOBILE HINT ── */
     .m-hint { position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
       font-size:.6rem; color:rgba(88,88,160,.5); letter-spacing:.08em;
       pointer-events:none; white-space:nowrap; }
+
+    .touch-hint { display:none; }
+    @media(hover:none)and(pointer:coarse){ .touch-hint{display:block;font-size:0.65rem;color:rgba(0,212,255,0.45);text-align:center;padding:0.3rem;font-family:'DM Mono',monospace;} }
+
+    /* ── CRASH ERROR HEADER ── */
+    .err-crash-header {
+      font-family:'DM Mono',monospace;
+      text-align:center;
+      padding:.55rem 1.2rem;
+      background:rgba(12,4,4,0.85);
+      border:1px solid rgba(255,80,40,0.30);
+      border-radius:6px;
+      line-height:1.65;
+    }
+    .err-crash-sig {
+      font-size:.72rem; font-weight:500; letter-spacing:.06em;
+      color:#FF5533; text-shadow:0 0 10px rgba(255,85,51,.55);
+    }
+    .err-crash-proc {
+      font-size:.63rem; letter-spacing:.04em;
+      color:#FF8855;
+    }
+    .err-crash-code {
+      font-size:.62rem; letter-spacing:.04em;
+      color:rgba(255,120,60,.65);
+    }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <a href="index.html" class="back-link">← halfstone.Kim</a>
+    <a href="index.html#games" class="back-link">← 게임 목록</a>
     <span class="top-title">IT Runner</span>
     <div class="top-right">
       <button id="ach-btn" onclick="openAch()">업적</button>
@@ -165,6 +197,7 @@
     </div>
   </div>
 
+  <div class="touch-hint">TAP to jump · SWIPE ↓ to slide</div>
   <div id="cv-wrap">
     <canvas id="cv"></canvas>
 
@@ -179,11 +212,17 @@
     </div>
 
     <div class="overlay" id="scr-dead">
+      <div class="err-crash-header">
+        <div class="err-crash-sig">SEGMENTATION FAULT (core dumped)</div>
+        <div class="err-crash-proc">Process: runner.exe terminated</div>
+        <div class="err-crash-code">Signal: SIGSEGV</div>
+      </div>
       <div class="ov-label" id="dead-lbl">RUNTIME ERROR</div>
       <div class="ov-score-big" id="dead-score">0</div>
       <div class="ov-best">BEST &nbsp;<em id="dead-best">0</em></div>
       <div class="ov-new-best" id="new-best-msg" style="display:none">★ NEW BEST ★</div>
       <button class="ov-btn" id="btn-restart">RESTART</button>
+      <button class="ov-btn-ghost" id="btn-to-title">← TITLE</button>
     </div>
 
     <div id="stage-announce">
@@ -217,7 +256,7 @@
     const w = document.getElementById('cv-wrap');
     W = cv.width = w.clientWidth; H = cv.height = w.clientHeight; GY = H * GR;
   }
-  window.addEventListener('resize', resize); resize();
+  window.addEventListener('resize', () => { resize(); initParallax(); }); resize();
 
   // ── STAGES ──
   const STAGES = [
@@ -340,6 +379,112 @@
     get h(){ return this.sliding ? PLR_SH : PLR_H; },
   };
 
+  // ── PARALLAX LAYERS ──
+  let plxBuildings = [];
+  let plxNodes = [];
+
+  function initParallax() {
+    plxBuildings = [];
+    const count = 20;
+    for (let i = 0; i < count; i++) {
+      const w = 30 + Math.random() * 30;
+      const h = H * (0.15 + Math.random() * 0.25);
+      plxBuildings.push({
+        x: Math.random() * (W + 400) - 200,
+        w,
+        h,
+        ox: 0
+      });
+    }
+
+    plxNodes = [];
+    for (let i = 0; i < 20; i++) {
+      plxNodes.push({
+        x: Math.random() * (W + 600) - 200,
+        y: H * 0.2 + Math.random() * (H * 0.5),
+        r: 1.5 + Math.random() * 2.5,
+        col: Math.random() < 0.55 ? '#00D4FF' : '#8B5CF6',
+        ox: 0
+      });
+    }
+  }
+
+  function updateParallax(dt) {
+    const spd = speed;
+    plxBuildings.forEach(b => {
+      b.x -= spd * 0.15 * dt;
+      if (b.x + b.w < 0) b.x = W + b.w + Math.random() * 60;
+    });
+    plxNodes.forEach(n => {
+      n.x -= spd * 0.4 * dt;
+      if (n.x + n.r < 0) {
+        n.x = W + n.r + Math.random() * 80;
+        n.y = H * 0.2 + Math.random() * (H * 0.5);
+        n.col = Math.random() < 0.55 ? '#00D4FF' : '#8B5CF6';
+      }
+    });
+  }
+
+  function drawParallax() {
+    // Layer 1 — city silhouette
+    ctx.save();
+    ctx.fillStyle = '#0E0E28';
+    plxBuildings.forEach(b => {
+      const bx = Math.floor(b.x);
+      const by = Math.floor(GY - b.h);
+      ctx.fillRect(bx, by, b.w, b.h);
+      ctx.fillStyle = 'rgba(100,100,180,0.08)';
+      ctx.fillRect(bx, by, b.w, 1);
+      ctx.fillStyle = '#0E0E28';
+    });
+    ctx.restore();
+
+    // Layer 2 — floating data nodes
+    ctx.save();
+    for (let i = 0; i < plxNodes.length; i++) {
+      const n = plxNodes[i];
+      ctx.globalAlpha = 0.72;
+      ctx.shadowColor = n.col;
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = n.col;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+      // connect nearby nodes
+      for (let j = i + 1; j < plxNodes.length; j++) {
+        const m = plxNodes[j];
+        const dx = n.x - m.x, dy = n.y - m.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 90) {
+          ctx.globalAlpha = 0.18 * (1 - dist / 90);
+          ctx.strokeStyle = n.col;
+          ctx.lineWidth = 0.7;
+          ctx.shadowBlur = 0;
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(m.x, m.y);
+          ctx.stroke();
+          ctx.shadowBlur = 6;
+        }
+      }
+    }
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    // Layer 3 — ground glow line
+    ctx.save();
+    const gl = ctx.createLinearGradient(0, GY - 1, W, GY - 1);
+    gl.addColorStop(0,   'rgba(0,212,255,0)');
+    gl.addColorStop(0.3, 'rgba(0,212,255,0.55)');
+    gl.addColorStop(0.5, 'rgba(0,212,255,0.85)');
+    gl.addColorStop(0.7, 'rgba(0,212,255,0.55)');
+    gl.addColorStop(1,   'rgba(0,212,255,0)');
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, GY - 2, W, 2);
+    ctx.restore();
+  }
+
   // ── BACKGROUND ──
   const BGWORDS = [
     '01101001','null','void*','0xFF','return','const','async','0xDEAD','stack',
@@ -432,6 +577,9 @@
 
     ctx.fillStyle = getBgCol();
     ctx.fillRect(0,0,W,H);
+
+    updateParallax(dt);
+    drawParallax();
 
     // Scanlines
     for (let y=0; y<H; y+=4) { ctx.fillStyle='rgba(0,0,0,.05)'; ctx.fillRect(0,y,W,1); }
@@ -814,7 +962,7 @@
     player.animT=0; player.animF=0;
 
     grantAch('boot');
-    initBg(); updateBestUI();
+    initBg(); initParallax(); updateBestUI();
     document.getElementById('pu-hud').innerHTML='';
 
     lastTs=performance.now();
@@ -879,6 +1027,12 @@
 
   document.getElementById('btn-start').addEventListener('click', startGame);
   document.getElementById('btn-restart').addEventListener('click', startGame);
+  document.getElementById('btn-to-title').addEventListener('click', ()=>{
+    document.getElementById('scr-dead').classList.remove('show');
+    document.getElementById('scr-start').classList.add('show');
+    STATE='idle';
+    startIdleLoop();
+  });
 
   let touchY0=0;
   const wrap=document.getElementById('cv-wrap');
@@ -896,15 +1050,20 @@
   if (!('ontouchstart' in window)) document.getElementById('m-hint').style.display='none';
 
   // ── IDLE PREVIEW ──
-  ;(function idleLoop(ts){
-    if (STATE!=='idle') return;
-    if (!lastTs) lastTs=ts;
-    const dt=Math.min((ts-lastTs)/1000,.05); lastTs=ts;
-    player.y=GY-PLR_H; player.vy=0; player.onGround=true; player.jumps=0;
-    player.animT+=dt*3; player.animF=Math.floor(player.animT)%2;
-    drawBg(dt); drawPlayer();
-    requestAnimationFrame(idleLoop);
-  })(performance.now());
+  initParallax();
+  function startIdleLoop() {
+    lastTs=0;
+    (function idleLoop(ts){
+      if (STATE!=='idle') return;
+      if (!lastTs) lastTs=ts;
+      const dt=Math.min((ts-lastTs)/1000,.05); lastTs=ts;
+      player.y=GY-PLR_H; player.vy=0; player.onGround=true; player.jumps=0;
+      player.animT+=dt*3; player.animF=Math.floor(player.animT)%2;
+      drawBg(dt); drawPlayer();
+      requestAnimationFrame(idleLoop);
+    })(performance.now());
+  }
+  startIdleLoop();
   </script>
 </body>
 </html>
