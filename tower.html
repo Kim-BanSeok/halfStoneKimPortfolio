@@ -39,11 +39,15 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 #wbtn{background:transparent;border:1px solid rgba(0,212,255,.4);color:var(--cyan);font-family:inherit;font-size:.62rem;padding:8px;cursor:pointer;width:100%;border-radius:6px;letter-spacing:.06em;transition:.15s}
 #wbtn:hover{background:rgba(0,212,255,.07);box-shadow:0 0 12px rgba(0,212,255,.15)}
 #wbtn:disabled{opacity:.3;cursor:default}
-#upbtn,#slbtn{background:transparent;font-family:inherit;font-size:.62rem;padding:6px;cursor:pointer;width:100%;border-radius:6px;display:none;letter-spacing:.06em;transition:.15s}
+#upbtn,#slbtn,#mvbtn{background:transparent;font-family:inherit;font-size:.62rem;padding:6px;cursor:pointer;width:100%;border-radius:6px;display:none;letter-spacing:.06em;transition:.15s}
 #upbtn{border:1px solid rgba(139,92,246,.4);color:var(--purple)}
 #upbtn:hover{background:rgba(139,92,246,.07);box-shadow:0 0 10px rgba(139,92,246,.15)}
 #slbtn{border:1px solid rgba(255,68,85,.35);color:var(--red)}
 #slbtn:hover{background:rgba(255,68,85,.07);box-shadow:0 0 10px rgba(255,68,85,.15)}
+#mvbtn{border:1px solid rgba(0,212,255,.35);color:var(--cyan)}
+#mvbtn:hover{background:rgba(0,212,255,.07);box-shadow:0 0 10px rgba(0,212,255,.15)}
+#mvbtn.moving{background:rgba(0,212,255,.12);border-color:var(--cyan);animation:mbpulse .7s ease-in-out infinite alternate}
+@keyframes mbpulse{to{box-shadow:0 0 14px rgba(0,212,255,.45)}}
 #seli{color:#888;font-size:9.5px;min-height:14px;line-height:1.7}
 #ov{position:fixed;inset:0;background:rgba(7,7,26,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50}
 #ov h1{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan)}
@@ -84,6 +88,7 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
     <h3>// SELECTED</h3>
     <div id="seli"></div>
     <button id="upbtn">UPGRADE</button>
+    <button id="mvbtn">MOVE</button>
     <button id="slbtn">SELL</button>
   </div>
 </div>
@@ -148,7 +153,7 @@ function makeWave(w){
 
 let hp,gold,score,wave,waveOn,selType,selCell;
 let enemies,towers,bullets,parts,queue,qTimer,left;
-let state='title',hov=null,gT=0;
+let state='title',hov=null,gT=0,moving=null;
 
 const AC=new AudioContext();
 function snd(t){
@@ -165,7 +170,7 @@ function snd(t){
 
 function init(){
   hp=20;gold=200;score=0;wave=0;waveOn=false;gT=0;
-  selType='FIREWALL';selCell=null;
+  selType='FIREWALL';selCell=null;moving=null;
   enemies=[];towers=[];bullets=[];parts=[];queue=[];qTimer=0;left=0;
   updPanel();setMsg('');
 }
@@ -270,16 +275,18 @@ function setMsg(m,c='#FF4455'){const e=document.getElementById('msg');e.textCont
 
 function updSel(){
   const si=document.getElementById('seli');
-  const ub=document.getElementById('upbtn'),sb=document.getElementById('slbtn');
-  if(!selCell){si.innerHTML='';ub.style.display='none';sb.style.display='none';return;}
+  const ub=document.getElementById('upbtn'),sb=document.getElementById('slbtn'),mb=document.getElementById('mvbtn');
+  if(!selCell){si.innerHTML='';ub.style.display='none';mb.style.display='none';sb.style.display='none';moving=null;mb.classList.remove('moving');return;}
   const [col,row]=selCell,t=towers.find(t=>t.col===col&&t.row===row);
   if(t){
     const ups=TD[t.type].ups;const canUp=t.lv<=ups.length;
     const uc=canUp?ups[t.lv-1]?.cost:0;
     si.innerHTML=`<span style="color:${t.color}">${t.type}</span> LV${t.lv}<br>DMG:${t.dmg} RNG:${(t.range/CS).toFixed(1)}`;
     ub.style.display='block';ub.textContent=canUp?`UPGRADE (${uc}G)`:'MAX';ub.disabled=!canUp||gold<uc;
+    mb.style.display='block';mb.textContent=moving===t?'CANCEL MOVE':'MOVE';
+    moving===t?mb.classList.add('moving'):mb.classList.remove('moving');
     sb.style.display='block';sb.textContent=`SELL (+${Math.floor(TD[t.type].cost*.5)}G)`;
-  }else{si.innerHTML='';ub.style.display='none';sb.style.display='none';}
+  }else{si.innerHTML='';ub.style.display='none';mb.style.display='none';sb.style.display='none';}
 }
 
 // ─── DRAW HELPERS ─────────────────────────────────────────────────
@@ -596,18 +603,36 @@ function draw(){
   drawBg();
   drawPathLayer();
 
+  // Moving tower pulse
+  if(moving){
+    const a=0.5+Math.sin(gT*5)*0.3;
+    ctx.strokeStyle=`rgba(0,212,255,${a})`;ctx.lineWidth=2;ctx.setLineDash([4,2]);
+    ctx.strokeRect(moving.col*CS+1,moving.row*CS+1,CS-2,CS-2);ctx.setLineDash([]);
+  }
+
   // Hover preview
-  if(hov&&!isPath(hov[0],hov[1])&&!towers.find(t=>t.col===hov[0]&&t.row===hov[1])){
-    ctx.fillStyle='rgba(0,212,255,.07)';ctx.fillRect(hov[0]*CS,hov[1]*CS,CS,CS);
-    const def=TD[selType];if(def){
-      ctx.strokeStyle='rgba(0,212,255,.22)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-      ctx.beginPath();ctx.arc(hov[0]*CS+CS/2,hov[1]*CS+CS/2,def.range*CS,0,Math.PI*2);ctx.stroke();
-      ctx.setLineDash([]);
+  if(hov){
+    const [hc,hr]=hov;
+    const isFree=!isPath(hc,hr)&&!towers.find(t=>t.col===hc&&t.row===hr);
+    if(moving){
+      if(isFree){
+        ctx.fillStyle='rgba(0,212,255,.1)';ctx.fillRect(hc*CS,hr*CS,CS,CS);
+        ctx.strokeStyle='rgba(0,212,255,.35)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.beginPath();ctx.arc(hc*CS+CS/2,hr*CS+CS/2,moving.range,0,Math.PI*2);ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    } else if(isFree){
+      ctx.fillStyle='rgba(0,212,255,.07)';ctx.fillRect(hc*CS,hr*CS,CS,CS);
+      const def=TD[selType];if(def){
+        ctx.strokeStyle='rgba(0,212,255,.22)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.beginPath();ctx.arc(hc*CS+CS/2,hr*CS+CS/2,def.range*CS,0,Math.PI*2);ctx.stroke();
+        ctx.setLineDash([]);
+      }
     }
   }
 
   // Selected cell highlight
-  if(selCell){
+  if(selCell&&!moving){
     const [sc,sr]=selCell;
     ctx.strokeStyle='#FFD700';ctx.lineWidth=1.5;ctx.setLineDash([]);
     ctx.strokeRect(sc*CS+1,sr*CS+1,CS-2,CS-2);
@@ -702,6 +727,22 @@ function handleClick(cx,cy){
   if(state!=='playing')return;
   const col=Math.floor(cx/CS),row=Math.floor(cy/CS);
   if(col<0||col>=COLS||row<0||row>=ROWS)return;
+  if(moving){
+    if(moving.col===col&&moving.row===row){
+      moving=null;document.getElementById('mvbtn').classList.remove('moving');
+      updSel();setMsg('');return;
+    }
+    const occupied=towers.find(t=>t.col===col&&t.row===row);
+    if(!occupied&&!isPath(col,row)){
+      moving.col=col;moving.row=row;moving.x=col*CS+CS/2;moving.y=row*CS+CS/2;
+      selCell=[col,row];moving=null;
+      document.getElementById('mvbtn').classList.remove('moving');
+      snd('place');updSel();setMsg('RELOCATED','#00D4FF');
+    }else{
+      setMsg('Cannot place here','#FF4455');
+    }
+    return;
+  }
   const ex=towers.find(t=>t.col===col&&t.row===row);
   if(ex){selCell=[col,row];updSel();}
   else if(!isPath(col,row)){place(col,row);selCell=null;updSel();}
@@ -739,11 +780,21 @@ document.getElementById('upbtn').addEventListener('click',()=>{
   if(up.slow!==undefined)t.slow=up.slow;if(up.splash)t.splash=up.splash;
   t.lv++;snd('place');updPanel();updSel();setMsg('UPGRADED','#00FF88');
 });
+document.getElementById('mvbtn').addEventListener('click',()=>{
+  if(!selCell)return;
+  const [col,row]=selCell,t=towers.find(t=>t.col===col&&t.row===row);if(!t)return;
+  if(moving===t){moving=null;document.getElementById('mvbtn').classList.remove('moving');setMsg('');}
+  else{moving=t;setMsg('Click empty cell · ESC cancel','#00D4FF');}
+  updSel();
+});
 document.getElementById('slbtn').addEventListener('click',()=>{
   if(!selCell)return;
   const [col,row]=selCell,idx=towers.findIndex(t=>t.col===col&&t.row===row);if(idx<0)return;
   const sv=Math.floor(TD[towers[idx].type].cost*.5);
-  gold+=sv;towers.splice(idx,1);selCell=null;updPanel();updSel();setMsg(`SOLD +${sv}G`,'#00FF88');
+  gold+=sv;towers.splice(idx,1);selCell=null;moving=null;updPanel();updSel();setMsg(`SOLD +${sv}G`,'#00FF88');
+});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Escape'&&moving){moving=null;document.getElementById('mvbtn').classList.remove('moving');updSel();setMsg('');}
 });
 
 const tbd=document.getElementById('tbtns');
