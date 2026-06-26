@@ -467,6 +467,12 @@
     .shooter-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
     .shooter-card .ftag { border: 1px solid rgba(0,212,255,.25); color: var(--cyan); background: rgba(0,212,255,.05); }
     .shooter-card .game-badge { color: var(--cyan); }
+
+    /* tower card */
+    .tower-card:hover { border-color: rgba(0,255,136,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,255,136,.08); }
+    .tower-card:hover .game-arrow { color: #00FF88; transform: translate(3px,-3px); }
+    .tower-card .ftag { border: 1px solid rgba(0,255,136,.25); color: #00FF88; background: rgba(0,255,136,.05); }
+    .tower-card .game-badge { color: #00FF88; }
     .games-grid .game-card:nth-child(7) { transition-delay: 0.6s; }
 
     /* ── SECTION WRAPPER ── */
@@ -1821,6 +1827,26 @@
           </div>
         </a>
 
+        <a class="game-card tower-card fade-up" href="tower.html">
+          <div class="game-preview" style="padding:0;overflow:hidden;">
+            <canvas id="tower-prev" style="width:100%;height:100%;display:block;"></canvas>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge">🛡 DEFEND</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-tower-title">타워 디펜스</div>
+            <p class="game-desc" data-i18n="game-tower-desc">네트워크를 지켜라! TOWER.EXE. 4종 타워, 5종 적, 10웨이브 클리어.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" data-i18n="ftag-tower-waves">10웨이브</span>
+              <span class="ftag" data-i18n="ftag-tower-types">타워 4종</span>
+              <span class="ftag" data-i18n="ftag-tower-upgrade">업그레이드</span>
+              <span class="ftag">Canvas 2D</span>
+            </div>
+          </div>
+        </a>
+
       </div>
     </section>
 
@@ -2190,6 +2216,8 @@
         'ftag-songs': '30곡', 'ftag-lanes': '7레인', 'ftag-judgment': '판정 4종',
         'game-shooter-title': '슈팅 게임', 'game-shooter-desc': '탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 웨이브 클리어.',
         'ftag-waves': '웨이브', 'ftag-boss': '보스전', 'ftag-powerup': '파워업 4종',
+        'game-tower-title': '타워 디펜스', 'game-tower-desc': '네트워크를 지켜라! TOWER.EXE. 4종 타워, 5종 적, 10웨이브 클리어.',
+        'ftag-tower-waves': '10웨이브', 'ftag-tower-types': '타워 4종', 'ftag-tower-upgrade': '업그레이드',
         'exp1-role': '사원', 'exp1-company': '에스더블유기술원', 'exp1-badge': '퇴사',
         'exp1-desc': 'React Native · Node.js · PostgreSQL · AWS<br>Android 중고거래 앱 <strong>바나나창고</strong> 기획·개발·출시 (Google Play)',
         'exp2-role': '대리', 'exp2-company': '(주)웰컴소프트',
@@ -2239,6 +2267,8 @@
         'ftag-songs': '30 Songs', 'ftag-lanes': '7 Lanes', 'ftag-judgment': '4 Judgments',
         'game-shooter-title': 'Shooter', 'game-shooter-desc': 'Bullet-hell shooter FIREWALL.EXE. 5 enemy types, boss every 5 waves, 4 power-ups.',
         'ftag-waves': 'Waves', 'ftag-boss': 'Boss Fight', 'ftag-powerup': '4 Power-ups',
+        'game-tower-title': 'Tower Defense', 'game-tower-desc': 'Defend the network! TOWER.EXE. 4 tower types, 5 enemies, 10-wave survival.',
+        'ftag-tower-waves': '10 Waves', 'ftag-tower-types': '4 Towers', 'ftag-tower-upgrade': 'Upgrade',
         'exp1-role': 'Staff', 'exp1-company': 'SW Technology Institute', 'exp1-badge': 'Left',
         'exp1-desc': 'React Native · Node.js · PostgreSQL · AWS<br>Built &amp; shipped <strong>BananaWarehouse</strong> — Android second-hand marketplace (Google Play)',
         'exp2-role': 'Associate', 'exp2-company': 'Welcomesoft Co., Ltd.',
@@ -2489,6 +2519,7 @@
         {icon:'▶', label:'벽돌 깨기',   hint:'breakout.html', fn:()=>window.open('breakout.html','_blank')},
         {icon:'▶', label:'리듬 게임',   hint:'rhythm.html',   fn:()=>window.open('rhythm.html','_blank')},
         {icon:'▶', label:'슈팅 게임',   hint:'shooter.html',  fn:()=>window.open('shooter.html','_blank')},
+        {icon:'▶', label:'타워 디펜스', hint:'tower.html',    fn:()=>window.open('tower.html','_blank')},
       ];
       const ALL = [
         ...NAV.map(c=>({...c, group:'Navigate'})),
