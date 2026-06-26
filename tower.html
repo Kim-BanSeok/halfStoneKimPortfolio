@@ -50,10 +50,15 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 @keyframes mbpulse{to{box-shadow:0 0 14px rgba(0,212,255,.45)}}
 #seli{color:#888;font-size:9.5px;min-height:14px;line-height:1.7}
 #ov{position:fixed;inset:0;background:rgba(7,7,26,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50}
-#ov h1{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan)}
-#ov p{color:#555;font-size:11px;text-align:center;line-height:1.9}
-#ov button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:inherit;font-size:12px;padding:9px 28px;cursor:pointer;letter-spacing:2px}
-#ov button:hover{background:#001520;box-shadow:0 0 16px rgba(0,212,255,.2)}
+#ov-h{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan);font-weight:500}
+#ov-sub{color:#555;font-size:11px;text-align:center;line-height:1.9}
+#ov-stages{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.sbtn{background:#0a0a22;border:1px solid #2a2a5a;color:#aaa;font-family:inherit;font-size:10px;padding:12px 18px;cursor:pointer;border-radius:6px;letter-spacing:1px;transition:.15s;text-align:center;line-height:1.7;min-width:90px}
+.sbtn span{display:block;font-size:8px;color:#555;letter-spacing:.5px;margin-top:2px}
+.sbtn:hover{border-color:var(--cyan);color:var(--cyan)}
+.sbtn.active{border-color:var(--purple);background:#160f38;color:var(--purple)}
+#obtn{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:inherit;font-size:12px;padding:9px 28px;cursor:pointer;letter-spacing:2px;border-radius:4px;transition:.15s}
+#obtn:hover{background:#001520;box-shadow:0 0 16px rgba(0,212,255,.2)}
 </style>
 </head>
 <body>
@@ -93,16 +98,21 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
   </div>
 </div>
 <div id="ov">
-  <h1>TOWER.EXE</h1>
-  <p>Defend the network from incoming threats.<br>Place towers — eliminate all 10 waves.</p>
-  <button id="obtn">[ INITIALIZE ]</button>
+  <div id="ov-h">TOWER.EXE</div>
+  <div id="ov-sub">Select network to defend.</div>
+  <div id="ov-stages">
+    <button class="sbtn" data-s="0">ALPHA<span>EASY · 10W</span></button>
+    <button class="sbtn" data-s="1">BETA<span>NORMAL · 10W</span></button>
+    <button class="sbtn" data-s="2">GAMMA<span>HARD · 10W</span></button>
+  </div>
+  <button id="obtn" style="display:none">[ RETRY ]</button>
 </div>
 <script>
 const COLS=22,ROWS=14,CS=40;
 const C=document.getElementById('c'),ctx=C.getContext('2d');
 C.width=COLS*CS;C.height=ROWS*CS;
 
-const PATH=[
+const PATH_1=[
   [0,2],[1,2],[2,2],[3,2],[4,2],[5,2],[6,2],
   [6,3],[6,4],[6,5],[6,6],[7,6],[8,6],[9,6],[10,6],[11,6],
   [11,5],[11,4],[11,3],[11,2],[12,2],[13,2],[14,2],[15,2],
@@ -111,18 +121,47 @@ const PATH=[
   [6,9],[6,10],[6,11],[7,11],[8,11],[9,11],[10,11],[11,11],
   [12,11],[13,11],[14,11],[15,11],[16,11],[17,11],[18,11],[19,11],[20,11],[21,11]
 ];
-const PSET=new Set(PATH.map(([c,r])=>`${c},${r}`));
+const PATH_2=[
+  [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],
+  [5,4],[5,5],[5,6],[5,7],[5,8],[5,9],[5,10],
+  [6,10],[7,10],[8,10],[9,10],[10,10],[11,10],
+  [11,9],[11,8],[11,7],[11,6],[11,5],[11,4],[11,3],
+  [12,3],[13,3],[14,3],[15,3],[16,3],[17,3],
+  [17,4],[17,5],[17,6],[17,7],[17,8],[17,9],[17,10],
+  [18,10],[19,10],[20,10],[21,10]
+];
+const PATH_3=[
+  [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],
+  [5,2],[5,3],[5,4],[5,5],[5,6],[5,7],[5,8],[5,9],[5,10],[5,11],[5,12],
+  [6,12],[7,12],[8,12],[9,12],
+  [9,11],[9,10],[9,9],[9,8],[9,7],[9,6],[9,5],[9,4],[9,3],[9,2],[9,1],
+  [10,1],[11,1],[12,1],[13,1],[14,1],
+  [14,2],[14,3],[14,4],[14,5],[14,6],[14,7],[14,8],[14,9],[14,10],[14,11],[14,12],
+  [15,12],[16,12],[17,12],[18,12],[19,12],[20,12],[21,12]
+];
+const STAGE_CFG=[
+  {name:'ALPHA',sub:'EASY · 10W',  path:PATH_1,hpx:1.0,spdx:1.0},
+  {name:'BETA', sub:'NORMAL · 10W',path:PATH_2,hpx:1.9,spdx:1.15},
+  {name:'GAMMA',sub:'HARD · 10W',  path:PATH_3,hpx:3.2,spdx:1.3},
+];
+let PATH,PSET,stageIdx=0;
+function setStage(i){stageIdx=i;PATH=STAGE_CFG[i].path;PSET=new Set(PATH.map(([c,r])=>`${c},${r}`));}
 const isPath=(c,r)=>PSET.has(`${c},${r}`);
+setStage(0);
 
 const TD={
-  FIREWALL:{name:'FIREWALL',cost:75,color:'#00D4FF',range:2.8,dmg:18,rate:1.2,desc:'Balanced',
-    ups:[{cost:80,dmg:30,range:3.2},{cost:150,dmg:55,range:3.6}]},
-  ANTIVIRUS:{name:'ANTIVIRUS',cost:100,color:'#00FF88',range:2.3,dmg:10,rate:0.8,slow:0.45,desc:'Slows',
+  FIREWALL:  {name:'FIREWALL',  cost:75, color:'#00D4FF',range:2.8,dmg:12,rate:1.2,          desc:'Balanced',
+    ups:[{cost:80,dmg:22,range:3.2},{cost:150,dmg:40,range:3.6}]},
+  ANTIVIRUS: {name:'ANTIVIRUS', cost:100,color:'#00FF88',range:2.3,dmg:7, rate:0.8,slow:0.45,desc:'Slows',
     ups:[{cost:90,slow:0.3,range:2.8},{cost:160,slow:0.18,range:3.2}]},
-  SCANNER:{name:'SCANNER',cost:120,color:'#FFD700',range:2.0,dmg:8,rate:3.5,desc:'Rapid fire',
-    ups:[{cost:100,dmg:15,rate:5.0},{cost:180,dmg:28,rate:7.0}]},
-  PROXY:{name:'PROXY',cost:180,color:'#8B5CF6',range:2.5,dmg:40,rate:0.5,splash:1.0,desc:'Area dmg',
-    ups:[{cost:130,dmg:65,splash:1.5},{cost:220,dmg:100,splash:2.0}]},
+  SCANNER:   {name:'SCANNER',   cost:120,color:'#FFD700',range:2.0,dmg:5, rate:3.5,          desc:'Rapid fire',
+    ups:[{cost:100,dmg:10,rate:5.0},{cost:180,dmg:18,rate:7.0}]},
+  PROXY:     {name:'PROXY',     cost:180,color:'#8B5CF6',range:2.5,dmg:26,rate:0.5,splash:1.0,desc:'Area dmg',
+    ups:[{cost:130,dmg:44,splash:1.5},{cost:220,dmg:70,splash:2.0}]},
+  ENCRYPTION:{name:'ENCRYPTION',cost:160,color:'#FF8844',range:4.5,dmg:65,rate:0.35,         desc:'Sniper',
+    ups:[{cost:130,dmg:110,range:5.0},{cost:200,dmg:180,rate:0.5}]},
+  HONEYPOT:  {name:'HONEYPOT',  cost:120,color:'#FFB830',range:2.5,dmg:5, rate:0.6,income:3, desc:'+3G/sec',
+    ups:[{cost:100,income:6},{cost:160,income:10}]},
 };
 
 const ED={
@@ -188,8 +227,9 @@ function startWave(){
 }
 
 function spawnEnemy(t,hm){
-  const d=ED[t];
-  enemies.push({d,t,hp:Math.floor(d.hp*hm),mhp:Math.floor(d.hp*hm),spd:d.spd,slow:1,slT:0,
+  const d=ED[t];const cfg=STAGE_CFG[stageIdx];
+  const ehp=Math.floor(d.hp*hm*cfg.hpx);
+  enemies.push({d,t,hp:ehp,mhp:ehp,spd:d.spd*cfg.spdx,slow:1,slT:0,
     pi:0,x:PATH[0][0]*CS+CS/2,y:PATH[0][1]*CS+CS/2,dir:0,hitFlash:0,id:Math.random()});
 }
 
@@ -213,7 +253,7 @@ function place(col,row){
   if(gold<def.cost){setMsg('Insufficient GOLD');return;}
   gold-=def.cost;
   towers.push({col,row,x:col*CS+CS/2,y:row*CS+CS/2,type:selType,def,
-    dmg:def.dmg,range:def.range*CS,rate:def.rate,slow:def.slow||0,splash:def.splash||0,
+    dmg:def.dmg,range:def.range*CS,rate:def.rate,slow:def.slow||0,splash:def.splash||0,income:def.income||0,
     cd:0,lv:1,color:def.color,aimAngle:0,sweepAngle:0,flash:0});
   snd('place');updPanel();setMsg('');
 }
@@ -441,6 +481,40 @@ function drawTower(t){
     ctx.beginPath();ctx.moveTo(-8,0);ctx.lineTo(8,0);ctx.stroke();
     // Core orb
     ctx.fillStyle=t.color;ctx.shadowBlur=glow+6;ctx.beginPath();ctx.arc(0,0,3.5,0,Math.PI*2);ctx.fill();
+  }
+  else if(t.type==='ENCRYPTION'){
+    ctx.rotate(t.aimAngle);
+    // Long barrel
+    ctx.fillStyle=t.color+'44';ctx.beginPath();ctx.roundRect(-11,-5,14,10,2);ctx.fill();
+    ctx.fillStyle=t.color;ctx.fillRect(3,-1.5,16,3);
+    ctx.fillRect(4,-3.5,5,7);
+    // Scope circle
+    ctx.lineWidth=1.5;ctx.strokeStyle=t.color;
+    ctx.beginPath();ctx.arc(14,0,5,0,Math.PI*2);ctx.stroke();
+    ctx.lineWidth=1;ctx.strokeStyle=t.color+'99';
+    ctx.beginPath();ctx.moveTo(11,0);ctx.lineTo(17,0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(14,-3);ctx.lineTo(14,3);ctx.stroke();
+    // Core
+    ctx.fillStyle=t.color;ctx.beginPath();ctx.arc(-5,0,2.5,0,Math.PI*2);ctx.fill();
+  }
+  else if(t.type==='HONEYPOT'){
+    const pulse=0.5+0.4*Math.sin(gT*2.8+t.col*0.7);
+    ctx.shadowBlur=glow*(0.7+0.5*pulse);
+    // Outer ring pulse
+    ctx.lineWidth=1.5;ctx.strokeStyle=t.color+'88';
+    ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.stroke();
+    // Hexagons (mini honeycomb, 3 cells)
+    const hR=5;
+    [[0,-8],[7,4],[-7,4]].forEach(([hx,hy])=>{
+      ctx.beginPath();
+      for(let j=0;j<6;j++){const a=j*Math.PI/3;ctx.lineTo(hx+Math.cos(a)*hR,hy+Math.sin(a)*hR);}
+      ctx.closePath();ctx.strokeStyle=t.color+'bb';ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle=t.color+'22';ctx.fill();
+    });
+    // G label
+    ctx.fillStyle=t.color;ctx.shadowBlur=glow;
+    ctx.font=`bold 8px 'DM Mono',monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('G',0,0);
   }
 
   ctx.restore();
@@ -677,6 +751,10 @@ function loop(ts){
   leaked.forEach(e=>{hp-=e.d.boss?3:1;left--;snd('leak');updPanel();setMsg(`BREACH! -${e.d.boss?3:1}HP`);if(hp<=0){gameOver();}});
   if(state!=='playing')return;
 
+  // HONEYPOT passive income
+  let inc=0;towers.forEach(t=>{if(t.income)inc+=t.income*dt;});
+  if(inc>0){gold+=inc;updPanel();}
+
   // Tower attacks
   towers.forEach(t=>attack(t,dt));
 
@@ -703,22 +781,36 @@ function loop(ts){
   draw();updSel();
 }
 
-function showOv(t,d,b){
-  const ov=document.getElementById('ov');
-  ov.querySelector('h1').textContent=t;ov.querySelector('p').innerHTML=d;ov.querySelector('button').textContent=b;
-  ov.style.display='flex';
+function showStageSelect(){
+  document.getElementById('ov-h').textContent='TOWER.EXE';
+  document.getElementById('ov-sub').textContent='Select network to defend.';
+  document.getElementById('ov-stages').style.display='flex';
+  document.getElementById('obtn').style.display='none';
+  document.getElementById('ov').style.display='flex';
 }
 function hideOv(){document.getElementById('ov').style.display='none';}
 
 function gameOver(){
   state='gameover';snd('gameover');
-  showOv('SYSTEM FAILURE',`Wave ${wave} — Score: ${score}<br>Network compromised.`,'[ REBOOT ]');
+  const cfg=STAGE_CFG[stageIdx];
+  document.getElementById('ov-h').textContent='SYSTEM FAILURE';
+  document.getElementById('ov-sub').innerHTML=`${cfg.name} — Wave ${wave}<br>Score: ${score}`;
+  document.getElementById('ov-stages').style.display='none';
+  const btn=document.getElementById('obtn');btn.style.display='block';btn.textContent='[ RETRY ]';
+  document.getElementById('ov').style.display='flex';
 }
 function gameWin(){
   state='win';
-  const hi=Math.max(score,+localStorage.getItem('tower_hi')||0);
-  localStorage.setItem('tower_hi',hi);
-  showOv('NETWORK SECURED',`All threats eliminated!<br>Score: ${score} | Best: ${hi}`,'[ PLAY AGAIN ]');
+  const cfg=STAGE_CFG[stageIdx];
+  const key=`tower_hi_${stageIdx}`;
+  const hi=Math.max(score,+localStorage.getItem(key)||0);localStorage.setItem(key,hi);
+  const isLast=stageIdx>=STAGE_CFG.length-1;
+  document.getElementById('ov-h').textContent='NETWORK SECURED';
+  document.getElementById('ov-sub').innerHTML=`${cfg.name} cleared!<br>Score: ${score} · Best: ${hi}`;
+  document.getElementById('ov-stages').style.display='none';
+  const btn=document.getElementById('obtn');btn.style.display='block';
+  btn.textContent=isLast?'[ BACK TO SELECT ]':'[ NEXT STAGE ]';
+  document.getElementById('ov').style.display='flex';
 }
 
 // ─── INPUT ─────────────────────────────────────────────────────────
@@ -767,8 +859,17 @@ C.addEventListener('touchstart',e=>{
 
 document.getElementById('obtn').addEventListener('click',()=>{
   AC.resume();
-  if(state!=='playing'){init();hideOv();state='playing';}
+  if(state==='gameover'){init();hideOv();state='playing';}
+  else if(state==='win'){
+    if(stageIdx<STAGE_CFG.length-1){setStage(stageIdx+1);init();hideOv();state='playing';}
+    else{showStageSelect();}
+  }
 });
+document.querySelectorAll('.sbtn').forEach(b=>b.addEventListener('click',()=>{
+  AC.resume();setStage(+b.dataset.s);
+  document.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+  init();hideOv();state='playing';
+}));
 document.getElementById('wbtn').addEventListener('click',()=>{if(state==='playing'&&!waveOn)startWave();});
 document.getElementById('upbtn').addEventListener('click',()=>{
   if(!selCell)return;
@@ -777,7 +878,7 @@ document.getElementById('upbtn').addEventListener('click',()=>{
   const up=ups[t.lv-1];if(gold<up.cost){setMsg('Insufficient GOLD');return;}
   gold-=up.cost;
   if(up.dmg)t.dmg=up.dmg;if(up.range)t.range=up.range*CS;if(up.rate)t.rate=up.rate;
-  if(up.slow!==undefined)t.slow=up.slow;if(up.splash)t.splash=up.splash;
+  if(up.slow!==undefined)t.slow=up.slow;if(up.splash)t.splash=up.splash;if(up.income)t.income=up.income;
   t.lv++;snd('place');updPanel();updSel();setMsg('UPGRADED','#00FF88');
 });
 document.getElementById('mvbtn').addEventListener('click',()=>{
@@ -810,6 +911,7 @@ Object.entries(TD).forEach(([k,d])=>{
 });
 
 requestAnimationFrame(loop);
+showStageSelect();
 </script>
 </body>
 </html>
