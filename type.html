@@ -495,8 +495,8 @@ let t0=null, timerInt=null, timeLeft=60;
 let wpmLog=[];
 let lineH=0, scrollPx=0;
 // Korean IME
-let isComposing=false, koSyncLen=0;
-let spacePending=false, skipNextSpace=false;
+let isComposing=false;
+let spacePending=false;
 // Race
 let raceActive=false, raceInt=null, botFinalWpm={};
 
@@ -787,7 +787,7 @@ function reset(){
   running=false; done=false;
   pos=0; typedAt={}; okCount=0; errCount=0; totalPressed=0; sessionErr={};
   t0=null; timeLeft=dur; wpmLog=[];
-  lineH=0; scrollPx=0; koSyncLen=0; isComposing=false;
+  lineH=0; scrollPx=0; isComposing=false;
   $('s-wpm').textContent='–'; $('s-acc').textContent='–';
   $('s-timer').textContent=dur; $('s-timer').className='sv';
   $('res').classList.add('hidden');
@@ -823,34 +823,17 @@ hi.addEventListener('compositionupdate',e=>{
   }
 });
 
-hi.addEventListener('compositionend',()=>{
+hi.addEventListener('compositionend',e=>{
   isComposing=false;
-  if(spans[pos]){ spans[pos].textContent=text[pos]; }
-  syncKorean();
-  // Space was pressed to commit this syllable — process the space char now
+  if(spans[pos]) spans[pos].textContent=text[pos];
+  const committed=(e.data||'').normalize('NFC');
+  for(const ch of committed){ if(pos<text.length) processChar(ch); }
+  hi.value='';
   if(spacePending){
-    if(text[pos]===' '){ processChar(' '); skipNextSpace=true; }
+    if(pos<text.length&&text[pos]===' ') processChar(' ');
     spacePending=false;
   }
 });
-
-hi.addEventListener('input',()=>{
-  if(lang==='ko'&&!isComposing) syncKorean();
-});
-
-function syncKorean(){
-  const val=hi.value;
-  let adj=koSyncLen;
-  // Skip space that was already processed manually via spacePending
-  if(skipNextSpace&&val[adj]===' '){ adj++; skipNextSpace=false; }
-  if(val.length>adj){
-    for(let i=adj;i<val.length&&pos<text.length;i++) processChar(val[i]);
-  } else if(val.length<adj){
-    const rm=adj-val.length; for(let i=0;i<rm;i++) doBackspace();
-  }
-  koSyncLen=val.length;
-  if(!isComposing&&val.length>60){ hi.value=''; koSyncLen=0; skipNextSpace=false; }
-}
 
 // ──────────────────────────────────────────
 //  KEYBOARD
@@ -868,7 +851,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){reset();return;}
 
   if(lang==='ko'){
-    if(e.key==='Backspace'&&hi.value.length===0&&!isComposing) doBackspace();
+    if(e.key==='Backspace'&&!isComposing){ e.preventDefault(); doBackspace(); return; }
     if(e.key===' '){
       if(!isComposing){
         // Not composing: handle space directly (don't rely on hi.value default behavior)
