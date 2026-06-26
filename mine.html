@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>SCAN.EXE | halfstone.Kim</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#07071A;--surface:#0D0D28;--card:#111130;--border:#1E1E4A;
+  --text:#E0E0FF;--muted:#5858A0;--dim:#1A1A38;
+  --cyan:#00D4FF;--purple:#8B5CF6;--red:#FF4455;--green:#00FF88;--yellow:#FFD700;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Mono',monospace;
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;user-select:none;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.75rem 2rem;
+  background:rgba(7,7,26,.92);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+.back-link{font-size:.72rem;color:var(--muted);text-decoration:none;letter-spacing:.04em;transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.nav-title{font-size:.75rem;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase;}
+.nav-title span{color:var(--muted);}
+
+/* HUD */
+.hud{
+  margin-top:3.2rem;
+  width:100%;max-width:720px;
+  display:flex;align-items:center;gap:.5rem;
+  padding:.65rem 1.2rem;
+  background:var(--surface);border:1px solid var(--border);border-bottom:none;
+  flex-wrap:wrap;
+}
+.diff-btns{display:flex;gap:.3rem;}
+.dbtn{
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.06em;
+  padding:.28rem .72rem;border-radius:4px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;
+  transition:color .15s,background .15s,border-color .15s;
+}
+.dbtn.on{background:var(--card);color:var(--cyan);border-color:rgba(0,212,255,.35);}
+.dbtn:hover:not(.on){color:var(--text);}
+.hud-sep{width:1px;height:18px;background:var(--border);margin:0 .2rem;}
+.hud-stat{display:flex;align-items:center;gap:.4rem;font-size:.7rem;}
+.hud-label{color:var(--muted);letter-spacing:.08em;font-size:.6rem;}
+.hud-val{font-size:.88rem;font-weight:500;font-variant-numeric:tabular-nums;}
+#hud-mines{color:var(--red);}
+#hud-timer{color:var(--text);}
+#hud-best{color:var(--purple);}
+.hud-spacer{flex:1;}
+.rescan-btn{
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;
+  padding:.3rem .9rem;border-radius:4px;border:1px solid rgba(0,212,255,.3);
+  background:transparent;color:var(--cyan);cursor:pointer;
+  transition:background .15s,box-shadow .2s;
+}
+.rescan-btn:hover{background:rgba(0,212,255,.08);box-shadow:0 0 14px rgba(0,212,255,.2);}
+
+/* CANVAS WRAP */
+.canvas-wrap{
+  position:relative;
+  border:1px solid var(--border);
+  background:var(--surface);
+  flex-shrink:0;
+  overflow:hidden;
+}
+canvas{display:block;}
+
+/* OVERLAY */
+.overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:1.2rem;
+  background:rgba(7,7,26,.88);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.show{opacity:1;pointer-events:all;}
+.ov-eyebrow{font-size:.58rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;}
+.ov-title{font-size:2rem;font-weight:500;letter-spacing:.06em;line-height:1.1;text-align:center;text-wrap:balance;}
+.ov-title.danger{color:var(--red);text-shadow:0 0 32px rgba(255,68,85,.45);}
+.ov-title.clear{color:var(--cyan);text-shadow:0 0 32px rgba(0,212,255,.45);}
+.ov-sub{font-size:.72rem;color:var(--muted);letter-spacing:.06em;}
+.ov-sub em{font-style:normal;color:var(--green);}
+.ov-sub .best-mark{color:var(--yellow);}
+.ov-error{
+  font-size:.62rem;line-height:1.8;color:var(--red);
+  border:1px solid rgba(255,68,85,.2);border-radius:4px;
+  padding:.6rem 1rem;background:rgba(255,68,85,.05);
+  text-align:left;min-width:220px;max-width:320px;
+}
+.ov-btn{
+  font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;
+  padding:.6rem 2rem;border-radius:5px;border:none;
+  background:var(--cyan);color:#000;cursor:pointer;
+  transition:box-shadow .25s,transform .2s;
+}
+.ov-btn:hover{box-shadow:0 0 26px rgba(0,212,255,.5);transform:translateY(-2px);}
+.ov-btn.danger-btn{background:var(--red);color:#fff;}
+.ov-btn.danger-btn:hover{box-shadow:0 0 26px rgba(255,68,85,.5);}
+
+/* SCANLINE FLICKER */
+@keyframes scan{0%{transform:translateY(-100%);}100%{transform:translateY(100vh);}}
+.scanline{
+  position:fixed;top:0;left:0;right:0;height:2px;
+  background:rgba(0,212,255,.04);pointer-events:none;z-index:9999;
+  animation:scan 6s linear infinite;
+}
+
+/* BOTTOM MARGIN */
+.bottom-pad{height:2rem;}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<nav>
+  <a class="back-link" href="index.html#games">← halfstone.Kim</a>
+  <div class="nav-title">SCAN<span>.</span>EXE</div>
+  <div style="font-size:.62rem;color:var(--muted);letter-spacing:.06em;">MALWARE SCANNER v2.1</div>
+</nav>
+
+<div class="hud" id="hud">
+  <div class="diff-btns">
+    <button class="dbtn on" data-diff="easy">EASY</button>
+    <button class="dbtn" data-diff="medium">MEDIUM</button>
+    <button class="dbtn" data-diff="hard">HARD</button>
+  </div>
+  <div class="hud-sep"></div>
+  <div class="hud-stat">
+    <span class="hud-label">⚠ MALWARE</span>
+    <span class="hud-val" id="hud-mines">10</span>
+  </div>
+  <div class="hud-sep"></div>
+  <div class="hud-stat">
+    <span class="hud-label">TIME</span>
+    <span class="hud-val" id="hud-timer">0</span>
+  </div>
+  <div class="hud-sep"></div>
+  <div class="hud-stat">
+    <span class="hud-label">BEST</span>
+    <span class="hud-val" id="hud-best">--</span>
+  </div>
+  <div class="hud-spacer"></div>
+  <button class="rescan-btn" id="rescan-btn">[RE-SCAN]</button>
+</div>
+
+<div class="canvas-wrap" id="cv-wrap">
+  <canvas id="cv"></canvas>
+  <div class="overlay" id="overlay">
+    <div class="ov-eyebrow" id="ov-eyebrow">SCAN COMPLETE</div>
+    <div class="ov-title" id="ov-title">SYSTEM CLEAN</div>
+    <div class="ov-sub" id="ov-sub"></div>
+    <div class="ov-error" id="ov-error" style="display:none"></div>
+    <button class="ov-btn" id="ov-btn">[RE-SCAN]</button>
+  </div>
+</div>
+<div class="bottom-pad"></div>
+
+<script>
+const CV = document.getElementById('cv');
+const CTX = CV.getContext('2d');
+const WRAP = document.getElementById('cv-wrap');
+const HUD_MINES = document.getElementById('hud-mines');
+const HUD_TIMER = document.getElementById('hud-timer');
+const HUD_BEST = document.getElementById('hud-best');
+const OVERLAY = document.getElementById('overlay');
+const OV_EYEBROW = document.getElementById('ov-eyebrow');
+const OV_TITLE = document.getElementById('ov-title');
+const OV_SUB = document.getElementById('ov-sub');
+const OV_ERROR = document.getElementById('ov-error');
+const OV_BTN = document.getElementById('ov-btn');
+
+const DIFFS = {
+  easy:   {cols:9,  rows:9,  mines:10, cs:48, key:'scan_easy'},
+  medium: {cols:16, rows:16, mines:40, cs:32, key:'scan_medium'},
+  hard:   {cols:24, rows:16, mines:75, cs:28, key:'scan_hard'},
+};
+const NUM_COLORS = ['','#00D4FF','#00FF88','#FF4455','#8B5CF6','#FF8844','#44FFCC','#ffffff','#888888'];
+
+let diff = 'easy';
+let grid = [], cols = 0, rows = 0, mines = 0, cs = 0;
+let firstClick = true, gameOver = false, won = false;
+let flagCount = 0, revealCount = 0;
+let timerSec = 0, timerInterval = null;
+let lastHover = null;
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let actx = null;
+
+function getACtx(){if(!actx) actx = new AudioCtx(); return actx;}
+
+// ── Audio ──
+function playTick(){
+  try{
+    const a=getACtx(), o=a.createOscillator(), g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.frequency.value=880;o.type='square';
+    g.gain.setValueAtTime(.06,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.06);
+    o.start(a.currentTime);o.stop(a.currentTime+.06);
+  }catch(e){}
+}
+function playFlag(){
+  try{
+    const a=getACtx(), o=a.createOscillator(), g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.frequency.setValueAtTime(440,a.currentTime);
+    o.frequency.exponentialRampToValueAtTime(660,a.currentTime+.08);
+    g.gain.setValueAtTime(.07,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.1);
+    o.start(a.currentTime);o.stop(a.currentTime+.1);
+  }catch(e){}
+}
+function playBoom(){
+  try{
+    const a=getACtx();
+    const buf=a.createBuffer(1,a.sampleRate*.4,a.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    const src=a.createBufferSource(), g=a.createGain();
+    src.buffer=buf;src.connect(g);g.connect(a.destination);
+    g.gain.setValueAtTime(.5,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.4);
+    src.start(a.currentTime);
+  }catch(e){}
+}
+function playWin(){
+  try{
+    const a=getACtx();
+    [523,659,784,1047].forEach((f,i)=>{
+      const o=a.createOscillator(), g=a.createGain();
+      o.connect(g);g.connect(a.destination);
+      o.frequency.value=f;o.type='triangle';
+      const t=a.currentTime+i*.1;
+      g.gain.setValueAtTime(.0001,t);
+      g.gain.exponentialRampToValueAtTime(.12,t+.05);
+      g.gain.exponentialRampToValueAtTime(.0001,t+.25);
+      o.start(t);o.stop(t+.25);
+    });
+  }catch(e){}
+}
+
+// ── Init ──
+function initGame(d){
+  diff = d;
+  const cfg = DIFFS[d];
+  cols=cfg.cols; rows=cfg.rows; mines=cfg.mines; cs=cfg.cs;
+  const W=cols*cs, H=rows*cs;
+  CV.width=W; CV.height=H;
+  WRAP.style.width=W+'px'; WRAP.style.height=H+'px';
+  grid=[];
+  for(let r=0;r<rows;r++){
+    grid[r]=[];
+    for(let c=0;c<cols;c++) grid[r][c]={mine:false,revealed:false,flagged:false,count:0};
+  }
+  firstClick=true; gameOver=false; won=false;
+  flagCount=0; revealCount=0;
+  stopTimer(); timerSec=0;
+  updateHUD();
+  OVERLAY.classList.remove('show');
+  OV_ERROR.style.display='none';
+  updateBestDisplay();
+  drawAll();
+}
+
+function placeMines(sr,sc){
+  const safe=new Set();
+  for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+    const nr=sr+dr, nc=sc+dc;
+    if(nr>=0&&nr<rows&&nc>=0&&nc<cols) safe.add(nr*cols+nc);
+  }
+  let placed=0;
+  while(placed<mines){
+    const idx=Math.floor(Math.random()*rows*cols);
+    if(safe.has(idx)) continue;
+    const r=Math.floor(idx/cols), c=idx%cols;
+    if(!grid[r][c].mine){grid[r][c].mine=true;placed++;}
+  }
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(grid[r][c].mine) continue;
+    let cnt=0;
+    for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+      const nr=r+dr, nc=c+dc;
+      if(nr>=0&&nr<rows&&nc>=0&&nc<cols&&grid[nr][nc].mine) cnt++;
+    }
+    grid[r][c].count=cnt;
+  }
+}
+
+// ── Timer ──
+function startTimer(){
+  if(timerInterval) return;
+  timerInterval=setInterval(()=>{timerSec++;HUD_TIMER.textContent=timerSec;},1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
+
+function updateHUD(){
+  HUD_MINES.textContent=mines-flagCount;
+  HUD_TIMER.textContent=timerSec;
+}
+function updateBestDisplay(){
+  const b=localStorage.getItem(DIFFS[diff].key);
+  HUD_BEST.textContent=b?b+'s':'--';
+}
+
+// ── Drawing ──
+function drawCell(r,c){
+  const cell=grid[r][c];
+  const x=c*cs, y=r*cs;
+  const S=cs;
+
+  if(cell.revealed){
+    // Revealed
+    CTX.fillStyle='#07071A';
+    CTX.fillRect(x,y,S,S);
+    CTX.strokeStyle='#0f0f28';
+    CTX.lineWidth=1;
+    CTX.strokeRect(x+.5,y+.5,S-1,S-1);
+
+    if(cell.mine){
+      // Exploded mine
+      CTX.fillStyle='rgba(255,68,85,.28)';
+      CTX.fillRect(x,y,S,S);
+      CTX.fillStyle='#FF4455';
+      CTX.font=`bold ${Math.floor(S*.52)}px DM Mono,monospace`;
+      CTX.textAlign='center';CTX.textBaseline='middle';
+      CTX.fillText('◉',x+S/2,y+S/2+1);
+    } else if(cell.count>0){
+      CTX.fillStyle=NUM_COLORS[cell.count]||'#fff';
+      CTX.font=`500 ${Math.floor(S*.46)}px DM Mono,monospace`;
+      CTX.textAlign='center';CTX.textBaseline='middle';
+      CTX.fillText(cell.count,x+S/2,y+S/2+1);
+    }
+  } else {
+    // Unrevealed — 3D feel
+    const isHov = lastHover && lastHover[0]===r && lastHover[1]===c;
+    CTX.fillStyle=isHov?'#10143a':'#0d1028';
+    CTX.fillRect(x,y,S,S);
+    // Border
+    CTX.strokeStyle='#1a2050';
+    CTX.lineWidth=1;
+    CTX.strokeRect(x+.5,y+.5,S-1,S-1);
+    // Top-left highlight (3D)
+    CTX.fillStyle='rgba(255,255,255,.06)';
+    CTX.fillRect(x,y,S,1);
+    CTX.fillRect(x,y,1,S);
+    // Bottom-right shadow
+    CTX.fillStyle='rgba(0,0,0,.25)';
+    CTX.fillRect(x,y+S-1,S,1);
+    CTX.fillRect(x+S-1,y,1,S);
+
+    if(cell.flagged){
+      // Flag symbol
+      CTX.fillStyle='#FF4455';
+      CTX.font=`${Math.floor(S*.46)}px DM Mono,monospace`;
+      CTX.textAlign='center';CTX.textBaseline='middle';
+      CTX.fillText('▲',x+S/2,y+S/2+1);
+      // Small "Q" label under flag for QUARANTINE
+      if(S>=32){
+        CTX.fillStyle='rgba(255,68,85,.5)';
+        CTX.font=`${Math.floor(S*.2)}px DM Mono,monospace`;
+        CTX.fillText('Q',x+S/2,y+S*.72);
+      }
+    }
+  }
+}
+
+function drawAll(){
+  CTX.clearRect(0,0,CV.width,CV.height);
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) drawCell(r,c);
+}
+
+// ── Reveal logic ──
+function revealCell(r,c){
+  const cell=grid[r][c];
+  if(cell.revealed||cell.flagged) return;
+  cell.revealed=true;
+  revealCount++;
+  if(cell.count===0&&!cell.mine){
+    // BFS flood fill
+    const q=[[r,c]];
+    while(q.length){
+      const [cr,cc]=q.shift();
+      for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+        if(dr===0&&dc===0) continue;
+        const nr=cr+dr, nc=cc+dc;
+        if(nr<0||nr>=rows||nc<0||nc>=cols) continue;
+        const nb=grid[nr][nc];
+        if(nb.revealed||nb.flagged||nb.mine) continue;
+        nb.revealed=true; revealCount++;
+        if(nb.count===0) q.push([nr,nc]);
+      }
+    }
+  }
+}
+
+function revealAllMines(trigR,trigC){
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const cell=grid[r][c];
+    if(cell.mine&&!cell.flagged) cell.revealed=true;
+  }
+}
+
+function checkWin(){
+  const total=cols*rows;
+  return revealCount===total-mines;
+}
+
+// ── Events ──
+function cellFromEvent(e){
+  const rect=CV.getBoundingClientRect();
+  const scaleX=CV.width/rect.width, scaleY=CV.height/rect.height;
+  let cx,cy;
+  if(e.touches){cx=e.touches[0].clientX;cy=e.touches[0].clientY;}
+  else{cx=e.clientX;cy=e.clientY;}
+  const c=Math.floor((cx-rect.left)*scaleX/cs);
+  const r=Math.floor((cy-rect.top)*scaleY/cs);
+  if(r<0||r>=rows||c<0||c>=cols) return null;
+  return [r,c];
+}
+
+CV.addEventListener('contextmenu',e=>{e.preventDefault();});
+
+CV.addEventListener('mousedown',e=>{
+  if(gameOver||won) return;
+  if(e.button===2){
+    const pos=cellFromEvent(e); if(!pos) return;
+    const [r,c]=pos;
+    const cell=grid[r][c];
+    if(cell.revealed) return;
+    cell.flagged=!cell.flagged;
+    flagCount+=cell.flagged?1:-1;
+    updateHUD();
+    playFlag();
+    drawCell(r,c);
+  }
+});
+
+let dblTimer=null, lastClick=null;
+CV.addEventListener('click',e=>{
+  if(gameOver||won) return;
+  const pos=cellFromEvent(e); if(!pos) return;
+  const [r,c]=pos;
+  const cell=grid[r][c];
+
+  // Double-click chord detection
+  if(lastClick&&lastClick[0]===r&&lastClick[1]===c){
+    clearTimeout(dblTimer);
+    lastClick=null;
+    chordReveal(r,c);
+    return;
+  }
+  lastClick=[r,c];
+  dblTimer=setTimeout(()=>{
+    lastClick=null;
+    doReveal(r,c);
+  },220);
+});
+
+function doReveal(r,c){
+  const cell=grid[r][c];
+  if(cell.revealed||cell.flagged) return;
+
+  if(firstClick){
+    firstClick=false;
+    placeMines(r,c);
+    startTimer();
+    getACtx(); // unlock audio
+  }
+
+  if(cell.mine){
+    cell.revealed=true;
+    revealAllMines(r,c);
+    playBoom();
+    gameOver=true;
+    stopTimer();
+    drawAll();
+    showGameOver(r,c);
+    return;
+  }
+  revealCell(r,c);
+  playTick();
+  drawAll();
+  if(checkWin()){
+    won=true;
+    stopTimer();
+    playWin();
+    saveBest();
+    showWin();
+  }
+}
+
+function chordReveal(r,c){
+  const cell=grid[r][c];
+  if(!cell.revealed||cell.count===0) return;
+  let adj=0;
+  const neighbors=[];
+  for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+    if(dr===0&&dc===0) continue;
+    const nr=r+dr, nc=c+dc;
+    if(nr<0||nr>=rows||nc<0||nc>=cols) continue;
+    if(grid[nr][nc].flagged) adj++;
+    else neighbors.push([nr,nc]);
+  }
+  if(adj!==cell.count) return;
+  let hitMine=false;
+  for(const [nr,nc] of neighbors){
+    const nb=grid[nr][nc];
+    if(nb.revealed) continue;
+    if(nb.mine){
+      nb.revealed=true;
+      revealAllMines(nr,nc);
+      hitMine=true;
+      gameOver=true;
+      break;
+    }
+    revealCell(nr,nc);
+  }
+  if(hitMine){
+    playBoom();
+    stopTimer();
+    drawAll();
+    showGameOver(r,c);
+    return;
+  }
+  playTick();
+  drawAll();
+  if(checkWin()){
+    won=true;
+    stopTimer();
+    playWin();
+    saveBest();
+    showWin();
+  }
+}
+
+CV.addEventListener('mousemove',e=>{
+  const pos=cellFromEvent(e);
+  const prev=lastHover;
+  lastHover=pos;
+  if(JSON.stringify(prev)===JSON.stringify(pos)) return;
+  if(prev) drawCell(prev[0],prev[1]);
+  if(pos) drawCell(pos[0],pos[1]);
+});
+CV.addEventListener('mouseleave',()=>{
+  if(lastHover){drawCell(lastHover[0],lastHover[1]);}
+  lastHover=null;
+});
+
+// Touch flag: long press
+let longPressTimer=null;
+CV.addEventListener('touchstart',e=>{
+  if(gameOver||won) return;
+  const pos=cellFromEvent(e); if(!pos) return;
+  longPressTimer=setTimeout(()=>{
+    longPressTimer=null;
+    const [r,c]=pos;
+    const cell=grid[r][c];
+    if(cell.revealed) return;
+    cell.flagged=!cell.flagged;
+    flagCount+=cell.flagged?1:-1;
+    updateHUD(); playFlag(); drawCell(r,c);
+  },400);
+},{passive:true});
+CV.addEventListener('touchend',e=>{
+  if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}
+},{passive:true});
+CV.addEventListener('touchmove',()=>{
+  if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}
+},{passive:true});
+
+// ── Overlays ──
+function showGameOver(){
+  OV_EYEBROW.textContent='THREAT DETECTED';
+  OV_TITLE.className='ov-title danger';
+  OV_TITLE.textContent='MALWARE DETECTED';
+  OV_SUB.innerHTML='SYSTEM COMPROMISED — SCAN FAILED';
+  OV_ERROR.style.display='block';
+  const leftover=[];
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) if(grid[r][c].mine&&!grid[r][c].flagged) leftover.push(`[${r},${c}]`);
+  OV_ERROR.textContent=`> ERROR: ${leftover.length} MALWARE PAYLOAD(S) UNDETECTED\n> SYSTEM INTEGRITY: COMPROMISED\n> RECOMMEND: FULL RE-SCAN`;
+  OV_BTN.className='ov-btn danger-btn';
+  OV_BTN.textContent='[RE-SCAN]';
+  OVERLAY.classList.add('show');
+}
+function showWin(){
+  OV_EYEBROW.textContent='SCAN COMPLETE';
+  OV_TITLE.className='ov-title clear';
+  OV_TITLE.textContent='SYSTEM CLEAN';
+  const best=localStorage.getItem(DIFFS[diff].key);
+  const isBest=best&&parseInt(best)===timerSec;
+  OV_SUB.innerHTML=`TIME: <em>${timerSec}s</em>${isBest?' — <span class="best-mark">★ NEW BEST</span>':''}`;
+  OV_ERROR.style.display='none';
+  OV_BTN.className='ov-btn';
+  OV_BTN.textContent='[RE-SCAN]';
+  OVERLAY.classList.add('show');
+}
+function saveBest(){
+  const key=DIFFS[diff].key;
+  const prev=localStorage.getItem(key);
+  if(!prev||timerSec<parseInt(prev)){
+    localStorage.setItem(key,timerSec);
+    updateBestDisplay();
+  }
+}
+
+// ── Controls ──
+document.querySelectorAll('.dbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    initGame(btn.dataset.diff);
+  });
+});
+document.getElementById('rescan-btn').addEventListener('click',()=>initGame(diff));
+OV_BTN.addEventListener('click',()=>initGame(diff));
+
+// Init
+initGame('easy');
+</script>
+</body>
+</html>
