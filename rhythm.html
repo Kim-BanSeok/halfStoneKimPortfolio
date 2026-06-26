@@ -77,6 +77,14 @@ canvas{display:block;width:100%;height:100%;}
 .mbt:hover,.mbt:active{border-color:var(--cyan);color:var(--cyan);}
 #mbt-sv{pointer-events:none;min-width:2.6rem;text-align:center;}
 .song-hi{font-size:.58rem;color:#3A3A6A;margin-top:.15rem;letter-spacing:.04em;}
+.mode-tabs{display:flex;gap:.4rem;}
+.mtab{border:1px solid #2E2E5A;background:transparent;color:#5858A0;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;padding:.25rem .9rem;border-radius:3px;cursor:pointer;transition:all .18s;}
+.mtab:hover{border-color:var(--cyan);color:var(--cyan);}
+.mtab.active[data-m="arcade"]{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.07);}
+.mtab.active[data-m="score"]{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.07);}
+#mode-badge{position:absolute;top:.38rem;left:.45rem;font-size:.58rem;letter-spacing:.1em;padding:.1rem .45rem;border-radius:2px;pointer-events:none;z-index:5;}
+#mode-badge.arcade{background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.25);}
+#mode-badge.score{background:rgba(255,215,0,.1);color:var(--gold);border:1px solid rgba(255,215,0,.25);}
 .touch-hint { display:none; }
 @media(hover:none)and(pointer:coarse){ .touch-hint{display:block;font-size:0.65rem;color:rgba(0,212,255,0.45);text-align:center;padding:0.3rem;font-family:'DM Mono',monospace;} }
 </style>
@@ -99,6 +107,7 @@ canvas{display:block;width:100%;height:100%;}
   <div id="prog" class="hidden"><div id="prog-fill"></div></div>
   <div id="judge"></div>
   <div id="esc-hint" class="hidden">ESC · PAUSE</div>
+  <div id="mode-badge" class="arcade hidden">ARCADE</div>
   <div id="mob-ctrl" class="hidden">
     <button class="mbt" id="mbt-sm">−</button>
     <button class="mbt" id="mbt-sv">1.0×</button>
@@ -113,6 +122,10 @@ canvas{display:block;width:100%;height:100%;}
       <button class="dtab" data-d="EASY">EASY</button>
       <button class="dtab" data-d="MEDIUM">MEDIUM</button>
       <button class="dtab" data-d="HARD">HARD</button>
+    </div>
+    <div class="mode-tabs">
+      <button class="mtab active" data-m="arcade" title="에너지 소진 시 실패">⚡ ARCADE</button>
+      <button class="mtab" data-m="score" title="실패 없음 · 점수만">★ SCORE</button>
     </div>
     <div class="song-list" id="song-list"></div>
     <div class="key-hint">
@@ -592,6 +605,7 @@ let parts=[],judgeT=0,judgeTxt='',judgeCol='#fff';
 let rafId=0,lastTs=0,countdown=0,gameOff=0;
 let energy=100,feverFlash=0;
 let speedMult=1.0;
+let gameMode='arcade';
 
 // ── PARTICLES ──
 function mkPart(lane,judgeType){
@@ -657,9 +671,9 @@ function hitLane(lane){
   if(!best||bd>JB){mkPart(lane,'M');return;}
   best.hit=true;
   const at=actx?actx.currentTime:0;
-  if(bd<=JP){sndHit(at,'P');energy=Math.min(100,energy+2);doJudge('PERFECT','#FFD700',300,true,lane,'P');cnt.p++;}
-  else if(bd<=JG){sndHit(at,'G');energy=Math.min(100,energy+1);doJudge('GOOD','#00FF88',150,true,lane,'G');cnt.g++;}
-  else{sndHit(at,'B');energy=Math.max(0,energy-2);doJudge('BAD','#FFB800',50,false,lane,'B');cnt.b++;}
+  if(bd<=JP){sndHit(at,'P');if(gameMode==='arcade')energy=Math.min(100,energy+2);doJudge('PERFECT','#FFD700',300,true,lane,'P');cnt.p++;}
+  else if(bd<=JG){sndHit(at,'G');if(gameMode==='arcade')energy=Math.min(100,energy+1);doJudge('GOOD','#00FF88',150,true,lane,'G');cnt.g++;}
+  else{sndHit(at,'B');if(gameMode==='arcade')energy=Math.max(0,energy-2);doJudge('BAD','#FFB800',50,false,lane,'B');cnt.b++;}
 }
 function doJudge(txt,col,pts,addCombo,lane,judgeType){
   if(addCombo) combo++;else combo=0;
@@ -679,10 +693,10 @@ function checkMiss(){
     if(t-n.t>JB){
       n.miss=true;cnt.m++;combo=0;
       judgeTxt='MISS';judgeCol='#FF5555';judgeT=500;
-      energy=Math.max(0,energy-10);
+      if(gameMode==='arcade'){energy=Math.max(0,energy-10);}
       mkPart(n.l,'M');
       if(actx) sndMiss(actx.currentTime);
-      if(energy<=0){failSong();return;}
+      if(gameMode==='arcade'&&energy<=0){failSong();return;}
       updateHUD();
     }
   }
@@ -835,6 +849,7 @@ function drawPlay(dt){
   }
   // Energy bar
   {const bx=LX[0],bw=LX[6]+LW-LX[0],by=H-10,bh=5;
+  if(gameMode==='arcade'){
   ctx.fillStyle='#1A1A3A';ctx.fillRect(bx,by,bw,bh);
   const fv2=combo>=20&&energy>0;
   const ecol=fv2?'#FFD700':energy>60?'#00FF88':energy>30?'#FFB800':'#FF5555';
@@ -844,6 +859,18 @@ function drawPlay(dt){
   ctx.font=`400 9px 'DM Mono',monospace`;
   ctx.fillStyle=fv2?'rgba(255,215,0,.65)':'rgba(70,70,130,.9)';
   ctx.fillText('ENERGY',bx,by-2);}
+  else{
+    // SCORE 모드: 하단 바를 점수 진행 표시로 대체
+    const tot=cnt.p+cnt.g+cnt.b+cnt.m;
+    const acc=tot>0?(cnt.p+cnt.g*.65+cnt.b*.2)/tot*100:100;
+    const acol=acc>=95?'#FFD700':acc>=80?'#00FF88':'#8B5CF6';
+    ctx.fillStyle='#1A1A3A';ctx.fillRect(bx,by,bw,bh);
+    ctx.save();ctx.fillStyle=acol;ctx.fillRect(bx,by,bw*(Math.min(acc,100)/100),bh);ctx.restore();
+    ctx.textAlign='left';ctx.textBaseline='bottom';
+    ctx.font=`400 9px 'DM Mono',monospace`;
+    ctx.fillStyle='rgba(255,215,0,.55)';
+    ctx.fillText('SCORE MODE',bx,by-2);}
+  }
   // Fever burst text
   if(feverFlash>0){
     ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
@@ -983,6 +1010,8 @@ function startSong(s){
   document.getElementById('hv-acc').textContent='100.00%';
   document.getElementById('prog-fill').style.width='0%';
   document.getElementById('esc-hint').classList.remove('hidden');
+  const mb=document.getElementById('mode-badge');
+  mb.className=gameMode;mb.textContent=gameMode==='arcade'?'ARCADE':'SCORE';mb.classList.remove('hidden');
   const mc=document.getElementById('mob-ctrl');
   mc.classList.remove('hidden');
   document.getElementById('mbt-sv').textContent=speedMult.toFixed(1)+'×';
@@ -992,6 +1021,7 @@ function endSong(){
   STATE='result';
   document.getElementById('hud').classList.add('hidden');
   document.getElementById('prog').classList.add('hidden');
+  document.getElementById('mode-badge').classList.add('hidden');
   const tot=cnt.p+cnt.g+cnt.b+cnt.m,w=cnt.p+cnt.g*.65+cnt.b*.2;
   const acc=tot>0?w/tot*100:100;
   let grade,gc;
@@ -1029,6 +1059,7 @@ function failSong(){
   document.getElementById('prog').classList.add('hidden');
   document.getElementById('esc-hint').classList.add('hidden');
   document.getElementById('mob-ctrl').classList.add('hidden');
+  document.getElementById('mode-badge').classList.add('hidden');
   const tot=cnt.p+cnt.g+cnt.b+cnt.m,w=cnt.p+cnt.g*.65+cnt.b*.2;
   const acc=tot>0?w/tot*100:100;
   document.getElementById('r-title').textContent=song.name;
@@ -1143,6 +1174,12 @@ document.querySelectorAll('.dtab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');renderSongList(tab.dataset.d);
+  });
+});
+document.querySelectorAll('.mtab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');gameMode=tab.dataset.m;
   });
 });
 
