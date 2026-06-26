@@ -893,13 +893,18 @@ function drawParts(){
 
 function drawHUD(){
   ctx.textBaseline='top';ctx.shadowBlur=0;
-  // lives (ship icons)
-  for(let i=0;i<3;i++){
-    ctx.save();ctx.translate(18+i*26,14);
-    if(i<lives){ctx.fillStyle='#00D4FF';ctx.shadowColor='#00D4FF';ctx.shadowBlur=10;}
-    else ctx.fillStyle='#1E1E4A';
+  // lives (ship icons — up to 5 shown, 6+ as ×N)
+  const showIcons=Math.min(lives,5);
+  for(let i=0;i<showIcons;i++){
+    ctx.save();ctx.translate(18+i*22,14);
+    ctx.fillStyle='#00D4FF';ctx.shadowColor='#00D4FF';ctx.shadowBlur=10;
     ctx.beginPath();ctx.moveTo(0,-9);ctx.lineTo(-7,9);ctx.lineTo(-2,5);ctx.lineTo(0,6);ctx.lineTo(2,5);ctx.lineTo(7,9);ctx.closePath();ctx.fill();
     ctx.restore();
+  }
+  if(lives>5){
+    ctx.fillStyle='#00D4FF';ctx.shadowColor='#00D4FF';ctx.shadowBlur=6;
+    ctx.font=`500 10px 'DM Mono',monospace`;ctx.textAlign='left';
+    ctx.fillText(`×${lives}`,18+5*22,9);ctx.shadowBlur=0;
   }
   // bombs
   if(pl.bombs>0){
