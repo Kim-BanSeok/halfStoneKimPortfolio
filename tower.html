@@ -13,27 +13,38 @@ a.back{position:fixed;top:14px;left:16px;color:var(--cyan);text-decoration:none;
 a.back:hover{opacity:1}
 #wrap{display:flex;gap:10px;align-items:flex-start}
 canvas{display:block;border:1px solid #1a1a3a;cursor:pointer}
-#panel{width:156px;display:flex;flex-direction:column;gap:6px;font-size:11px}
-.stat{color:#aaa;line-height:1.7}.stat span{color:var(--cyan);font-weight:500}
-.hpbar{height:4px;background:#111;border-radius:2px;margin-top:2px}
-.hpbar-fill{height:100%;border-radius:2px;background:var(--red);transition:width .3s}
-h3{color:var(--purple);font-size:9px;letter-spacing:2px;margin-top:2px;padding-top:4px;border-top:1px solid #1a1a3a}
-.tbtn{background:#0d0d2b;border:1px solid #2a2a5a;padding:6px 8px;cursor:pointer;border-radius:3px;text-align:left;color:#ccc;font-family:inherit;font-size:10px;width:100%;transition:.12s}
-.tbtn:hover{border-color:var(--cyan)}
-.tbtn.sel{border-color:var(--purple);background:#160f38}
-.tbtn .tn{font-size:11px;font-weight:500;margin-bottom:1px}
-.tbtn .tc{color:var(--yellow);font-size:10px}
-.tbtn .td{color:#555;font-size:9px;margin-top:1px}
-#msg{color:var(--red);font-size:10px;min-height:13px}
-#wbtn{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:inherit;font-size:10px;padding:7px;cursor:pointer;width:100%;border-radius:3px}
-#wbtn:hover{background:#001520}
-#wbtn:disabled{opacity:.35;cursor:default}
-#upbtn,#slbtn{background:transparent;font-family:inherit;font-size:10px;padding:5px;cursor:pointer;width:100%;border-radius:3px;display:none}
-#upbtn{border:1px solid var(--purple);color:var(--purple)}
-#upbtn:hover{background:#180d36}
-#slbtn{border:1px solid var(--red);color:var(--red)}
-#slbtn:hover{background:#270810}
-#seli{color:#888;font-size:10px;min-height:14px;line-height:1.7}
+#panel{width:162px;display:flex;flex-direction:column;gap:6px;font-size:11px;max-height:90vh;overflow-y:auto;scrollbar-width:none}
+#panel::-webkit-scrollbar{display:none}
+.scard{background:rgba(8,8,26,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.sc-num{font-size:1.5rem;font-weight:500;color:var(--cyan);line-height:1}
+.sc-label{font-size:.52rem;letter-spacing:.15em;text-transform:uppercase;color:#5858A0;margin-top:2px}
+.sc-bar-wrap{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:7px}
+.sc-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),#008fb3);box-shadow:0 0 6px rgba(0,212,255,.35);transition:width .4s}
+.srow{display:flex;gap:6px}
+.srow-item{flex:1;background:rgba(8,8,26,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:7px 8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.srow-val{font-size:1.2rem;font-weight:500;color:var(--cyan);line-height:1}
+.srow-val.yellow{color:var(--yellow)}
+.srow-key{font-size:.48rem;letter-spacing:.15em;text-transform:uppercase;color:#5858A0;margin-top:3px}
+.hpbar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:7px}
+.hpbar-fill{height:100%;border-radius:3px;transition:width .3s,background .3s}
+h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padding-top:6px;border-top:1px solid rgba(255,255,255,.05)}
+.tbtn{background:rgba(8,8,26,.7);border:1px solid rgba(255,255,255,.07);padding:6px 8px 6px 13px;cursor:pointer;border-radius:6px;text-align:left;color:#ccc;font-family:inherit;font-size:10px;width:100%;transition:.15s;position:relative;overflow:hidden}
+.tbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--tc,var(--cyan))}
+.tbtn:hover{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.03)}
+.tbtn.sel{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.08)}
+.tbtn .tn{font-size:10px;font-weight:500;margin-bottom:2px}
+.tbtn .tc{color:var(--yellow);font-size:9.5px}
+.tbtn .td{color:#555;font-size:8.5px;margin-top:2px}
+#msg{color:var(--red);font-size:9.5px;min-height:13px}
+#wbtn{background:transparent;border:1px solid rgba(0,212,255,.4);color:var(--cyan);font-family:inherit;font-size:.62rem;padding:8px;cursor:pointer;width:100%;border-radius:6px;letter-spacing:.06em;transition:.15s}
+#wbtn:hover{background:rgba(0,212,255,.07);box-shadow:0 0 12px rgba(0,212,255,.15)}
+#wbtn:disabled{opacity:.3;cursor:default}
+#upbtn,#slbtn{background:transparent;font-family:inherit;font-size:.62rem;padding:6px;cursor:pointer;width:100%;border-radius:6px;display:none;letter-spacing:.06em;transition:.15s}
+#upbtn{border:1px solid rgba(139,92,246,.4);color:var(--purple)}
+#upbtn:hover{background:rgba(139,92,246,.07);box-shadow:0 0 10px rgba(139,92,246,.15)}
+#slbtn{border:1px solid rgba(255,68,85,.35);color:var(--red)}
+#slbtn:hover{background:rgba(255,68,85,.07);box-shadow:0 0 10px rgba(255,68,85,.15)}
+#seli{color:#888;font-size:9.5px;min-height:14px;line-height:1.7}
 #ov{position:fixed;inset:0;background:rgba(7,7,26,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50}
 #ov h1{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan)}
 #ov p{color:#555;font-size:11px;text-align:center;line-height:1.9}
@@ -46,11 +57,26 @@ h3{color:var(--purple);font-size:9px;letter-spacing:2px;margin-top:2px;padding-t
 <div id="wrap">
   <canvas id="c"></canvas>
   <div id="panel">
-    <div class="stat">WAVE <span id="wn">0</span> / 10</div>
-    <div class="stat">NET HP <span id="hn">20</span></div>
-    <div class="hpbar"><div class="hpbar-fill" id="hpbar" style="width:100%"></div></div>
-    <div class="stat">GOLD <span id="gn">150</span></div>
-    <div class="stat">SCORE <span id="sn">0</span></div>
+    <div class="scard">
+      <div class="sc-num" id="wn">0</div>
+      <div class="sc-label">WAVE / 10</div>
+      <div class="sc-bar-wrap"><div class="sc-bar" id="wbar" style="width:0%"></div></div>
+    </div>
+    <div class="scard">
+      <div class="sc-num" id="hn">20</div>
+      <div class="sc-label">NET HP</div>
+      <div class="hpbar"><div class="hpbar-fill" id="hpbar" style="width:100%"></div></div>
+    </div>
+    <div class="srow">
+      <div class="srow-item">
+        <div class="srow-val yellow" id="gn">150</div>
+        <div class="srow-key">GOLD</div>
+      </div>
+      <div class="srow-item">
+        <div class="srow-val" id="sn">0</div>
+        <div class="srow-key">SCORE</div>
+      </div>
+    </div>
     <h3>// DEPLOY</h3>
     <div id="tbtns"></div>
     <div id="msg"></div>
@@ -238,6 +264,7 @@ function updPanel(){
   document.getElementById('sn').textContent=score;
   document.getElementById('hpbar').style.width=(hp/20*100)+'%';
   document.getElementById('hpbar').style.background=hp>10?'#00FF88':hp>5?'#FFD700':'#FF4455';
+  document.getElementById('wbar').style.width=(wave/10*100)+'%';
 }
 function setMsg(m,c='#FF4455'){const e=document.getElementById('msg');e.textContent=m;e.style.color=c;}
 
@@ -721,7 +748,7 @@ document.getElementById('slbtn').addEventListener('click',()=>{
 
 const tbd=document.getElementById('tbtns');
 Object.entries(TD).forEach(([k,d])=>{
-  const b=document.createElement('button');b.className='tbtn'+(k==='FIREWALL'?' sel':'');b.dataset.k=k;
+  const b=document.createElement('button');b.className='tbtn'+(k==='FIREWALL'?' sel':'');b.dataset.k=k;b.style.setProperty('--tc',d.color);
   b.innerHTML=`<div class="tn" style="color:${d.color}">${d.name}</div><div class="tc">${d.cost}G</div><div class="td">${d.desc}</div>`;
   b.addEventListener('click',()=>{
     selType=k;selCell=null;
