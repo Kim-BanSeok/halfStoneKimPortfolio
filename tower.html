@@ -121,11 +121,11 @@ const TD={
 };
 
 const ED={
-  BUG:    {name:'BUG',    hp:60, spd:1.1, reward:10, color:'#FF6644',sz:7},
-  VIRUS:  {name:'VIRUS',  hp:35, spd:2.2, reward:15, color:'#FF44AA',sz:6},
-  TROJAN: {name:'TROJAN', hp:220,spd:0.75,reward:25, color:'#AA44FF',sz:11},
-  WORM:   {name:'WORM',   hp:90, spd:1.5, reward:20, color:'#44FFCC',sz:8},
-  ROOTKIT:{name:'ROOTKIT',hp:700,spd:0.85,reward:100,color:'#FF2244',sz:15,boss:true},
+  BUG:    {name:'BUG',    hp:60, spd:1.1, reward:12, color:'#FF6644',sz:7},
+  VIRUS:  {name:'VIRUS',  hp:35, spd:2.2, reward:18, color:'#FF44AA',sz:6},
+  TROJAN: {name:'TROJAN', hp:200,spd:0.75,reward:32, color:'#AA44FF',sz:11},
+  WORM:   {name:'WORM',   hp:90, spd:1.5, reward:24, color:'#44FFCC',sz:8},
+  ROOTKIT:{name:'ROOTKIT',hp:600,spd:0.85,reward:120,color:'#FF2244',sz:15,boss:true},
 };
 
 function makeWave(w){
@@ -164,7 +164,7 @@ function snd(t){
 }
 
 function init(){
-  hp=20;gold=150;score=0;wave=0;waveOn=false;gT=0;
+  hp=20;gold=200;score=0;wave=0;waveOn=false;gT=0;
   selType='FIREWALL';selCell=null;
   enemies=[];towers=[];bullets=[];parts=[];queue=[];qTimer=0;left=0;
   updPanel();setMsg('');
@@ -668,7 +668,7 @@ function loop(ts){
   // Wave end check
   if(waveOn&&!queue.length&&!enemies.length&&left<=0){
     waveOn=false;
-    const bonus=wave*20;gold+=bonus;score+=wave*100;updPanel();
+    const bonus=wave*30+20;gold+=bonus;score+=wave*100;updPanel();
     if(wave>=10){gameWin();return;}
     document.getElementById('wbtn').disabled=false;
     document.getElementById('wbtn').textContent=`[ BOOT WAVE ${wave+1} ]`;
