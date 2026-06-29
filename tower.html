@@ -52,8 +52,17 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 #ov{position:fixed;inset:0;background:rgba(7,7,26,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50}
 #ov-h{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan);font-weight:500}
 #ov-sub{color:#555;font-size:11px;text-align:center;line-height:1.9}
-#ov-stages{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;max-width:430px;width:90%}
-.sbtn{background:#0d0d2a;border:1px solid #00D4FF44;color:#00D4FF;font-family:inherit;font-size:10px;padding:8px 2px;cursor:pointer;border-radius:5px;letter-spacing:.5px;transition:.15s;text-align:center}
+#ov-diff{display:flex;gap:10px}
+.dbtn{background:transparent;border:1px solid #1a1a38;color:#2a2a50;font-family:inherit;font-size:10px;padding:7px 22px;cursor:pointer;border-radius:20px;letter-spacing:2px;transition:.15s}
+.dbtn[disabled]{color:#151530;border-color:#0d0d25;cursor:default}
+.dbtn.easy:not([disabled]){color:#00FF88;border-color:#00FF8855}
+.dbtn.normal:not([disabled]){color:#FFD700;border-color:#FFD70055}
+.dbtn.hard:not([disabled]){color:#FF4455;border-color:#FF445555}
+.dbtn.easy.active{border-color:#00FF88;box-shadow:0 0 12px rgba(0,255,136,.25)}
+.dbtn.normal.active{border-color:#FFD700;box-shadow:0 0 12px rgba(255,215,0,.25)}
+.dbtn.hard.active{border-color:#FF4455;box-shadow:0 0 12px rgba(255,68,85,.25)}
+#ov-stages{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:360px;width:90%}
+.sbtn{background:#0d0d2a;border:1px solid #00D4FF44;color:#00D4FF;font-family:inherit;font-size:10px;padding:9px 2px;cursor:pointer;border-radius:5px;letter-spacing:.5px;transition:.15s;text-align:center}
 .sbtn:not([disabled]):hover{border-color:var(--cyan);color:#fff;background:#001a22;box-shadow:0 0 8px rgba(0,212,255,.3)}
 .sbtn[disabled]{color:#1e1e40;border-color:#12122e;cursor:default;background:#080818}
 .sbtn.done{color:#00CC66;border-color:#00CC6644;background:#0a1a0f}
@@ -103,7 +112,8 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 </div>
 <div id="ov">
   <div id="ov-h">TOWER.EXE</div>
-  <div id="ov-sub">Select network to defend.</div>
+  <div id="ov-sub">SELECT DIFFICULTY</div>
+  <div id="ov-diff"></div>
   <div id="ov-stages"></div>
   <div style="display:flex;gap:10px">
     <button id="obtn" style="display:none">[ RETRY ]</button>
@@ -188,6 +198,12 @@ const STAGE_CFG=Array.from({length:30},(_,i)=>({
   hpx:+(0.6*Math.pow(1.085,i)).toFixed(3),
   spdx:+(0.85+i*0.024).toFixed(3),
 }));
+const DIFFS=[
+  {name:'EASY',  cls:'easy',  range:[0,9]},
+  {name:'NORMAL',cls:'normal',range:[10,19]},
+  {name:'HARD',  cls:'hard',  range:[20,29]},
+];
+let curDiff=0;
 let PATH,PSET,stageIdx=0;
 function setStage(i){
   stageIdx=i;PATH=STAGE_CFG[i].path;PSET=new Set(PATH.map(([c,r])=>`${c},${r}`));
@@ -833,27 +849,46 @@ function loop(ts){
   draw();updSel();
 }
 
+function showDiffStages(){
+  const unlocked=getUnlocked();
+  const [start,end]=DIFFS[curDiff].range;
+  const grid=document.getElementById('ov-stages');
+  grid.innerHTML='';
+  for(let i=start;i<=end;i++){
+    const b=document.createElement('button');
+    b.className='sbtn';b.dataset.s=i;
+    const locked=i>unlocked;
+    b.disabled=locked;
+    b.textContent=locked?'—':i+1;
+    if(!locked&&i<unlocked)b.classList.add('done');
+    if(i===stageIdx&&!locked)b.classList.add('active');
+    grid.appendChild(b);
+  }
+  const diff=DIFFS[curDiff];
+  const cleared=Math.max(0,Math.min(unlocked,end+1)-start);
+  document.getElementById('ov-sub').textContent=`${diff.name}  ·  ${cleared} / 10 CLEARED`;
+}
 function showStageSelect(){
   document.getElementById('ov-h').textContent='TOWER.EXE';
   const unlocked=getUnlocked();
-  document.getElementById('ov-sub').textContent=`STAGE SELECT  ·  ${unlocked+1}/30 UNLOCKED`;
-  const grid=document.getElementById('ov-stages');
-  if(!grid.children.length){
-    for(let i=0;i<30;i++){
+  const diffDiv=document.getElementById('ov-diff');
+  if(!diffDiv.children.length){
+    DIFFS.forEach((d,i)=>{
       const b=document.createElement('button');
-      b.className='sbtn';b.dataset.s=i;
-      grid.appendChild(b);
-    }
+      b.className=`dbtn ${d.cls}`;b.dataset.d=i;b.textContent=d.name;
+      diffDiv.appendChild(b);
+    });
   }
-  grid.querySelectorAll('.sbtn').forEach(b=>{
-    const i=+b.dataset.s;
-    const locked=i>unlocked;
-    b.disabled=locked;
-    b.textContent=locked?'--':i+1;
-    b.classList.toggle('done',!locked&&i<unlocked);
-    b.classList.toggle('active',i===stageIdx&&!locked);
+  curDiff=stageIdx>=20?2:stageIdx>=10?1:0;
+  if(unlocked<DIFFS[curDiff].range[0])curDiff=0;
+  diffDiv.querySelectorAll('.dbtn').forEach(b=>{
+    const i=+b.dataset.d;
+    b.disabled=unlocked<DIFFS[i].range[0];
+    b.classList.toggle('active',i===curDiff&&!b.disabled);
   });
-  grid.style.display='grid';
+  diffDiv.style.display='flex';
+  showDiffStages();
+  document.getElementById('ov-stages').style.display='grid';
   document.getElementById('obtn').style.display='none';
   document.getElementById('obtn2').style.display='none';
   document.getElementById('ov').style.display='flex';
@@ -865,6 +900,7 @@ function gameOver(){
   const cfg=STAGE_CFG[stageIdx];
   document.getElementById('ov-h').textContent='SYSTEM FAILURE';
   document.getElementById('ov-sub').innerHTML=`${cfg.name} — Wave ${wave}<br>Score: ${score}`;
+  document.getElementById('ov-diff').style.display='none';
   document.getElementById('ov-stages').style.display='none';
   const btn=document.getElementById('obtn');btn.style.display='block';btn.textContent='[ RETRY ]';
   const btn2=document.getElementById('obtn2');btn2.style.display='block';btn2.textContent='[ STAGE SELECT ]';
@@ -877,8 +913,11 @@ function gameWin(){
   const hi=Math.max(score,+localStorage.getItem(key)||0);localStorage.setItem(key,hi);
   if(stageIdx<29)setUnlocked(stageIdx+1);
   const isLast=stageIdx>=29;
-  document.getElementById('ov-h').textContent='NETWORK SECURED';
-  document.getElementById('ov-sub').innerHTML=`${cfg.name} cleared!<br>Score: ${score} · Best: ${hi}`;
+  const milestones={9:'EASY COMPLETE!  NORMAL UNLOCKED',19:'NORMAL COMPLETE!  HARD UNLOCKED',29:'ALL 30 STAGES CLEARED!'};
+  const milestone=milestones[stageIdx];
+  document.getElementById('ov-h').textContent=milestone?'NETWORK SECURED':'NETWORK SECURED';
+  document.getElementById('ov-sub').innerHTML=milestone?`${milestone}<br>Score: ${score} · Best: ${hi}`:`${cfg.name} cleared!<br>Score: ${score} · Best: ${hi}`;
+  document.getElementById('ov-diff').style.display='none';
   document.getElementById('ov-stages').style.display='none';
   const btn=document.getElementById('obtn');btn.style.display='block';
   btn.textContent=isLast?'[ STAGE SELECT ]':'[ NEXT STAGE ]';
@@ -953,6 +992,14 @@ document.getElementById('ov-stages').addEventListener('click',e=>{
   document.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   init();hideOv();state='playing';
+});
+document.getElementById('ov-diff').addEventListener('click',e=>{
+  const b=e.target.closest('.dbtn');
+  if(!b||b.disabled)return;
+  curDiff=+b.dataset.d;
+  document.querySelectorAll('.dbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  showDiffStages();
 });
 document.getElementById('wbtn').addEventListener('click',()=>{if(state==='playing'&&!waveOn)startWave();});
 document.getElementById('upbtn').addEventListener('click',()=>{
