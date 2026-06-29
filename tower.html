@@ -53,10 +53,10 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 #ov-h{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan);font-weight:500}
 #ov-sub{color:#555;font-size:11px;text-align:center;line-height:1.9}
 #ov-stages{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;max-width:430px;width:90%}
-.sbtn{background:#080820;border:1px solid #1a1a40;color:#555;font-family:inherit;font-size:9.5px;padding:7px 2px;cursor:pointer;border-radius:5px;letter-spacing:.5px;transition:.15s;text-align:center}
-.sbtn:not([disabled]):hover{border-color:var(--cyan);color:var(--cyan)}
-.sbtn[disabled]{color:#1e1e3a;border-color:#0f0f28;cursor:default}
-.sbtn.done{color:#00CC66;border-color:#0a2a18}
+.sbtn{background:#0d0d2a;border:1px solid #00D4FF44;color:#00D4FF;font-family:inherit;font-size:10px;padding:8px 2px;cursor:pointer;border-radius:5px;letter-spacing:.5px;transition:.15s;text-align:center}
+.sbtn:not([disabled]):hover{border-color:var(--cyan);color:#fff;background:#001a22;box-shadow:0 0 8px rgba(0,212,255,.3)}
+.sbtn[disabled]{color:#1e1e40;border-color:#12122e;cursor:default;background:#080818}
+.sbtn.done{color:#00CC66;border-color:#00CC6644;background:#0a1a0f}
 .sbtn.active{border-color:var(--purple);background:#160f38;color:var(--purple)}
 #obtn,#obtn2{background:transparent;font-family:inherit;font-size:12px;padding:9px 28px;cursor:pointer;letter-spacing:2px;border-radius:4px;transition:.15s}
 #obtn{border:1px solid var(--cyan);color:var(--cyan)}
@@ -835,20 +835,23 @@ function loop(ts){
 
 function showStageSelect(){
   document.getElementById('ov-h').textContent='TOWER.EXE';
-  document.getElementById('ov-sub').textContent='Select network to defend.';
+  const unlocked=getUnlocked();
+  document.getElementById('ov-sub').textContent=`STAGE SELECT  ·  ${unlocked+1}/30 UNLOCKED`;
   const grid=document.getElementById('ov-stages');
   if(!grid.children.length){
     for(let i=0;i<30;i++){
       const b=document.createElement('button');
-      b.className='sbtn';b.dataset.s=i;b.textContent=i+1;
+      b.className='sbtn';b.dataset.s=i;
       grid.appendChild(b);
     }
   }
-  const unlocked=getUnlocked();
   grid.querySelectorAll('.sbtn').forEach(b=>{
     const i=+b.dataset.s;
-    b.disabled=i>unlocked;
-    b.classList.toggle('done',i<unlocked&&!b.classList.contains('active'));
+    const locked=i>unlocked;
+    b.disabled=locked;
+    b.textContent=locked?'--':i+1;
+    b.classList.toggle('done',!locked&&i<unlocked);
+    b.classList.toggle('active',i===stageIdx&&!locked);
   });
   grid.style.display='grid';
   document.getElementById('obtn').style.display='none';
