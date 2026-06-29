@@ -52,13 +52,17 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 #ov{position:fixed;inset:0;background:rgba(7,7,26,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50}
 #ov-h{color:var(--cyan);font-size:20px;letter-spacing:4px;text-shadow:0 0 24px var(--cyan);font-weight:500}
 #ov-sub{color:#555;font-size:11px;text-align:center;line-height:1.9}
-#ov-stages{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.sbtn{background:#0a0a22;border:1px solid #2a2a5a;color:#aaa;font-family:inherit;font-size:10px;padding:12px 18px;cursor:pointer;border-radius:6px;letter-spacing:1px;transition:.15s;text-align:center;line-height:1.7;min-width:90px}
-.sbtn span{display:block;font-size:8px;color:#555;letter-spacing:.5px;margin-top:2px}
-.sbtn:hover{border-color:var(--cyan);color:var(--cyan)}
+#ov-stages{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;max-width:430px;width:90%}
+.sbtn{background:#080820;border:1px solid #1a1a40;color:#555;font-family:inherit;font-size:9.5px;padding:7px 2px;cursor:pointer;border-radius:5px;letter-spacing:.5px;transition:.15s;text-align:center}
+.sbtn:not([disabled]):hover{border-color:var(--cyan);color:var(--cyan)}
+.sbtn[disabled]{color:#1e1e3a;border-color:#0f0f28;cursor:default}
+.sbtn.done{color:#00CC66;border-color:#0a2a18}
 .sbtn.active{border-color:var(--purple);background:#160f38;color:var(--purple)}
-#obtn{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:inherit;font-size:12px;padding:9px 28px;cursor:pointer;letter-spacing:2px;border-radius:4px;transition:.15s}
+#obtn,#obtn2{background:transparent;font-family:inherit;font-size:12px;padding:9px 28px;cursor:pointer;letter-spacing:2px;border-radius:4px;transition:.15s}
+#obtn{border:1px solid var(--cyan);color:var(--cyan)}
 #obtn:hover{background:#001520;box-shadow:0 0 16px rgba(0,212,255,.2)}
+#obtn2{border:1px solid #2a2a5a;color:#555}
+#obtn2:hover{border-color:var(--purple);color:var(--purple)}
 </style>
 </head>
 <body>
@@ -100,12 +104,11 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
 <div id="ov">
   <div id="ov-h">TOWER.EXE</div>
   <div id="ov-sub">Select network to defend.</div>
-  <div id="ov-stages">
-    <button class="sbtn" data-s="0">ALPHA<span>EASY · 10W</span></button>
-    <button class="sbtn" data-s="1">BETA<span>NORMAL · 10W</span></button>
-    <button class="sbtn" data-s="2">GAMMA<span>HARD · 10W</span></button>
+  <div id="ov-stages"></div>
+  <div style="display:flex;gap:10px">
+    <button id="obtn" style="display:none">[ RETRY ]</button>
+    <button id="obtn2" style="display:none">[ STAGE SELECT ]</button>
   </div>
-  <button id="obtn" style="display:none">[ RETRY ]</button>
 </div>
 <script>
 const COLS=22,ROWS=14,CS=40;
@@ -139,11 +142,52 @@ const PATH_3=[
   [14,2],[14,3],[14,4],[14,5],[14,6],[14,7],[14,8],[14,9],[14,10],[14,11],[14,12],
   [15,12],[16,12],[17,12],[18,12],[19,12],[20,12],[21,12]
 ];
-const STAGE_CFG=[
-  {name:'ALPHA',sub:'EASY · 10W',  path:PATH_1,hpx:1.0,spdx:1.0},
-  {name:'BETA', sub:'NORMAL · 10W',path:PATH_2,hpx:1.9,spdx:1.15},
-  {name:'GAMMA',sub:'HARD · 10W',  path:PATH_3,hpx:3.2,spdx:1.3},
+const PATH_D=[
+  [0,6],[1,6],[2,6],[3,6],[4,6],[5,6],
+  [5,5],[5,4],[5,3],[5,2],[5,1],
+  [6,1],[7,1],[8,1],[9,1],[10,1],
+  [10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],[10,11],[10,12],
+  [11,12],[12,12],[13,12],[14,12],[15,12],
+  [15,11],[15,10],[15,9],[15,8],[15,7],[15,6],[15,5],[15,4],[15,3],[15,2],[15,1],
+  [16,1],[17,1],[18,1],[19,1],[20,1],[21,1]
 ];
+const PATH_E=[
+  [0,3],[1,3],[2,3],[3,3],
+  [3,4],[3,5],[3,6],[3,7],[3,8],[3,9],[3,10],[3,11],
+  [4,11],[5,11],[6,11],
+  [6,10],[6,9],[6,8],[6,7],[6,6],[6,5],[6,4],[6,3],
+  [7,3],[8,3],[9,3],
+  [9,4],[9,5],[9,6],[9,7],[9,8],[9,9],[9,10],[9,11],
+  [10,11],[11,11],[12,11],
+  [12,10],[12,9],[12,8],[12,7],[12,6],[12,5],[12,4],[12,3],
+  [13,3],[14,3],[15,3],
+  [15,4],[15,5],[15,6],[15,7],[15,8],[15,9],[15,10],[15,11],
+  [16,11],[17,11],[18,11],
+  [18,10],[18,9],[18,8],[18,7],[18,6],[18,5],[18,4],[18,3],
+  [19,3],[20,3],[21,3]
+];
+const PATH_F=[
+  [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[9,1],[10,1],[11,1],[12,1],[13,1],[14,1],[15,1],[16,1],[17,1],[18,1],[19,1],[20,1],
+  [20,2],[20,3],
+  [19,3],[18,3],[17,3],[16,3],[15,3],[14,3],[13,3],[12,3],[11,3],[10,3],[9,3],[8,3],[7,3],[6,3],[5,3],[4,3],[3,3],[2,3],[1,3],
+  [1,4],[1,5],
+  [2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],[11,5],[12,5],[13,5],[14,5],[15,5],[16,5],[17,5],[18,5],[19,5],[20,5],
+  [20,6],[20,7],
+  [19,7],[18,7],[17,7],[16,7],[15,7],[14,7],[13,7],[12,7],[11,7],[10,7],[9,7],[8,7],[7,7],[6,7],[5,7],[4,7],[3,7],[2,7],[1,7],
+  [1,8],[1,9],
+  [2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],[10,9],[11,9],[12,9],[13,9],[14,9],[15,9],[16,9],[17,9],[18,9],[19,9],[20,9],
+  [20,10],[20,11],
+  [19,11],[18,11],[17,11],[16,11],[15,11],[14,11],[13,11],[12,11],[11,11],[10,11],[9,11],[8,11],[7,11],[6,11],[5,11],[4,11],[3,11],[2,11],[1,11],
+  [1,12],[1,13],
+  [2,13],[3,13],[4,13],[5,13],[6,13],[7,13],[8,13],[9,13],[10,13],[11,13],[12,13],[13,13],[14,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],[21,13]
+];
+const PATHS=[PATH_1,PATH_D,PATH_2,PATH_E,PATH_3,PATH_F];
+const STAGE_CFG=Array.from({length:30},(_,i)=>({
+  name:`STAGE ${i+1}`,
+  path:PATHS[Math.floor(i/5)],
+  hpx:+(0.6*Math.pow(1.085,i)).toFixed(3),
+  spdx:+(0.85+i*0.024).toFixed(3),
+}));
 let PATH,PSET,stageIdx=0;
 function setStage(i){
   stageIdx=i;PATH=STAGE_CFG[i].path;PSET=new Set(PATH.map(([c,r])=>`${c},${r}`));
@@ -151,6 +195,8 @@ function setStage(i){
 }
 const isPath=(c,r)=>PSET.has(`${c},${r}`);
 setStage(0);
+const getUnlocked=()=>+localStorage.getItem('tower_unlock')||0;
+const setUnlocked=n=>{if(n>getUnlocked())localStorage.setItem('tower_unlock',n);};
 
 const TD={
   FIREWALL:  {name:'FIREWALL',  cost:75, color:'#00D4FF',range:2.8,dmg:12,rate:1.2,          desc:'Balanced',
@@ -790,8 +836,23 @@ function loop(ts){
 function showStageSelect(){
   document.getElementById('ov-h').textContent='TOWER.EXE';
   document.getElementById('ov-sub').textContent='Select network to defend.';
-  document.getElementById('ov-stages').style.display='flex';
+  const grid=document.getElementById('ov-stages');
+  if(!grid.children.length){
+    for(let i=0;i<30;i++){
+      const b=document.createElement('button');
+      b.className='sbtn';b.dataset.s=i;b.textContent=i+1;
+      grid.appendChild(b);
+    }
+  }
+  const unlocked=getUnlocked();
+  grid.querySelectorAll('.sbtn').forEach(b=>{
+    const i=+b.dataset.s;
+    b.disabled=i>unlocked;
+    b.classList.toggle('done',i<unlocked&&!b.classList.contains('active'));
+  });
+  grid.style.display='grid';
   document.getElementById('obtn').style.display='none';
+  document.getElementById('obtn2').style.display='none';
   document.getElementById('ov').style.display='flex';
 }
 function hideOv(){document.getElementById('ov').style.display='none';}
@@ -803,6 +864,7 @@ function gameOver(){
   document.getElementById('ov-sub').innerHTML=`${cfg.name} — Wave ${wave}<br>Score: ${score}`;
   document.getElementById('ov-stages').style.display='none';
   const btn=document.getElementById('obtn');btn.style.display='block';btn.textContent='[ RETRY ]';
+  const btn2=document.getElementById('obtn2');btn2.style.display='block';btn2.textContent='[ STAGE SELECT ]';
   document.getElementById('ov').style.display='flex';
 }
 function gameWin(){
@@ -810,12 +872,16 @@ function gameWin(){
   const cfg=STAGE_CFG[stageIdx];
   const key=`tower_hi_${stageIdx}`;
   const hi=Math.max(score,+localStorage.getItem(key)||0);localStorage.setItem(key,hi);
-  const isLast=stageIdx>=STAGE_CFG.length-1;
+  if(stageIdx<29)setUnlocked(stageIdx+1);
+  const isLast=stageIdx>=29;
   document.getElementById('ov-h').textContent='NETWORK SECURED';
   document.getElementById('ov-sub').innerHTML=`${cfg.name} cleared!<br>Score: ${score} · Best: ${hi}`;
   document.getElementById('ov-stages').style.display='none';
   const btn=document.getElementById('obtn');btn.style.display='block';
-  btn.textContent=isLast?'[ BACK TO SELECT ]':'[ NEXT STAGE ]';
+  btn.textContent=isLast?'[ STAGE SELECT ]':'[ NEXT STAGE ]';
+  const btn2=document.getElementById('obtn2');
+  btn2.style.display=isLast?'none':'block';
+  btn2.textContent='[ STAGE SELECT ]';
   document.getElementById('ov').style.display='flex';
 }
 
@@ -867,19 +933,24 @@ document.getElementById('obtn').addEventListener('click',()=>{
   AC.resume();
   if(state==='gameover'){init();hideOv();state='playing';}
   else if(state==='win'){
-    if(stageIdx<STAGE_CFG.length-1){
+    if(stageIdx<29){
       setStage(stageIdx+1);init();hideOv();
-      // flash canvas white briefly to signal new stage
       ctx.fillStyle='rgba(0,212,255,.18)';ctx.fillRect(0,0,C.width,C.height);
       state='playing';
     }else{showStageSelect();}
   }
 });
-document.querySelectorAll('.sbtn').forEach(b=>b.addEventListener('click',()=>{
-  AC.resume();setStage(+b.dataset.s);
-  document.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+document.getElementById('obtn2').addEventListener('click',()=>showStageSelect());
+document.getElementById('ov-stages').addEventListener('click',e=>{
+  const b=e.target.closest('.sbtn');
+  if(!b||b.disabled)return;
+  AC.resume();
+  const idx=+b.dataset.s;
+  setStage(idx);
+  document.querySelectorAll('.sbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
   init();hideOv();state='playing';
-}));
+});
 document.getElementById('wbtn').addEventListener('click',()=>{if(state==='playing'&&!waveOn)startWave();});
 document.getElementById('upbtn').addEventListener('click',()=>{
   if(!selCell)return;
