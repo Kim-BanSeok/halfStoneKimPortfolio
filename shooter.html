@@ -50,7 +50,7 @@ cv.addEventListener('touchstart',e=>{
   const t0=e.touches[0];
   const tx=(t0.clientX-rect.left)*(W/rect.width);
   const ty=(t0.clientY-rect.top)*(H/rect.height);
-  if(STATE==='title'||STATE==='gameover'){kp[' ']=true;return;}
+  if(STATE==='title'||STATE==='gameover'||STATE==='clear'){kp[' ']=true;return;}
   if(STATE==='playing'){
     if(paused){paused=false;return;}
     if(tx>W-58&&ty<52){paused=true;return;}
@@ -289,7 +289,7 @@ function update(dt){
 
   // one-shot key actions
   if(kp['Enter']||kp[' ']){
-    if(STATE==='title'||STATE==='gameover'){startGame();kp['Enter']=kp[' ']=false;return;}
+    if(STATE==='title'||STATE==='gameover'||STATE==='clear'){startGame();kp['Enter']=kp[' ']=false;return;}
   }
   if((kp['z']||kp['Z']||kp['x']||kp['X'])&&STATE==='playing'&&pl.bombs>0){
     pl.bombs--;sndBomb();
@@ -449,11 +449,17 @@ function update(dt){
   // wave management
   if(waveClearing){
     waveTimer-=dt;
-    if(waveTimer<=0){waveClearing=false;wave++;buildWave();}
+    if(waveTimer<=0){
+      waveClearing=false;wave++;
+      if(wave>20){
+        STATE='clear';
+        if(score>hiScore){hiScore=score;localStorage.setItem('fw_hi',String(score));}
+      }else{buildWave();}
+    }
   }else if(enemies.length===0){
-    waveClearing=true;waveTimer=2.4;sndClear();
-    score+=wave*100;
-    openShop();
+    waveClearing=true;score+=wave*100;sndClear();
+    if(wave===20){waveTimer=1.5;}
+    else{waveTimer=2.4;openShop();}
   }
 
   // particles
@@ -567,6 +573,7 @@ function render(){
   ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
   if(STATE==='title'){drawTitle();ctx.restore();return;}
   if(STATE==='gameover'){drawGameover();ctx.restore();return;}
+  if(STATE==='clear'){drawClear();ctx.restore();return;}
   drawHex();
   drawParts();
   for(const e of enemies)if(!e.dead)drawEnemy(e);
@@ -1081,6 +1088,55 @@ function drawGameover(){
   const blink=Math.sin(performance.now()/400)>0;
   ctx.font=`500 12px 'DM Mono',monospace`;ctx.fillStyle=blink?'#00D4FF':'#2E2E5A';
   ctx.fillText('[ TAP / ENTER / SPACE — RESTART ]',W/2,H*.80);
+  ctx.textBaseline='alphabetic';
+}
+
+function drawClear(){
+  drawHex();
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  const t=performance.now()/1000;
+  // glow ring
+  const rg=ctx.createRadialGradient(W/2,H*0.22,0,W/2,H*0.22,H*0.32);
+  rg.addColorStop(0,'rgba(0,255,136,0.07)');rg.addColorStop(1,'rgba(0,255,136,0)');
+  ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  // title
+  ctx.font=`700 30px 'DM Mono',monospace`;ctx.fillStyle='#00FF88';ctx.shadowColor='#00FF88';ctx.shadowBlur=28;
+  ctx.fillText('MISSION COMPLETE',W/2,H*.15);ctx.shadowBlur=0;
+  ctx.font=`400 10px 'DM Mono',monospace`;ctx.fillStyle='#2E5A40';
+  ctx.fillText('FIREWALL.EXE — ALL 20 WAVES NEUTRALIZED',W/2,H*.23);
+  // separator
+  ctx.strokeStyle='rgba(0,255,136,0.18)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W*.28,H*.28);ctx.lineTo(W*.72,H*.28);ctx.stroke();
+  // score block
+  ctx.font=`400 10px 'DM Mono',monospace`;ctx.fillStyle='#3A3A6A';
+  ctx.fillText('FINAL SCORE',W/2,H*.335);
+  ctx.font=`500 28px 'DM Mono',monospace`;ctx.fillStyle='#E0E0FF';ctx.shadowColor='#00D4FF';ctx.shadowBlur=10;
+  ctx.fillText(score.toLocaleString(),W/2,H*.40);ctx.shadowBlur=0;
+  ctx.font=`400 10px 'DM Mono',monospace`;ctx.fillStyle='#3A3A6A';
+  ctx.fillText(`WAVE ${wave-1}  ·  MAX COMBO ${maxCombo}`,W/2,H*.455);
+  if(score>=hiScore&&score>0){
+    ctx.font=`500 12px 'DM Mono',monospace`;ctx.fillStyle='#FFD700';ctx.shadowColor='#FFD700';ctx.shadowBlur=12;
+    ctx.fillText('NEW HI-SCORE',W/2,H*.51);ctx.shadowBlur=0;
+  }else if(hiScore>0){
+    ctx.font=`400 10px 'DM Mono',monospace`;ctx.fillStyle='#2A2A5A';
+    ctx.fillText(`HI-SCORE: ${hiScore.toLocaleString()}`,W/2,H*.51);
+  }
+  // grade panel
+  const bw=Math.min(320,W*0.78),bh=50,bx=W/2-bw/2,by=H*.555;
+  ctx.fillStyle='rgba(0,20,10,0.7)';ctx.fillRect(bx,by,bw,bh);
+  ctx.strokeStyle='rgba(0,255,136,0.15)';ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,bh);
+  ctx.font=`400 9px 'DM Mono',monospace`;ctx.fillStyle='#00FF88';
+  const gln=[
+    'process  : FIREWALL.EXE    status: TERMINATED',
+    'threat_count : 0    firewall_integrity: 100%',
+    'exit_code : 0x00   // SYSTEM SECURED',
+  ];
+  gln.forEach((l,i)=>ctx.fillText(l,W/2,by+12+i*14));
+  // restart
+  const blink=Math.sin(t*2.6)>0;
+  ctx.font=`500 12px 'DM Mono',monospace`;
+  ctx.fillStyle=blink?'#00D4FF':'#2E2E5A';ctx.shadowBlur=0;
+  ctx.fillText('[ TAP / ENTER / SPACE — PLAY AGAIN ]',W/2,H*.80);
   ctx.textBaseline='alphabetic';
 }
 

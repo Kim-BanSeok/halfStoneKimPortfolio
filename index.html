@@ -976,6 +976,14 @@
       padding: 0.18rem 0.5rem;
       border-radius: 3px;
     }
+    .game-record {
+      font-size: .58rem;
+      color: #3A3A6A;
+      letter-spacing: .08em;
+      margin-top: .4rem;
+      display: none;
+    }
+    .game-record .rv { color: var(--cyan); }
     .snake-card .ftag { border: 1px solid rgba(0,255,136,.25); color: #00FF88; background: rgba(0,255,136,.05); }
     .g2048-card .ftag { border: 1px solid rgba(139,92,246,.25); color: var(--purple); background: rgba(139,92,246,.05); }
 
@@ -1640,6 +1648,7 @@
               <span class="ftag">Web Audio</span>
               <span class="ftag" data-i18n="ftag-mobile">모바일</span>
             </div>
+            <div class="game-record" id="rec-snake"></div>
           </div>
         </a>
 
@@ -1667,6 +1676,7 @@
               <span class="ftag" data-i18n="ftag-hint">힌트</span>
               <span class="ftag" data-i18n="ftag-particle">파티클</span>
             </div>
+            <div class="game-record" id="rec-2048"></div>
           </div>
         </a>
 
@@ -1689,6 +1699,7 @@
               <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);" data-i18n="ftag-wpm-chart">WPM 그래프</span>
               <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);" data-i18n="ftag-pb">개인 최고</span>
             </div>
+            <div class="game-record" id="rec-type"></div>
           </div>
         </a>
 
@@ -1722,6 +1733,7 @@
               <span class="ftag" data-i18n="ftag-runner-combo">콤보</span>
               <span class="ftag" data-i18n="ftag-speed">속도 증가</span>
             </div>
+            <div class="game-record" id="rec-runner"></div>
           </div>
         </a>
 
@@ -1771,6 +1783,7 @@
               <span class="ftag" data-i18n="ftag-explosive">폭발 벽돌</span>
               <span class="ftag" data-i18n="ftag-powerups">파워업</span>
             </div>
+            <div class="game-record" id="rec-break"></div>
           </div>
         </a>
 
@@ -1826,6 +1839,7 @@
               <span class="ftag" data-i18n="ftag-judgment">판정 4종</span>
               <span class="ftag">Web Audio</span>
             </div>
+            <div class="game-record" id="rec-rhythm"></div>
           </div>
         </a>
 
@@ -1839,13 +1853,14 @@
               <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
             </div>
             <div class="game-title" data-i18n="game-shooter-title">슈팅 게임</div>
-            <p class="game-desc" data-i18n="game-shooter-desc">탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 웨이브 클리어.</p>
+            <p class="game-desc" data-i18n="game-shooter-desc">탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 20웨이브 캠페인 엔딩.</p>
             <div class="game-feature-tags">
               <span class="ftag" data-i18n="ftag-waves">웨이브</span>
               <span class="ftag" data-i18n="ftag-boss">보스전</span>
               <span class="ftag" data-i18n="ftag-powerup">파워업 4종</span>
               <span class="ftag">Canvas 2D</span>
             </div>
+            <div class="game-record" id="rec-shooter"></div>
           </div>
         </a>
 
@@ -1866,6 +1881,7 @@
               <span class="ftag" data-i18n="ftag-tower-upgrade">3난이도</span>
               <span class="ftag">Canvas 2D</span>
             </div>
+            <div class="game-record" id="rec-tower"></div>
           </div>
         </a>
 
@@ -1886,6 +1902,7 @@
               <span class="ftag" data-i18n="ftag-tetris-das">DAS</span>
               <span class="ftag">Canvas 2D</span>
             </div>
+            <div class="game-record" id="rec-tetris"></div>
           </div>
         </a>
 
@@ -1906,6 +1923,7 @@
               <span class="ftag" data-i18n="ftag-mine-safe">첫클릭 안전</span>
               <span class="ftag">Canvas 2D</span>
             </div>
+            <div class="game-record" id="rec-mine"></div>
           </div>
         </a>
 
@@ -2276,7 +2294,7 @@
         'ftag-multiball': '멀티볼', 'ftag-laser': '레이저', 'ftag-explosive': '폭발 벽돌', 'ftag-powerups': '파워업',
         'game-rhythm-title': '리듬 게임', 'game-rhythm-desc': '7레인 O2JAM 스타일 리듬 게임. 30곡 (EASY·MEDIUM·HARD)과 Web Audio 절차적 사운드.',
         'ftag-songs': '30곡', 'ftag-lanes': '7레인', 'ftag-judgment': '판정 4종',
-        'game-shooter-title': '슈팅 게임', 'game-shooter-desc': '탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 웨이브 클리어.',
+        'game-shooter-title': '슈팅 게임', 'game-shooter-desc': '탄막 슈팅 FIREWALL.EXE. 5종 적·보스, 4종 파워업, 20웨이브 캠페인 엔딩.',
         'ftag-waves': '웨이브', 'ftag-boss': '보스전', 'ftag-powerup': '파워업 4종',
         'game-tower-title': '타워 디펜스', 'game-tower-desc': 'TOWER.EXE. 6종 타워·업그레이드, 30스테이지 캠페인 (EASY·NORMAL·HARD), 이동·판매 시스템.',
         'ftag-tower-waves': '30스테이지', 'ftag-tower-types': '타워 6종', 'ftag-tower-upgrade': '3난이도',
@@ -2331,7 +2349,7 @@
         'ftag-multiball': 'Multi-ball', 'ftag-laser': 'Laser', 'ftag-explosive': 'Explosive', 'ftag-powerups': 'Power-ups',
         'game-rhythm-title': 'Rhythm', 'game-rhythm-desc': '7-lane O2JAM-style rhythm game. 30 tracks across EASY / MEDIUM / HARD with procedural Web Audio.',
         'ftag-songs': '30 Songs', 'ftag-lanes': '7 Lanes', 'ftag-judgment': '4 Judgments',
-        'game-shooter-title': 'Shooter', 'game-shooter-desc': 'Bullet-hell shooter FIREWALL.EXE. 5 enemy types, boss every 5 waves, 4 power-ups.',
+        'game-shooter-title': 'Shooter', 'game-shooter-desc': 'Bullet-hell shooter FIREWALL.EXE. 5 enemy types, boss every 5 waves, 4 power-ups, 20-wave campaign ending.',
         'ftag-waves': 'Waves', 'ftag-boss': 'Boss Fight', 'ftag-powerup': '4 Power-ups',
         'game-tower-title': 'Tower Defense', 'game-tower-desc': 'TOWER.EXE. 6 tower types, 30-stage campaign (EASY / NORMAL / HARD), move & sell system.',
         'ftag-tower-waves': '30 Stages', 'ftag-tower-types': '6 Towers', 'ftag-tower-upgrade': '3 Tiers',
@@ -3069,6 +3087,44 @@
         applyTheme(theme === 'dark' ? 'light' : 'dark');
       });
     })();
+  </script>
+  <script>
+  (function(){
+    function fmt(n){return parseInt(n).toLocaleString('ko-KR');}
+    function set(id,html){const el=document.getElementById(id);if(el){el.innerHTML=html;el.style.display='block';}}
+
+    const fwHi=localStorage.getItem('fw_hi');
+    if(fwHi&&fwHi!=='0') set('rec-shooter','HI · <span class="rv">'+fmt(fwHi)+'</span>');
+
+    const tu=localStorage.getItem('tower_unlock');
+    if(tu!==null){const n=parseInt(tu)+1;const tier=n>=30?'ALL CLEAR ✓':n>=20?'HARD '+Math.min(n-20,10)+'/10':n>=10?'NORMAL '+Math.min(n-10,10)+'/10':'EASY '+Math.min(n,10)+'/10';set('rec-tower','STAGE <span class="rv">'+Math.min(n,30)+'/30</span>  '+tier);}
+
+    const se=localStorage.getItem('scan_easy'),sm=localStorage.getItem('scan_medium'),sh=localStorage.getItem('scan_hard');
+    const mp=[];if(se)mp.push('E·<span class="rv">'+se+'s</span>');if(sm)mp.push('M·<span class="rv">'+sm+'s</span>');if(sh)mp.push('H·<span class="rv">'+sh+'s</span>');
+    if(mp.length) set('rec-mine','BEST · '+mp.join(' &nbsp;'));
+
+    let sS=0,sA=0;
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('rh-hg-')){const g=localStorage.getItem(k);if(g==='S')sS++;else if(g==='A')sA++;}}
+    if(sS+sA>0) set('rec-rhythm','S · <span class="rv">'+sS+'</span>  A · <span class="rv">'+sA+'</span>  / 30곡');
+
+    const tp=localStorage.getItem('tr-pb');
+    if(tp&&tp!=='0') set('rec-type','PB · <span class="rv">'+tp+' WPM</span>');
+
+    const snHi=localStorage.getItem('snakeHi');
+    if(snHi&&snHi!=='0') set('rec-snake','HI · <span class="rv">'+fmt(snHi)+'</span>');
+
+    const b2=localStorage.getItem('2048best');const st2=JSON.parse(localStorage.getItem('2048stats')||'null');
+    if(b2&&b2!=='0'){const tile=st2&&st2.bestTile?'  BEST TILE <span class="rv">'+st2.bestTile+'</span>':'';set('rec-2048','HI · <span class="rv">'+fmt(b2)+'</span>'+tile);}
+
+    const rb=localStorage.getItem('runner-best');
+    if(rb&&rb!=='0') set('rec-runner','HI · <span class="rv">'+fmt(rb)+'</span>');
+
+    const bb=localStorage.getItem('breakout-best');
+    if(bb&&bb!=='0') set('rec-break','HI · <span class="rv">'+fmt(bb)+'</span>');
+
+    const th=localStorage.getItem('defrag_hi');
+    if(th&&th!=='0') set('rec-tetris','HI · <span class="rv">'+fmt(th)+'</span>');
+  })();
   </script>
 
 </body>
