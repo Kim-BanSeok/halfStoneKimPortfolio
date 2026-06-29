@@ -68,7 +68,7 @@ h3{color:var(--purple);font-size:.55rem;letter-spacing:.16em;margin-top:2px;padd
   <div id="panel">
     <div class="scard">
       <div class="sc-num" id="wn">0</div>
-      <div class="sc-label">WAVE / 10</div>
+      <div class="sc-label"><span id="stage-lbl" style="color:var(--cyan)">ALPHA</span> · WAVE / 10</div>
       <div class="sc-bar-wrap"><div class="sc-bar" id="wbar" style="width:0%"></div></div>
     </div>
     <div class="scard">
@@ -145,7 +145,10 @@ const STAGE_CFG=[
   {name:'GAMMA',sub:'HARD · 10W',  path:PATH_3,hpx:3.2,spdx:1.3},
 ];
 let PATH,PSET,stageIdx=0;
-function setStage(i){stageIdx=i;PATH=STAGE_CFG[i].path;PSET=new Set(PATH.map(([c,r])=>`${c},${r}`));}
+function setStage(i){
+  stageIdx=i;PATH=STAGE_CFG[i].path;PSET=new Set(PATH.map(([c,r])=>`${c},${r}`));
+  const el=document.getElementById('stage-lbl');if(el)el.textContent=STAGE_CFG[i].name;
+}
 const isPath=(c,r)=>PSET.has(`${c},${r}`);
 setStage(0);
 
@@ -211,7 +214,10 @@ function init(){
   hp=20;gold=200;score=0;wave=0;waveOn=false;gT=0;
   selType='FIREWALL';selCell=null;moving=null;
   enemies=[];towers=[];bullets=[];parts=[];queue=[];qTimer=0;left=0;
-  updPanel();setMsg('');
+  const wb=document.getElementById('wbtn');wb.disabled=false;wb.textContent='[ BOOT WAVE 1 ]';
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.toggle('sel',b.dataset.k==='FIREWALL'));
+  document.getElementById('mvbtn').classList.remove('moving');
+  updPanel();updSel();setMsg('');
 }
 
 function startWave(){
@@ -861,8 +867,12 @@ document.getElementById('obtn').addEventListener('click',()=>{
   AC.resume();
   if(state==='gameover'){init();hideOv();state='playing';}
   else if(state==='win'){
-    if(stageIdx<STAGE_CFG.length-1){setStage(stageIdx+1);init();hideOv();state='playing';}
-    else{showStageSelect();}
+    if(stageIdx<STAGE_CFG.length-1){
+      setStage(stageIdx+1);init();hideOv();
+      // flash canvas white briefly to signal new stage
+      ctx.fillStyle='rgba(0,212,255,.18)';ctx.fillRect(0,0,C.width,C.height);
+      state='playing';
+    }else{showStageSelect();}
   }
 });
 document.querySelectorAll('.sbtn').forEach(b=>b.addEventListener('click',()=>{
