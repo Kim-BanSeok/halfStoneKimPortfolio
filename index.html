@@ -1927,6 +1927,37 @@
           </div>
         </a>
 
+        <a class="game-card puzzle-card fade-up" href="puzzle.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
+            <div class="puzzle-mini-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;width:108px;">
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.3);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">03</span></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.2);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">01</span></div>
+              <div class="pm-t" style="background:#030310;border:1px solid #0f0f28;border-radius:3px;height:32px;"></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.2);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">06</span></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.35);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">02</span></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.2);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">07</span></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.2);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">04</span></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.2);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">08</span></div>
+              <div class="pm-t" style="background:#0D0D2A;border:1px solid rgba(0,212,255,.2);border-radius:3px;height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;"><span style="font-size:.4rem;color:#2A2A5A;">0x</span><span style="font-size:.7rem;color:var(--cyan);">05</span></div>
+            </div>
+          </div>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:var(--cyan);">⊞ SORT</span>
+              <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-puzzle-title">슬라이딩 퍼즐</div>
+            <p class="game-desc" data-i18n="game-puzzle-desc">SORT.EXE. 메모리 블록을 정렬하라. 3×3·4×4·5×5 난이도, 이동 수 기반 S~C 등급, 베스트 타임.</p>
+            <div class="game-feature-tags" style="--ftag-border:rgba(0,212,255,.25);--ftag-color:var(--cyan);--ftag-bg:rgba(0,212,255,.05);">
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);">3난이도</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);">이동 카운터</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);">S~C 등급</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:var(--cyan);background:rgba(0,212,255,.05);">Web Audio</span>
+            </div>
+            <div class="game-record" id="rec-puzzle"></div>
+          </div>
+        </a>
+
       </div>
     </section>
 
@@ -2302,6 +2333,7 @@
         'ftag-tetris-srs': 'SRS 회전', 'ftag-tetris-hold': '홀드', 'ftag-tetris-das': 'DAS',
         'game-mine-title': '지뢰찾기', 'game-mine-desc': 'SCAN.EXE. 악성코드를 찾아라. 3가지 난이도, 첫 클릭 안전, BFS 자동 공개.',
         'ftag-mine-diff': '3난이도', 'ftag-mine-flood': '플러드 필', 'ftag-mine-safe': '첫클릭 안전',
+        'game-puzzle-title': '슬라이딩 퍼즐', 'game-puzzle-desc': 'SORT.EXE. 메모리 블록을 정렬하라. 3×3·4×4·5×5 난이도, 이동 수 기반 S~C 등급, 베스트 타임.',
         'exp1-role': '사원', 'exp1-company': '에스더블유기술원', 'exp1-badge': '퇴사',
         'exp1-desc': 'React Native · Node.js · PostgreSQL · AWS<br>Android 중고거래 앱 <strong>바나나창고</strong> 기획·개발·출시 (Google Play)',
         'exp2-role': '대리', 'exp2-company': '(주)웰컴소프트',
@@ -2356,6 +2388,7 @@
         'game-tetris-title': 'Tetris', 'game-tetris-desc': 'DEFRAG.EXE. SRS rotation, ghost piece, hold, next 3 preview, DAS controls.',
         'ftag-tetris-srs': 'SRS Rotation', 'ftag-tetris-hold': 'Hold', 'ftag-tetris-das': 'DAS',
         'game-mine-title': 'Minesweeper', 'game-mine-desc': 'SCAN.EXE. Find the malware. 3 difficulties, safe first click, BFS flood fill.',
+        'game-puzzle-title': 'Sliding Puzzle', 'game-puzzle-desc': 'SORT.EXE. Sort the memory blocks. 3×3/4×4/5×5 grids, S–C grade by moves, best time tracking.',
         'ftag-mine-diff': '3 Levels', 'ftag-mine-flood': 'Flood Fill', 'ftag-mine-safe': 'Safe Start',
         'exp1-role': 'Staff', 'exp1-company': 'SW Technology Institute', 'exp1-badge': 'Left',
         'exp1-desc': 'React Native · Node.js · PostgreSQL · AWS<br>Built &amp; shipped <strong>BananaWarehouse</strong> — Android second-hand marketplace (Google Play)',
@@ -3124,6 +3157,11 @@
 
     const th=localStorage.getItem('defrag_hi');
     if(th&&th!=='0') set('rec-tetris','HI · <span class="rv">'+fmt(th)+'</span>');
+
+    function fmtT(s){return`${~~(s/60)}:${String(s%60).padStart(2,'0')}`;}
+    const pe=localStorage.getItem('sort_easy'),pm=localStorage.getItem('sort_medium'),ph=localStorage.getItem('sort_hard');
+    const pp2=[];if(pe)pp2.push('E·<span class="rv">'+fmtT(+pe)+'</span>');if(pm)pp2.push('M·<span class="rv">'+fmtT(+pm)+'</span>');if(ph)pp2.push('H·<span class="rv">'+fmtT(+ph)+'</span>');
+    if(pp2.length) set('rec-puzzle','BEST · '+pp2.join(' &nbsp;'));
   })();
   </script>
 
