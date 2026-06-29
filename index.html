@@ -2764,6 +2764,178 @@
       }
     })();
 
+    // ── TETRIS PREVIEW ──
+    (function(){
+      const cv=document.getElementById('tetris-prev');if(!cv)return;
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      const obs=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){obs.disconnect();start();}},{threshold:0.1});
+      obs.observe(cv);
+      function start(){
+        const rect=cv.getBoundingClientRect();cv.width=rect.width*dpr;cv.height=rect.height*dpr;
+        const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,CS=W/10;
+        const COLS={I:'#00D4FF',O:'#FFD700',T:'#8B5CF6',S:'#00FF88',Z:'#FF4455',J:'#4499FF',L:'#FF8844'};
+        // Static filled rows at bottom
+        const fixed=[
+          {r:9, cells:[0,1,2,3,4,5,7,8,9], col:['#FF4455','#FF4455','#FFD700','#FFD700','#8B5CF6','#8B5CF6','#00D4FF','#00D4FF','#FF8844']},
+          {r:10,cells:[0,1,2,3,5,6,7,8,9], col:['#8B5CF6','#00FF88','#00FF88','#FF8844','#00D4FF','#00D4FF','#FF4455','#FFD700','#FFD700']},
+          {r:11,cells:[0,1,2,3,4,5,6,7,8,9],col:['#00D4FF','#FF4455','#8B5CF6','#00FF88','#FFD700','#FF8844','#00D4FF','#FF4455','#8B5CF6','#00FF88']},
+        ];
+        // Falling T-piece shape offsets
+        const T=[[0,0],[1,0],[-1,0],[0,-1]];
+        let py=0,t=0;
+        function blk(x,y,c){
+          ctx.fillStyle=c;ctx.shadowColor=c;ctx.shadowBlur=5*dpr;
+          ctx.fillRect(x*CS+1.5,y*CS+1.5,CS-3,CS-3);
+          ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(x*CS+1.5,y*CS+1.5,CS-3,3);
+          ctx.shadowBlur=0;
+        }
+        function loop(){
+          requestAnimationFrame(loop);t++;
+          if(t%60===0){py++;if(py>8)py=0;}
+          ctx.fillStyle='#07071A';ctx.fillRect(0,0,W,H);
+          ctx.strokeStyle='#1a1a3a';ctx.lineWidth=.5;
+          for(let c=0;c<=10;c++){ctx.beginPath();ctx.moveTo(c*CS,0);ctx.lineTo(c*CS,H);ctx.stroke();}
+          for(let r=0;r*CS<H;r++){ctx.beginPath();ctx.moveTo(0,r*CS);ctx.lineTo(W,r*CS);ctx.stroke();}
+          fixed.forEach(row=>row.cells.forEach((c,i)=>blk(c,row.r,row.col[i])));
+          T.forEach(([dx,dy])=>blk(5+dx,py+dy,'#8B5CF6'));
+          // Row 9 flash (almost complete)
+          const a=0.3+0.25*Math.sin(t*0.12);
+          ctx.fillStyle=`rgba(255,215,0,${a})`;ctx.fillRect(8*CS,9*CS,CS,CS);
+        }
+        loop();
+      }
+    })();
+
+    // ── MINESWEEPER PREVIEW ──
+    (function(){
+      const cv=document.getElementById('mine-prev');if(!cv)return;
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      const obs=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){obs.disconnect();start();}},{threshold:0.1});
+      obs.observe(cv);
+      function start(){
+        const rect=cv.getBoundingClientRect();cv.width=rect.width*dpr;cv.height=rect.height*dpr;
+        const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+        const COLS=8,ROWS=6,CW=W/COLS,CH=H/ROWS;
+        // Grid: 0=hidden, 1-3=number, 9=mine, 10=flag
+        const G=[
+          [0,0,1,10,0,0,0,0],
+          [0,2,0, 0,1,0,10,0],
+          [1,0,3, 0,0,2, 0,0],
+          [0,1,0, 2,10,0, 1,0],
+          [0,0,2, 0, 0,1, 0,0],
+          [0,10,0, 1, 0,0, 2,0],
+        ];
+        const NCOL=['','#00D4FF','#00FF88','#FF4455'];
+        let t=0,pulse=4; // cell to pulse (reveal animation)
+        function cell(c,r){
+          const v=G[r][c];
+          const x=c*CW,y=r*CH;
+          ctx.strokeStyle='#1E1E4A';ctx.lineWidth=1;
+          if(v===0){
+            ctx.fillStyle='#0D0D28';ctx.fillRect(x+.5,y+.5,CW-1,CH-1);
+          }else if(v===10){
+            ctx.fillStyle='#0D0D28';ctx.fillRect(x+.5,y+.5,CW-1,CH-1);
+            ctx.fillStyle='#FF4455';ctx.font=`bold ${10*dpr}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+            ctx.fillText('⚑',x+CW/2,y+CH/2+1);
+          }else if(v===9){
+            ctx.fillStyle='#1a0008';ctx.fillRect(x+.5,y+.5,CW-1,CH-1);
+            ctx.fillStyle='#FF2244';ctx.shadowColor='#FF2244';ctx.shadowBlur=8*dpr;
+            ctx.beginPath();ctx.arc(x+CW/2,y+CH/2,CW*.28,0,Math.PI*2);ctx.fill();
+            ctx.shadowBlur=0;
+          }else{
+            ctx.fillStyle='#111130';ctx.fillRect(x+.5,y+.5,CW-1,CH-1);
+            ctx.fillStyle=NCOL[v]||'#E0E0FF';ctx.shadowColor=NCOL[v]||'#E0E0FF';ctx.shadowBlur=6*dpr;
+            ctx.font=`bold ${11*dpr}px 'DM Mono',monospace`;ctx.textAlign='center';ctx.textBaseline='middle';
+            ctx.fillText(v,x+CW/2,y+CH/2+1);ctx.shadowBlur=0;
+          }
+          ctx.strokeRect(x+.5,y+.5,CW-1,CH-1);
+        }
+        function loop(){
+          requestAnimationFrame(loop);t++;
+          ctx.fillStyle='#07071A';ctx.fillRect(0,0,W,H);
+          for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)cell(c,r);
+          // Scan line pulse on one hidden cell
+          const a=0.4+0.35*Math.sin(t*.08);
+          ctx.fillStyle=`rgba(0,212,255,${a})`;ctx.fillRect(4*CW+.5,0*CH+.5,CW-1,CH-1);
+        }
+        loop();
+      }
+    })();
+
+    // ── TOWER DEFENSE PREVIEW ──
+    (function(){
+      const cv=document.getElementById('tower-prev');if(!cv)return;
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      const obs=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){obs.disconnect();start();}},{threshold:0.1});
+      obs.observe(cv);
+      function start(){
+        const rect=cv.getBoundingClientRect();cv.width=rect.width*dpr;cv.height=rect.height*dpr;
+        const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+        const COLS=11,ROWS=7,CW=W/COLS,CH=H/ROWS;
+        // Simplified path: right→down→right→up→right
+        const PATH=[
+          [0,1],[1,1],[2,1],[3,1],[3,2],[3,3],[3,4],[4,4],[5,4],[6,4],[6,3],[6,2],[6,1],[7,1],[8,1],[9,1],[10,1]
+        ];
+        const PS=new Set(PATH.map(([c,r])=>`${c},${r}`));
+        // Towers: [col, row, color]
+        const TW=[[1,3,'#00D4FF'],[5,2,'#FFD700'],[8,3,'#8B5CF6']];
+        // Enemies
+        const EN=[{pi:0,prog:0,spd:.4},{pi:3,prog:0,spd:.35},{pi:7,prog:0,spd:.45}];
+        let t=0;
+        function loop(){
+          requestAnimationFrame(loop);t++;
+          ctx.fillStyle='#07071A';ctx.fillRect(0,0,W,H);
+          // Grid
+          ctx.strokeStyle='#0e0e28';ctx.lineWidth=.5;
+          for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*CW,0);ctx.lineTo(c*CW,H);ctx.stroke();}
+          for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CH);ctx.lineTo(W,r*CH);ctx.stroke();}
+          // Path
+          PATH.forEach(([c,r])=>{ctx.fillStyle='#0c1128';ctx.fillRect(c*CW+.5,r*CH+.5,CW-1,CH-1);});
+          ctx.strokeStyle='#1a2850';ctx.lineWidth=1;
+          PATH.forEach(([c,r])=>{ctx.strokeRect(c*CW+.5,r*CH+.5,CW-1,CH-1);});
+          // Data packets on path
+          ctx.fillStyle='rgba(0,212,255,.6)';ctx.shadowColor='#00D4FF';ctx.shadowBlur=5*dpr;
+          for(let i=0;i<3;i++){
+            const pos=(t*.015+i*(PATH.length/3))%PATH.length;
+            const pi=Math.floor(pos),fr=pos-pi;
+            if(pi>=PATH.length-1)continue;
+            const[c1,r1]=PATH[pi],[c2,r2]=PATH[pi+1];
+            const px=c1*CW+CW/2+(c2-c1)*CW*fr,py=r1*CH+CH/2+(r2-r1)*CH*fr;
+            ctx.beginPath();ctx.arc(px,py,2*dpr,0,Math.PI*2);ctx.fill();
+          }
+          ctx.shadowBlur=0;
+          // Towers
+          TW.forEach(([c,r,col])=>{
+            ctx.strokeStyle=col+'55';ctx.lineWidth=1;ctx.strokeRect(c*CW+1.5,r*CH+1.5,CW-3,CH-3);
+            ctx.fillStyle='#0b0b26';ctx.fillRect(c*CW+2,r*CH+2,CW-4,CH-4);
+            ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=8*dpr;
+            ctx.beginPath();ctx.arc(c*CW+CW/2,r*CH+CH/2,CW*.22,0,Math.PI*2);ctx.fill();
+            ctx.shadowBlur=0;
+          });
+          // Enemies
+          EN.forEach(e=>{
+            e.prog+=e.spd;if(e.prog>=1){e.prog=0;e.pi=(e.pi+1)%PATH.length;}
+            const[c1,r1]=PATH[e.pi],[c2,r2]=PATH[(e.pi+1)%PATH.length];
+            const ex=c1*CW+CW/2+(c2-c1)*CW*e.prog,ey=r1*CH+CH/2+(r2-r1)*CH*e.prog;
+            ctx.fillStyle='#FF4455';ctx.shadowColor='#FF4455';ctx.shadowBlur=7*dpr;
+            ctx.beginPath();ctx.arc(ex,ey,CW*.2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+          });
+          // Bullet (tower 0 shooting)
+          const bt=t%80;if(bt<30){
+            const[tc,tr]=TW[0];const[ec]=PATH[bt%PATH.length];
+            const tx=tc*CW+CW/2,ty=tr*CH+CH/2;
+            const tx2=PATH[Math.min(bt%PATH.length+2,PATH.length-1)][0]*CW+CW/2;
+            const ty2=PATH[Math.min(bt%PATH.length+2,PATH.length-1)][1]*CH+CH/2;
+            const prog=bt/30;
+            const bx=tx+(tx2-tx)*prog,by=ty+(ty2-ty)*prog;
+            ctx.fillStyle='#00D4FF';ctx.shadowColor='#00D4FF';ctx.shadowBlur=8*dpr;
+            ctx.beginPath();ctx.arc(bx,by,2.5*dpr,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+          }
+        }
+        loop();
+      }
+    })();
+
     // ── SKILLS BAR REVEAL ──
     (function() {
       const grid = document.getElementById('skills-bar-grid');
