@@ -240,7 +240,7 @@ function makeWave(w){
 }
 
 let hp,gold,score,wave,waveOn,selType,selCell;
-let enemies,towers,bullets,parts,queue,qTimer,left;
+let enemies=[],towers=[],bullets=[],parts=[],queue=[],qTimer=0,left=0;
 let state='title',hov=null,gT=0,moving=null;
 
 const AC=new AudioContext();
