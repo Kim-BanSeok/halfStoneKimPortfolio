@@ -431,9 +431,9 @@ const sfx={
 // ──────────────────────────────────────────
 //  DATA
 // ──────────────────────────────────────────
-const EN_WORDS = 'the be to of and a in that have it for not on with as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us where very about people state just help part need would about other after out over where most know take some time'.split(' ');
+const EN_WORDS = 'the be to of and a in that have it for not on with as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come over think also back after use two how our work first well way even new want because any these give day most us where state help part need real every great world feel place long hand high such live last word mean both still find kind end point turn change keep hold around bring begin full small number fact right far move set true free best open run mind step call show try ask add clear find build pass short next plan path fast slow deep wide safe rich'.split(' ');
 
-const KO_WORDS = '사람 나라 학교 친구 가족 음식 시간 날씨 여행 음악 영화 책 운동 건강 행복 사랑 희망 꿈 미래 문화 역사 과학 기술 개발 소프트웨어 데이터 서버 클라우드 모바일 앱 게임 디자인 창의 혁신 성장 도전 성공 노력 열정 지식 경험 실력 능력 목표 계획 실행 결과 개선 발전 완성 서비스 사용자 시장 팀 협력 소통 신뢰 관계 네트워크 프로그램 알고리즘 함수 변수 배열 객체 클래스 메서드 인터페이스 데이터베이스 쿼리 서버 클라이언트 요청 응답 인증 보안 성능 최적화 테스트 디버그 배포 버전 코드 로직 구조 패턴'.split(' ');
+const KO_WORDS = '사람 나라 학교 친구 가족 음식 시간 날씨 여행 음악 영화 책 운동 건강 행복 사랑 희망 꿈 미래 문화 역사 과학 기술 개발 소프트웨어 데이터 서버 클라우드 모바일 앱 게임 디자인 창의 혁신 성장 도전 성공 노력 열정 지식 경험 실력 능력 목표 계획 실행 결과 개선 발전 완성 서비스 사용자 시장 팀 협력 소통 신뢰 관계 네트워크 프로그램 알고리즘 함수 변수 배열 객체 클래스 메서드 인터페이스 데이터베이스 쿼리 클라이언트 요청 응답 인증 보안 성능 최적화 테스트 디버그 배포 버전 코드 로직 구조 패턴 생각 마음 눈빛 하늘 바다 산길 봄날 여름 가을 겨울 바람 빛나다 달리다 만들다 이루다 찾아다 나아가다 배우다 즐기다 기억 순간 선택 방법 이야기 의미 가치 방향 중심 변화 준비 실천'.split(' ');
 
 const EN_QUOTES = [
   "Code is like humor. When you have to explain it, it is bad.",
@@ -446,6 +446,20 @@ const EN_QUOTES = [
   "Clean code always looks like it was written by someone who cares.",
   "Before software can be reusable it first has to be usable.",
   "Debugging is twice as hard as writing the code in the first place.",
+  "The function of good software is to make the complex appear simple.",
+  "Programs must be written for people to read, and only incidentally for machines to execute.",
+  "The most powerful tool we have as developers is automation.",
+  "Software is a great combination between artistry and engineering.",
+  "One of the best programming skills you can have is knowing when to walk away.",
+  "Every great developer you know got there by solving problems they were unqualified to solve.",
+  "The best way to predict the future is to invent it.",
+  "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away.",
+  "Good code is its own best documentation.",
+  "Premature optimization is the root of all evil.",
+  "Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live.",
+  "It works on my machine.",
+  "There are only two hard things in computer science: cache invalidation and naming things.",
+  "The most dangerous phrase in the language is we have always done it this way.",
 ];
 
 const KO_QUOTES = [
@@ -457,6 +471,18 @@ const KO_QUOTES = [
   "소프트웨어는 예술과 공학의 훌륭한 조합이다.",
   "재사용 가능한 소프트웨어가 되기 전에 먼저 사용 가능해야 한다.",
   "열정 없이는 위대한 것을 이룰 수 없다.",
+  "완벽함은 더 이상 추가할 것이 없을 때가 아니라, 더 이상 뺄 것이 없을 때 이루어진다.",
+  "디버깅은 코드를 처음 작성하는 것보다 두 배 더 어렵다.",
+  "최고의 에러 메시지는 나타나지 않는 것이다.",
+  "복잡함을 단순하게 보이도록 만드는 것이 좋은 소프트웨어의 기능이다.",
+  "프리마처 최적화는 모든 악의 근원이다.",
+  "미래를 예측하는 가장 좋은 방법은 미래를 직접 발명하는 것이다.",
+  "이름 짓기와 캐시 무효화. 컴퓨터 과학에서 어려운 것은 딱 두 가지다.",
+  "항상 코드를 작성할 때, 유지보수하는 사람이 당신이 사는 곳을 아는 폭력적인 사이코패스라고 생각하고 작성하라.",
+  "동작은 하는데 이유를 모르겠다면, 그것도 버그다.",
+  "1인 개발자는 기획자이자 개발자이자 디자이너이자 QA다.",
+  "배포 전날 밤은 개발자에게 가장 긴 밤이다.",
+  "버그를 수정하는 가장 좋은 방법은 처음부터 만들지 않는 것이다.",
 ];
 
 const CODE = [
