@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MEMORY.EXE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07071A;
+  --cyan:#00D4FF;
+  --purple:#8B5CF6;
+  --green:#00FF88;
+  --gold:#FFD700;
+  --card-bg:#0D0D2B;
+  --card-border:#1A1A3E;
+  --text:#C0C0E0;
+}
+html,body{
+  width:100%;height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Mono',monospace;
+  overflow:hidden;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.hidden{display:none!important;}
+
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px 6px;
+  border-bottom:1px solid #1A1A3E;
+  flex-shrink:0;
+}
+#topbar a{
+  color:var(--cyan);
+  text-decoration:none;
+  font-size:.75rem;
+  opacity:.8;
+}
+#topbar a:hover{opacity:1;}
+#topbar .title{
+  font-size:1rem;
+  font-weight:500;
+  color:var(--cyan);
+  letter-spacing:.15em;
+  text-shadow:0 0 8px var(--cyan);
+}
+
+#hud{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  padding:6px 16px;
+  border-bottom:1px solid #1A1A3E;
+  flex-shrink:0;
+}
+.hud-item{
+  display:flex;align-items:center;gap:5px;
+  font-size:.7rem;
+  color:var(--text);
+}
+.hud-label{color:#5A5A8A;font-size:.65rem;}
+.hud-val{color:var(--cyan);min-width:2.8ch;}
+.hud-sep{color:#2A2A4A;margin:0 2px;}
+
+.diff-btn{
+  background:none;border:1px solid #2A2A5A;
+  color:#5A5A8A;font-family:'DM Mono',monospace;font-size:.65rem;
+  padding:3px 8px;cursor:pointer;border-radius:3px;
+  transition:all .15s;
+}
+.diff-btn:hover{border-color:var(--purple);color:var(--purple);}
+.diff-btn.active{border-color:var(--cyan);color:var(--cyan);text-shadow:0 0 6px var(--cyan);}
+
+#btn-new{
+  background:none;border:1px solid #2A2A5A;
+  color:var(--text);font-family:'DM Mono',monospace;font-size:.65rem;
+  padding:3px 8px;cursor:pointer;border-radius:3px;
+  transition:all .15s;margin-left:auto;
+}
+#btn-new:hover{border-color:var(--green);color:var(--green);}
+
+#arena{
+  flex:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;
+  overflow:hidden;
+}
+
+#grid{
+  display:grid;
+  gap:8px;
+}
+
+.card{
+  cursor:pointer;
+  perspective:600px;
+  border-radius:6px;
+}
+.card-inner{
+  width:100%;height:100%;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .35s ease;
+  border-radius:6px;
+}
+.card.flipped .card-inner{transform:rotateY(180deg);}
+.card.matched .card-inner{transform:rotateY(180deg);}
+
+.card-face{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:6px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.card-back{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  font-size:1.1em;
+  color:#3A3A6A;
+  transition:border-color .15s;
+}
+.card:hover:not(.flipped):not(.matched) .card-back{
+  border-color:var(--purple);
+  color:var(--purple);
+}
+.card-front{
+  background:#0A0A20;
+  border:1px solid #2A2A5A;
+  font-size:.75em;
+  font-weight:500;
+  letter-spacing:.08em;
+  transform:rotateY(180deg);
+  text-align:center;padding:4px;
+}
+.card.matched .card-front{
+  border-color:var(--green);
+  box-shadow:0 0 10px var(--green), inset 0 0 8px rgba(0,255,136,.1);
+  color:var(--green);
+}
+
+#overlay{
+  position:fixed;inset:0;
+  background:rgba(7,7,26,.96);
+  display:flex;align-items:center;justify-content:center;
+  z-index:100;
+}
+#overlay-box{
+  text-align:center;
+  border:1px solid #2A2A5A;
+  border-radius:8px;
+  padding:32px 40px;
+  background:#0A0A20;
+  max-width:320px;width:90%;
+}
+.ov-title{font-size:1.2rem;letter-spacing:.2em;color:var(--cyan);margin-bottom:8px;}
+.ov-grade{font-size:5rem;font-weight:500;line-height:1;margin:8px 0;text-shadow:0 0 20px currentColor;}
+.grade-S{color:var(--gold);}
+.grade-A{color:var(--cyan);}
+.grade-B{color:var(--purple);}
+.grade-C{color:var(--text);}
+.ov-best{font-size:.75rem;color:var(--gold);margin-bottom:12px;min-height:1.2em;}
+.ov-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-bottom:20px;
+}
+.ov-stat{
+  border:1px solid #1A1A3E;border-radius:4px;padding:8px;
+}
+.ov-stat-label{font-size:.6rem;color:#5A5A8A;margin-bottom:2px;}
+.ov-stat-val{font-size:.95rem;color:var(--cyan);}
+#btn-again{
+  background:none;border:1px solid var(--cyan);
+  color:var(--cyan);font-family:'DM Mono',monospace;font-size:.8rem;
+  padding:10px 28px;cursor:pointer;border-radius:4px;
+  text-shadow:0 0 6px var(--cyan);
+  transition:all .15s;
+}
+#btn-again:hover{background:rgba(0,212,255,.08);}
+
+body{display:flex;flex-direction:column;height:100vh;}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="index.html#games">← 게임 목록</a>
+  <span class="title">MEMORY.EXE</span>
+  <span style="width:80px"></span>
+</div>
+
+<div id="hud">
+  <div class="hud-item">
+    <span class="hud-label">TIME</span>
+    <span class="hud-val" id="hud-time">0:00</span>
+  </div>
+  <span class="hud-sep">|</span>
+  <div class="hud-item">
+    <span class="hud-label">FLIPS</span>
+    <span class="hud-val" id="hud-flips">0</span>
+  </div>
+  <span class="hud-sep">|</span>
+  <div class="hud-item">
+    <span class="hud-label">BEST</span>
+    <span class="hud-val" id="hud-best">--</span>
+  </div>
+  <span class="hud-sep">|</span>
+  <button class="diff-btn active" data-diff="easy">EASY</button>
+  <button class="diff-btn" data-diff="med">MED</button>
+  <button class="diff-btn" data-diff="hard">HARD</button>
+  <button id="btn-new">↺ NEW</button>
+</div>
+
+<div id="arena">
+  <div id="grid"></div>
+</div>
+
+<div id="overlay" class="hidden">
+  <div id="overlay-box">
+    <div class="ov-title">MEMORY CLEAR</div>
+    <div class="ov-grade" id="ov-grade">S</div>
+    <div class="ov-best" id="ov-best-msg"></div>
+    <div class="ov-stats">
+      <div class="ov-stat">
+        <div class="ov-stat-label">FLIPS</div>
+        <div class="ov-stat-val" id="ov-flips">0</div>
+      </div>
+      <div class="ov-stat">
+        <div class="ov-stat-label">TIME</div>
+        <div class="ov-stat-val" id="ov-time">0:00</div>
+      </div>
+      <div class="ov-stat">
+        <div class="ov-stat-label">MATCHED</div>
+        <div class="ov-stat-val" id="ov-matched">0</div>
+      </div>
+      <div class="ov-stat">
+        <div class="ov-stat-label">BEST</div>
+        <div class="ov-stat-val" id="ov-best-stat">--</div>
+      </div>
+    </div>
+    <button id="btn-again">↺ NEW GAME</button>
+  </div>
+</div>
+
+<script>
+const KEYWORDS = [
+  'async','await','const','class','fetch','proxy',
+  'redux','react','nginx','linux','mysql','swift',
+  'babel','kafka','mocha','redis','spark','cloud',
+  'stack','queue','array','cache','debug','patch'
+];
+
+const DIFF = {
+  easy: {cols:4,rows:4,pairs:8,key:'mem_easy',thS:20,thA:35,thB:55},
+  med:  {cols:5,rows:4,pairs:10,key:'mem_medium',thS:35,thA:55,thB:80},
+  hard: {cols:6,rows:4,pairs:12,key:'mem_hard',thS:50,thA:80,thB:120}
+};
+
+const CARD_COLORS = [
+  'var(--cyan)','var(--purple)','var(--cyan)','var(--purple)',
+  'var(--cyan)','var(--purple)','var(--cyan)','var(--purple)',
+  'var(--cyan)','var(--purple)','var(--cyan)','var(--purple)'
+];
+
+let ctx = null;
+let diff = 'easy';
+let cards = [];
+let first = null, second = null;
+let lock = false;
+let flips = 0, matched = 0;
+let elapsed = 0, timerID = null, started = false;
+
+function getCtx(){
+  if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+  return ctx;
+}
+
+function beep(freq1, freq2, dur, type='sine', vol=.25){
+  try{
+    const ac = getCtx();
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.connect(gain); gain.connect(ac.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq1, ac.currentTime);
+    if(freq2 !== freq1) osc.frequency.linearRampToValueAtTime(freq2, ac.currentTime + dur);
+    gain.gain.setValueAtTime(vol, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(0, ac.currentTime + dur);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + dur);
+  }catch(e){}
+}
+
+function sndFlip(){ beep(400,400,.07,'square',.15); }
+function sndMatch(){ beep(440,660,.18,'sine',.3); }
+function sndFail(){ beep(300,200,.2,'sawtooth',.2); }
+function sndWin(){
+  const notes=[440,554,659,880];
+  notes.forEach((n,i)=>{
+    setTimeout(()=>beep(n,n,.25,'sine',.3), i*140);
+  });
+}
+
+function fmt(sec){
+  const m = Math.floor(sec/60);
+  const s = sec % 60;
+  return `${m}:${s<10?'0':''}${s}`;
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function loadBest(){
+  const k = DIFF[diff].key;
+  const v = localStorage.getItem(k);
+  return v !== null ? parseInt(v) : null;
+}
+
+function saveBest(sec){
+  const k = DIFF[diff].key;
+  const prev = loadBest();
+  if(prev === null || sec < prev){
+    localStorage.setItem(k, sec);
+    return true;
+  }
+  return false;
+}
+
+function updateHudBest(){
+  const b = loadBest();
+  document.getElementById('hud-best').textContent = b !== null ? fmt(b) : '--';
+}
+
+function calcSz(){
+  const d = DIFF[diff];
+  const arena = document.getElementById('arena');
+  const aw = arena.clientWidth - 24;
+  const ah = arena.clientHeight - 24;
+  const gap = 8;
+  const maxW = Math.floor((aw - gap*(d.cols-1)) / d.cols);
+  const maxH = Math.floor((ah - gap*(d.rows-1)) / d.rows);
+  const sz = Math.min(maxW, maxH, 110);
+  return Math.max(sz, 48);
+}
+
+function buildGrid(){
+  const d = DIFF[diff];
+  const pool = shuffle([...KEYWORDS]).slice(0, d.pairs);
+  const deck = shuffle([...pool, ...pool]);
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const sz = calcSz();
+  grid.style.gridTemplateColumns = `repeat(${d.cols}, ${sz}px)`;
+  grid.style.gridTemplateRows = `repeat(${d.rows}, ${sz}px)`;
+
+  cards = [];
+  deck.forEach((word, idx) => {
+    const colorIdx = pool.indexOf(word) % CARD_COLORS.length;
+    const color = CARD_COLORS[colorIdx];
+
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.style.width = sz + 'px';
+    el.style.height = sz + 'px';
+
+    const fontSize = sz < 60 ? '.55em' : sz < 80 ? '.65em' : '.75em';
+
+    el.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-back">[?]</div>
+        <div class="card-face card-front" style="color:${color};font-size:${fontSize}">${word}</div>
+      </div>`;
+
+    el.addEventListener('click', () => onCardClick(idx));
+    grid.appendChild(el);
+    cards.push({ el, word, idx });
+  });
+}
+
+function startTimer(){
+  if(started) return;
+  started = true;
+  timerID = setInterval(() => {
+    elapsed++;
+    document.getElementById('hud-time').textContent = fmt(elapsed);
+  }, 1000);
+}
+
+function stopTimer(){
+  if(timerID){ clearInterval(timerID); timerID = null; }
+}
+
+function resetState(){
+  stopTimer();
+  first = null; second = null;
+  lock = false;
+  flips = 0; matched = 0;
+  elapsed = 0; started = false;
+  document.getElementById('hud-time').textContent = '0:00';
+  document.getElementById('hud-flips').textContent = '0';
+  updateHudBest();
+}
+
+function newGame(){
+  document.getElementById('overlay').classList.add('hidden');
+  resetState();
+  buildGrid();
+}
+
+function onCardClick(idx){
+  if(lock) return;
+  const c = cards[idx];
+  if(c.el.classList.contains('flipped')) return;
+  if(c.el.classList.contains('matched')) return;
+
+  startTimer();
+  sndFlip();
+
+  c.el.classList.add('flipped');
+  flips++;
+  document.getElementById('hud-flips').textContent = flips;
+
+  if(!first){
+    first = c;
+    return;
+  }
+
+  second = c;
+  lock = true;
+
+  if(first.word === second.word){
+    first.el.classList.add('matched');
+    second.el.classList.add('matched');
+    sndMatch();
+    matched++;
+    first = null; second = null;
+    lock = false;
+
+    if(matched === DIFF[diff].pairs){
+      stopTimer();
+      setTimeout(showWin, 400);
+    }
+  } else {
+    const f = first, s = second;
+    setTimeout(() => {
+      f.el.classList.remove('flipped');
+      s.el.classList.remove('flipped');
+      sndFail();
+      first = null; second = null;
+      lock = false;
+    }, 800);
+  }
+}
+
+function getGrade(sec){
+  const d = DIFF[diff];
+  if(sec <= d.thS) return 'S';
+  if(sec <= d.thA) return 'A';
+  if(sec <= d.thB) return 'B';
+  return 'C';
+}
+
+function showWin(){
+  sndWin();
+  const grade = getGrade(elapsed);
+  const isNew = saveBest(elapsed);
+  const best = loadBest();
+
+  const gradeEl = document.getElementById('ov-grade');
+  gradeEl.textContent = grade;
+  gradeEl.className = 'ov-grade grade-' + grade;
+
+  document.getElementById('ov-best-msg').textContent = isNew ? '★ NEW BEST TIME' : '';
+  document.getElementById('ov-flips').textContent = flips;
+  document.getElementById('ov-time').textContent = fmt(elapsed);
+  document.getElementById('ov-matched').textContent = DIFF[diff].pairs + ' / ' + DIFF[diff].pairs;
+  document.getElementById('ov-best-stat').textContent = best !== null ? fmt(best) : '--';
+  updateHudBest();
+
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    diff = btn.dataset.diff;
+    newGame();
+  });
+});
+
+document.getElementById('btn-new').addEventListener('click', newGame);
+document.getElementById('btn-again').addEventListener('click', newGame);
+
+window.addEventListener('resize', () => {
+  const grid = document.getElementById('grid');
+  if(!grid.children.length) return;
+  const d = DIFF[diff];
+  const sz = calcSz();
+  grid.style.gridTemplateColumns = `repeat(${d.cols}, ${sz}px)`;
+  grid.style.gridTemplateRows = `repeat(${d.rows}, ${sz}px)`;
+  cards.forEach(c => {
+    c.el.style.width = sz + 'px';
+    c.el.style.height = sz + 'px';
+    const front = c.el.querySelector('.card-front');
+    if(front) front.style.fontSize = sz < 60 ? '.55em' : sz < 80 ? '.65em' : '.75em';
+  });
+});
+
+newGame();
+</script>
+</body>
+</html>

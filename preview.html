@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200">
+  <title>halfstone.Kim | Developer Portfolio — OG Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      background: #07071A;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .card {
+      position: relative;
+      width: 1200px;
+      height: 630px;
+      background: #07071A;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 80px;
+    }
+
+    .glow {
+      position: absolute;
+      bottom: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(139,92,246,.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .lanes {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 340px;
+      height: 100%;
+      display: flex;
+      gap: 42px;
+      padding-left: 20px;
+      pointer-events: none;
+    }
+
+    .lane {
+      width: 1px;
+      height: 100%;
+      background: rgba(0,212,255,.04);
+    }
+
+    .site-name {
+      font-size: 2.2rem;
+      font-weight: 400;
+      color: #00D4FF;
+      letter-spacing: 0.05em;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      font-size: 4rem;
+      font-weight: 500;
+      color: #FFFFFF;
+      letter-spacing: 0.2em;
+      line-height: 1.1;
+      margin-bottom: 22px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #8080C0;
+      letter-spacing: 0.04em;
+      margin-bottom: 36px;
+    }
+
+    .badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: #00D4FF;
+      border: 1px solid rgba(0,212,255,.3);
+      padding: .25rem .6rem;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .url {
+      position: absolute;
+      bottom: 32px;
+      right: 48px;
+      font-size: 0.75rem;
+      color: #3A3A6A;
+      letter-spacing: 0.06em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="lanes">
+      <div class="lane"></div>
+      <div class="lane"></div>
+      <div class="lane"></div>
+      <div class="lane"></div>
+      <div class="lane"></div>
+      <div class="lane"></div>
+      <div class="lane"></div>
+    </div>
+
+    <div class="site-name">halfstone.Kim</div>
+    <div class="title">DEVELOPER&nbsp;&nbsp;PORTFOLIO</div>
+    <div class="subtitle">풀스택 개발자 · Canvas 게임 14종 · Web Audio · React Native · Unity · MFC</div>
+    <div class="badges">
+      <span class="badge">JavaScript</span>
+      <span class="badge">TypeScript</span>
+      <span class="badge">React Native</span>
+      <span class="badge">Node.js</span>
+      <span class="badge">Canvas 2D</span>
+      <span class="badge">Unity 3D</span>
+    </div>
+
+    <div class="url">kim-banseok.github.io</div>
+  </div>
+</body>
+</html>

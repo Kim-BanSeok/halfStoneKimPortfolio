@@ -4,16 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>halfstone.Kim | Developer</title>
-  <meta name="description" content="풀스택 개발자 halfstone.Kim 포트폴리오. Canvas 2D 게임 10종, Web Audio API, React Native, Node.js, MFC, Unity.">
+  <meta name="description" content="풀스택 개발자 halfstone.Kim 포트폴리오. Canvas 2D 게임 17종, Web Audio API, React Native, Node.js, MFC, Unity.">
   <meta name="keywords" content="풀스택 개발자, JavaScript, 게임 개발, Canvas 2D, Web Audio API, React Native, Node.js, Unity, MFC">
   <meta property="og:title" content="halfstone.Kim | Developer Portfolio">
-  <meta property="og:description" content="MFC·Unity 3D 시뮬레이터부터 모바일 앱, 웹 게임 10종까지. 시스템부터 브라우저까지 풀스택 개발자.">
+  <meta property="og:description" content="MFC·Unity 3D 시뮬레이터부터 모바일 앱, 웹 게임 17종까지. 시스템부터 브라우저까지 풀스택 개발자.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://kim-banseok.github.io/halfStoneKimPortfolio/">
   <meta property="og:site_name" content="halfstone.Kim">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://kim-banseok.github.io/halfStoneKimPortfolio/preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="halfstone.Kim | Developer Portfolio">
-  <meta name="twitter:description" content="풀스택 개발자 포트폴리오. Canvas 2D 게임 10종, Web Audio API, React Native.">
+  <meta name="twitter:description" content="풀스택 개발자 포트폴리오. Canvas 2D 게임 17종, Web Audio API, React Native.">
+  <meta name="twitter:image" content="https://kim-banseok.github.io/halfStoneKimPortfolio/preview.png">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -483,7 +487,6 @@
     .tower-card:hover .game-arrow { color: #00FF88; transform: translate(3px,-3px); }
     .tower-card .ftag { border: 1px solid rgba(0,255,136,.25); color: #00FF88; background: rgba(0,255,136,.05); }
     .tower-card .game-badge { color: #00FF88; }
-    .games-grid .game-card:nth-child(7) { transition-delay: 0.6s; }
 
     /* tetris card */
     .tetris-card:hover { border-color: rgba(139,92,246,.4); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(139,92,246,.1); }
@@ -987,9 +990,22 @@
     .snake-card .ftag { border: 1px solid rgba(0,255,136,.25); color: #00FF88; background: rgba(0,255,136,.05); }
     .g2048-card .ftag { border: 1px solid rgba(139,92,246,.25); color: var(--purple); background: rgba(139,92,246,.05); }
 
-    .games-grid .game-card:nth-child(2) { transition-delay: 0.1s; }
-    .games-grid .game-card:nth-child(3) { transition-delay: 0.2s; }
-    .games-grid .game-card:nth-child(4) { transition-delay: 0.3s; }
+    .games-grid .game-card:nth-child(2)  { transition-delay: 0.1s; }
+    .games-grid .game-card:nth-child(3)  { transition-delay: 0.2s; }
+    .games-grid .game-card:nth-child(4)  { transition-delay: 0.3s; }
+    .games-grid .game-card:nth-child(5)  { transition-delay: 0.4s; }
+    .games-grid .game-card:nth-child(6)  { transition-delay: 0.5s; }
+    .games-grid .game-card:nth-child(7)  { transition-delay: 0.6s; }
+    .games-grid .game-card:nth-child(8)  { transition-delay: 0.7s; }
+    .games-grid .game-card:nth-child(9)  { transition-delay: 0.8s; }
+    .games-grid .game-card:nth-child(10) { transition-delay: 0.9s; }
+    .games-grid .game-card:nth-child(11) { transition-delay: 1.0s; }
+    .games-grid .game-card:nth-child(12) { transition-delay: 1.1s; }
+    .games-grid .game-card:nth-child(13) { transition-delay: 1.2s; }
+    .games-grid .game-card:nth-child(14) { transition-delay: 1.3s; }
+    .games-grid .game-card:nth-child(15) { transition-delay: 1.4s; }
+    .games-grid .game-card:nth-child(16) { transition-delay: 1.5s; }
+    .games-grid .game-card:nth-child(17) { transition-delay: 1.6s; }
 
     /* runner preview */
     .runner-preview-inner {
@@ -1027,7 +1043,6 @@
     .break-card:hover { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.1); }
     .break-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
     .break-card .ftag { border: 1px solid rgba(0,212,255,.25); color: var(--cyan); background: rgba(0,212,255,.05); }
-    .games-grid .game-card:nth-child(5) { transition-delay: 0.4s; }
     .break-preview-grid {
       display: grid; grid-template-columns: repeat(10,1fr); gap: 3px;
       width: 100%; padding: 0 6px;
@@ -1039,7 +1054,6 @@
     @keyframes bp-slide { 0%,100%{transform:translateX(0)} 33%{transform:translateX(12px)} 66%{transform:translateX(-10px)} }
 
     /* rhythm card */
-    .games-grid .game-card:nth-child(6) { transition-delay: 0.5s; }
     .rhythm-card:hover { border-color: rgba(139,92,246,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(139,92,246,.12); }
     .rhythm-card:hover .game-arrow { color: var(--purple); transform: translate(3px,-3px); }
     .rhythm-card .ftag { border: 1px solid rgba(139,92,246,.25); color: var(--purple); background: rgba(139,92,246,.05); }
@@ -1958,6 +1972,193 @@
           </div>
         </a>
 
+        <a class="game-card fade-up" href="binary.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.09) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;width:108px;">
+              <div style="height:16px;border-radius:2px;background:rgba(0,212,255,.18);border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--cyan);">0</div>
+              <div style="height:16px;border-radius:2px;background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--purple);">1</div>
+              <div style="height:16px;border-radius:2px;background:#0D0D2A;border:1px solid #1A1A40;"></div>
+              <div style="height:16px;border-radius:2px;background:rgba(0,212,255,.18);border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--cyan);">0</div>
+              <div style="height:16px;border-radius:2px;background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--purple);">1</div>
+              <div style="height:16px;border-radius:2px;background:#0D0D2A;border:1px solid #1A1A40;"></div>
+              <div style="height:16px;border-radius:2px;background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--purple);">1</div>
+              <div style="height:16px;border-radius:2px;background:#0D0D2A;border:1px solid #1A1A40;"></div>
+              <div style="height:16px;border-radius:2px;background:rgba(0,212,255,.18);border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--cyan);">0</div>
+              <div style="height:16px;border-radius:2px;background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--purple);">1</div>
+              <div style="height:16px;border-radius:2px;background:#0D0D2A;border:1px solid #1A1A40;"></div>
+              <div style="height:16px;border-radius:2px;background:rgba(0,212,255,.18);border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--cyan);">0</div>
+            </div>
+          </div>
+          <div class="game-badges">
+            <span class="game-badge" style="color:var(--purple);">⊞ BINARY</span>
+            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          </div>
+          <div class="game-title" data-i18n="game-binary-title">이진 퍼즐</div>
+          <p class="game-desc" data-i18n="game-binary-desc">BINARY.EXE. 비트를 채워라. 6×6·8×8·10×10, 3연속 금지·행열 균등 규칙, 시간 기반 S~C 등급.</p>
+          <div class="game-feature-tags" style="--ftag-border:rgba(139,92,246,.25);--ftag-color:var(--purple);--ftag-bg:rgba(139,92,246,.05);">
+            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">3난이도</span>
+            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">논리 퍼즐</span>
+            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">S~C 등급</span>
+            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">Web Audio</span>
+          </div>
+          <div class="game-record" id="rec-binary"></div>
+        </a>
+
+        <a class="game-card fade-up" href="pipe.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,255,136,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
+            <svg width="108" height="72" viewBox="0 0 108 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" stroke="#00D4FF" stroke-width="2" fill="rgba(0,212,255,.15)"/>
+              <circle cx="96" cy="60" r="6" stroke="#00D4FF" stroke-width="2" fill="rgba(0,212,255,.15)"/>
+              <path d="M12 18 L12 36 L54 36 L54 60 L90 60" stroke="#00D4FF" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="54" cy="12" r="6" stroke="#00FF88" stroke-width="2" fill="rgba(0,255,136,.15)"/>
+              <circle cx="12" cy="60" r="6" stroke="#00FF88" stroke-width="2" fill="rgba(0,255,136,.15)"/>
+              <path d="M54 18 L54 24 L96 24 L96 36 L18 36 L18 60" stroke="#00FF88" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="96" cy="12" r="6" stroke="#FFD700" stroke-width="2" fill="rgba(255,215,0,.15)"/>
+              <circle cx="96" cy="36" r="6" stroke="#FFD700" stroke-width="2" fill="rgba(255,215,0,.15)"/>
+              <path d="M90 12 L72 12 L72 30" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="game-badges">
+            <span class="game-badge" style="color:#00FF88;">⊞ PIPE</span>
+            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          </div>
+          <div class="game-title" data-i18n="game-pipe-title">파이프 연결</div>
+          <p class="game-desc" data-i18n="game-pipe-desc">PIPE.EXE. 서버를 연결하라. 5×5·7×7·9×9 격자, 전체 칸 채우기, 이동 수 기반 S~C 등급.</p>
+          <div class="game-feature-tags" style="--ftag-border:rgba(0,255,136,.25);--ftag-color:#00FF88;--ftag-bg:rgba(0,255,136,.05);">
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">3난이도</span>
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">라우팅 퍼즐</span>
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">전체 채우기</span>
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">Web Audio</span>
+          </div>
+          <div class="game-record" id="rec-pipe"></div>
+        </a>
+
+        <a class="game-card fade-up" href="defrag.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(255,215,0,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:108px;">
+              <div style="height:18px;border-radius:2px;background:rgba(0,212,255,.35);border:1px solid rgba(0,212,255,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:#050510;border:1px solid #1A1A40;"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(139,92,246,.35);border:1px solid rgba(139,92,246,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(0,212,255,.35);border:1px solid rgba(0,212,255,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:#050510;border:1px solid #1A1A40;"></div>
+              <div style="height:18px;border-radius:2px;background:#050510;border:1px solid #1A1A40;"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(0,255,136,.35);border:1px solid rgba(0,255,136,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(139,92,246,.35);border:1px solid rgba(139,92,246,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:#050510;border:1px solid #1A1A40;"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(255,215,0,.35);border:1px solid rgba(255,215,0,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(0,255,136,.35);border:1px solid rgba(0,255,136,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(255,215,0,.35);border:1px solid rgba(255,215,0,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:#050510;border:1px solid #1A1A40;"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(0,212,255,.35);border:1px solid rgba(0,212,255,.5);"></div>
+              <div style="height:18px;border-radius:2px;background:rgba(0,255,136,.35);border:1px solid rgba(0,255,136,.5);"></div>
+            </div>
+          </div>
+          <div class="game-badges">
+            <span class="game-badge" style="color:var(--gold, #FFD700);">⊞ DEFRAG</span>
+            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          </div>
+          <div class="game-title" data-i18n="game-defrag-title">디스크 조각 모음</div>
+          <p class="game-desc" data-i18n="game-defrag-desc">DEFRAG.EXE. 메모리를 정렬하라. 색상 블록을 인접 이동시켜 파일 정렬 완료. 이동 수 기반 S~C 등급.</p>
+          <div class="game-feature-tags" style="--ftag-border:rgba(255,215,0,.25);--ftag-color:#FFD700;--ftag-bg:rgba(255,215,0,.05);">
+            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">3난이도</span>
+            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">블록 이동</span>
+            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">BFS 연결 판정</span>
+            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">Web Audio</span>
+          </div>
+          <div class="game-record" id="rec-defrag"></div>
+        </a>
+
+        <a class="game-card fade-up" href="memory.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;padding:8px;">
+            <div style="width:30px;height:30px;border-radius:4px;background:#0D0D2A;border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:var(--cyan,#00D4FF);">[?]</div>
+            <div style="width:30px;height:30px;border-radius:4px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.5);display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#00D4FF;">async</div>
+            <div style="width:30px;height:30px;border-radius:4px;background:#0D0D2A;border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:var(--purple,#8B5CF6);">[?]</div>
+            <div style="width:30px;height:30px;border-radius:4px;background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.5);display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#00FF88;">redux</div>
+            <div style="width:30px;height:30px;border-radius:4px;background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.5);display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#00FF88;">redux</div>
+            <div style="width:30px;height:30px;border-radius:4px;background:#0D0D2A;border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:var(--cyan,#00D4FF);">[?]</div>
+          </div>
+          <div class="game-badges">
+            <span class="game-badge" style="color:var(--cyan,#00D4FF);">⊞ MEMORY</span>
+            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          </div>
+          <div class="game-title" data-i18n="game-memory-title">메모리 매칭</div>
+          <p class="game-desc" data-i18n="game-memory-desc">MEMORY.EXE. IT 키워드를 기억하라. 카드를 뒤집어 같은 단어 2장 매칭. 타임 기반 S~C 등급.</p>
+          <div class="game-feature-tags">
+            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">3난이도</span>
+            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">3D 플립</span>
+            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">IT 키워드</span>
+            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">Web Audio</span>
+          </div>
+          <div class="game-record" id="rec-memory"></div>
+        </a>
+
+        <a class="game-card fade-up" href="wordle.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,255,136,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;gap:3px;">
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;gap:3px;">
+                <div style="width:22px;height:22px;border-radius:2px;background:rgba(0,212,255,.25);border:1px solid rgba(0,212,255,.6);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#00D4FF;font-weight:700;">R</div>
+                <div style="width:22px;height:22px;border-radius:2px;background:rgba(255,215,0,.2);border:1px solid rgba(255,215,0,.5);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#FFD700;font-weight:700;">E</div>
+                <div style="width:22px;height:22px;border-radius:2px;background:#1a1a3a;border:1px solid #2a2a5a;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#5858A0;font-weight:700;">A</div>
+                <div style="width:22px;height:22px;border-radius:2px;background:rgba(0,212,255,.25);border:1px solid rgba(0,212,255,.6);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#00D4FF;font-weight:700;">C</div>
+                <div style="width:22px;height:22px;border-radius:2px;background:rgba(0,212,255,.25);border:1px solid rgba(0,212,255,.6);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#00D4FF;font-weight:700;">T</div>
+              </div>
+              <div style="display:flex;gap:3px;">
+                <div style="width:22px;height:22px;border-radius:2px;background:#0D0D2A;border:1px solid #1E1E4A;"></div>
+                <div style="width:22px;height:22px;border-radius:2px;background:#0D0D2A;border:1px solid #1E1E4A;"></div>
+                <div style="width:22px;height:22px;border-radius:2px;background:#0D0D2A;border:1px solid #1E1E4A;"></div>
+                <div style="width:22px;height:22px;border-radius:2px;background:#0D0D2A;border:1px solid #1E1E4A;"></div>
+                <div style="width:22px;height:22px;border-radius:2px;background:#0D0D2A;border:1px solid #1E1E4A;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="game-badges">
+            <span class="game-badge" style="color:var(--green,#00FF88);">⊞ WORDLE</span>
+            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          </div>
+          <div class="game-title" data-i18n="game-wordle-title">IT 워들</div>
+          <p class="game-desc" data-i18n="game-wordle-desc">WORDLE.EXE. IT 용어를 추측하라. 5글자 IT 단어를 6번 안에. 초록=정답, 노랑=위치 오류. 스트릭 누적.</p>
+          <div class="game-feature-tags">
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">무한플레이</span>
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">QWERTY 키보드</span>
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">65개 IT단어</span>
+            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">스트릭 기록</span>
+          </div>
+          <div class="game-record" id="rec-wordle"></div>
+        </a>
+
+        <a class="game-card fade-up" href="stack.html">
+          <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(255,121,198,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;gap:5px;">
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <div style="width:36px;height:18px;border-radius:3px;background:#F7DF1E;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#000;font-weight:700;">.JS</div>
+              <div style="width:36px;height:18px;border-radius:3px;background:#F7DF1E;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#000;font-weight:700;">.JS</div>
+              <div style="width:36px;height:18px;border-radius:3px;background:#3572A5;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#fff;font-weight:700;">.PY</div>
+              <div style="width:36px;height:18px;border-radius:3px;background:#563D7C;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#fff;font-weight:700;">.CSS</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <div style="width:36px;height:18px;border-radius:3px;background:#563D7C;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#fff;font-weight:700;">.CSS</div>
+              <div style="width:36px;height:18px;border-radius:3px;background:#00D4FF;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#000;font-weight:700;">.SQL</div>
+              <div style="width:36px;height:18px;border-radius:3px;background:#3572A5;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#fff;font-weight:700;">.PY</div>
+              <div style="width:36px;height:18px;border-radius:3px;background:#F7DF1E;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#000;font-weight:700;">.JS</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <div style="width:36px;height:72px;background:#0D0D2A;border:1px solid #1E1E4A;border-radius:3px;"></div>
+            </div>
+          </div>
+          <div class="game-badges">
+            <span class="game-badge" style="color:#FF79C6;">⊞ STACK</span>
+            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          </div>
+          <div class="game-title" data-i18n="game-stack-title">스택 정렬</div>
+          <p class="game-desc" data-i18n="game-stack-desc">STACK.EXE. 파일을 정렬하라. .JS .PY .CSS 등 IT 파일 블록을 같은 종류끼리 스택에 쌓아라. 이동 수 기반 S~C 등급.</p>
+          <div class="game-feature-tags">
+            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">3난이도</span>
+            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">IT 파일 블록</span>
+            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">Water Sort</span>
+            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">Web Audio</span>
+          </div>
+          <div class="game-record" id="rec-stack"></div>
+        </a>
+
       </div>
     </section>
 
@@ -2334,6 +2535,12 @@
         'game-mine-title': '지뢰찾기', 'game-mine-desc': 'SCAN.EXE. 악성코드를 찾아라. 3가지 난이도, 첫 클릭 안전, BFS 자동 공개.',
         'ftag-mine-diff': '3난이도', 'ftag-mine-flood': '플러드 필', 'ftag-mine-safe': '첫클릭 안전',
         'game-puzzle-title': '슬라이딩 퍼즐', 'game-puzzle-desc': 'SORT.EXE. 메모리 블록을 정렬하라. 3×3·4×4·5×5 난이도, 이동 수 기반 S~C 등급, 베스트 타임.',
+        'game-binary-title': '이진 퍼즐', 'game-binary-desc': 'BINARY.EXE. 비트를 채워라. 6×6·8×8·10×10, 3연속 금지·행열 균등 규칙, 시간 기반 S~C 등급.',
+        'game-pipe-title': '파이프 연결', 'game-pipe-desc': 'PIPE.EXE. 서버를 연결하라. 5×5·7×7·9×9 격자, 전체 칸 채우기, 이동 수 기반 S~C 등급.',
+        'game-defrag-title': '디스크 조각 모음', 'game-defrag-desc': 'DEFRAG.EXE. 메모리를 정렬하라. 색상 블록을 인접 이동시켜 파일 정렬 완료. 이동 수 기반 S~C 등급.',
+        'game-memory-title': '메모리 매칭', 'game-memory-desc': 'MEMORY.EXE. IT 키워드를 기억하라. 카드를 뒤집어 같은 단어 2장 매칭. 타임 기반 S~C 등급.',
+        'game-wordle-title': 'IT 워들', 'game-wordle-desc': 'WORDLE.EXE. IT 용어를 추측하라. 5글자 IT 단어를 6번 안에. 초록=정답, 노랑=위치 오류. 스트릭 누적.',
+        'game-stack-title': '스택 정렬', 'game-stack-desc': 'STACK.EXE. 파일을 정렬하라. IT 파일 블록을 같은 종류끼리 스택에 쌓아라. 이동 수 기반 S~C 등급.',
         'exp1-role': '사원', 'exp1-company': '에스더블유기술원', 'exp1-badge': '퇴사',
         'exp1-desc': 'React Native · Node.js · PostgreSQL · AWS<br>Android 중고거래 앱 <strong>바나나창고</strong> 기획·개발·출시 (Google Play)',
         'exp2-role': '대리', 'exp2-company': '(주)웰컴소프트',
@@ -2389,6 +2596,12 @@
         'ftag-tetris-srs': 'SRS Rotation', 'ftag-tetris-hold': 'Hold', 'ftag-tetris-das': 'DAS',
         'game-mine-title': 'Minesweeper', 'game-mine-desc': 'SCAN.EXE. Find the malware. 3 difficulties, safe first click, BFS flood fill.',
         'game-puzzle-title': 'Sliding Puzzle', 'game-puzzle-desc': 'SORT.EXE. Sort the memory blocks. 3×3/4×4/5×5 grids, S–C grade by moves, best time tracking.',
+        'game-binary-title': 'Binary Puzzle', 'game-binary-desc': 'BINARY.EXE. Fill the bits. 6×6/8×8/10×10 grids, no-triple & balance rules, S–C grade by time.',
+        'game-pipe-title': 'Pipe Connect', 'game-pipe-desc': 'PIPE.EXE. Route the network. 5×5/7×7/9×9 grids, fill every cell, S–C grade by moves.',
+        'game-defrag-title': 'Disk Defrag', 'game-defrag-desc': 'DEFRAG.EXE. Defragment memory. Slide color blocks to adjacent empty cells, S–C grade by moves.',
+        'game-memory-title': 'Memory Match', 'game-memory-desc': 'MEMORY.EXE. Remember the IT keywords. Flip cards to match pairs, S–C grade by time.',
+        'game-wordle-title': 'IT Wordle', 'game-wordle-desc': 'WORDLE.EXE. Guess the IT term. 5-letter IT words in 6 tries. Green=correct, yellow=wrong place. Build your streak.',
+        'game-stack-title': 'Stack Sort', 'game-stack-desc': 'STACK.EXE. Sort the files. Stack .JS .PY .CSS blocks by type. S–C grade by moves.',
         'ftag-mine-diff': '3 Levels', 'ftag-mine-flood': 'Flood Fill', 'ftag-mine-safe': 'Safe Start',
         'exp1-role': 'Staff', 'exp1-company': 'SW Technology Institute', 'exp1-badge': 'Left',
         'exp1-desc': 'React Native · Node.js · PostgreSQL · AWS<br>Built &amp; shipped <strong>BananaWarehouse</strong> — Android second-hand marketplace (Google Play)',
@@ -3162,6 +3375,21 @@
     const pe=localStorage.getItem('sort_easy'),pm=localStorage.getItem('sort_medium'),ph=localStorage.getItem('sort_hard');
     const pp2=[];if(pe)pp2.push('E·<span class="rv">'+fmtT(+pe)+'</span>');if(pm)pp2.push('M·<span class="rv">'+fmtT(+pm)+'</span>');if(ph)pp2.push('H·<span class="rv">'+fmtT(+ph)+'</span>');
     if(pp2.length) set('rec-puzzle','BEST · '+pp2.join(' &nbsp;'));
+    const be=localStorage.getItem('bin_easy'),bm=localStorage.getItem('bin_medium'),bh=localStorage.getItem('bin_hard');
+    const bp2=[];if(be)bp2.push('E·<span class="rv">'+fmtT(+be)+'</span>');if(bm)bp2.push('M·<span class="rv">'+fmtT(+bm)+'</span>');if(bh)bp2.push('H·<span class="rv">'+fmtT(+bh)+'</span>');
+    if(bp2.length) set('rec-binary','BEST · '+bp2.join(' &nbsp;'));
+    const prec=(k,d)=>{const t=localStorage.getItem(k+'_'+d+'_t'),m=localStorage.getItem(k+'_'+d);return t?fmtT(+t):m?m+'mv':null;};
+    const pp3=[];['easy','medium','hard'].forEach((d,i)=>{const v=prec('pipe',d);if(v)pp3.push(['E','M','H'][i]+'·<span class="rv">'+v+'</span>');});
+    if(pp3.length) set('rec-pipe','BEST · '+pp3.join(' &nbsp;'));
+    const dp2=[];['easy','medium','hard'].forEach((d,i)=>{const v=prec('defrag',d);if(v)dp2.push(['E','M','H'][i]+'·<span class="rv">'+v+'</span>');});
+    if(dp2.length) set('rec-defrag','BEST · '+dp2.join(' &nbsp;'));
+    const me=localStorage.getItem('mem_easy'),mm=localStorage.getItem('mem_medium'),mh=localStorage.getItem('mem_hard');
+    const mp3=[];if(me)mp3.push('E·<span class="rv">'+fmtT(+me)+'</span>');if(mm)mp3.push('M·<span class="rv">'+fmtT(+mm)+'</span>');if(mh)mp3.push('H·<span class="rv">'+fmtT(+mh)+'</span>');
+    if(mp3.length) set('rec-memory','BEST · '+mp3.join(' &nbsp;'));
+    const ws=localStorage.getItem('wordle_streak'),wb=localStorage.getItem('wordle_best');
+    if(ws||wb){const parts=[];if(ws&&+ws>0)parts.push('STREAK·<span class="rv">'+ws+'</span>');if(wb&&+wb>0)parts.push('BEST·<span class="rv">'+wb+'</span>');if(parts.length)set('rec-wordle',parts.join(' &nbsp;'));}
+    const sk2=[];['easy','medium','hard'].forEach((d,i)=>{const v=localStorage.getItem('stack_'+d);if(v)sk2.push(['E','M','H'][i]+'·<span class="rv">'+v+'mv</span>');});
+    if(sk2.length) set('rec-stack','BEST · '+sk2.join(' &nbsp;'));
   })();
   </script>
 

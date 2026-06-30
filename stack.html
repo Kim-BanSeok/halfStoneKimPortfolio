@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STACK.EXE</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07071A;--cyan:#00D4FF;--purple:#8B5CF6;--green:#00FF88;--gold:#FFD700;
+  --stack-bg:#0D0D2A;--border:#1a1a3e;--text:#e0e0ff;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;user-select:none;-webkit-tap-highlight-color:transparent}
+.hidden{display:none!important}
+
+#hud{
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  border-bottom:1px solid var(--border);flex-wrap:wrap;
+}
+#back-btn{
+  background:none;border:1px solid var(--border);color:var(--cyan);
+  font-family:'DM Mono',monospace;font-size:12px;padding:4px 10px;
+  cursor:pointer;border-radius:4px;white-space:nowrap;
+}
+#back-btn:hover{border-color:var(--cyan);background:#00d4ff15}
+#title{color:var(--cyan);font-size:15px;font-weight:500;margin-right:4px}
+.hud-sep{color:var(--border);font-size:18px;margin:0 2px}
+.stat-box{display:flex;flex-direction:column;align-items:center;min-width:54px}
+.stat-label{font-size:9px;color:#666;letter-spacing:1px}
+.stat-val{font-size:14px;color:var(--gold)}
+.diff-group{display:flex;gap:4px;margin-left:4px}
+.diff-btn{
+  background:none;border:1px solid var(--border);color:#888;
+  font-family:'DM Mono',monospace;font-size:11px;padding:3px 9px;
+  cursor:pointer;border-radius:3px;
+}
+.diff-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.diff-btn.active{border-color:var(--purple);color:var(--purple);background:#8b5cf615}
+#new-btn{
+  background:none;border:1px solid var(--border);color:var(--green);
+  font-family:'DM Mono',monospace;font-size:12px;padding:4px 10px;
+  cursor:pointer;border-radius:4px;margin-left:auto;
+}
+#new-btn:hover{border-color:var(--green);background:#00ff8815}
+
+#arena{
+  display:flex;justify-content:center;align-items:center;
+  width:100%;height:calc(100vh - 57px);padding:16px;overflow:hidden;
+}
+#stacks-wrap{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;
+  gap:10px;max-width:100%;
+}
+
+.stack{
+  display:flex;flex-direction:column-reverse;
+  background:var(--stack-bg);border:1px solid var(--border);
+  border-radius:8px;padding:6px;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;
+  position:relative;
+}
+.stack:hover{border-color:#2a2a5a}
+.stack.selected{border-color:var(--cyan);box-shadow:0 0 12px #00d4ff40}
+.stack.done{border-color:var(--green);box-shadow:0 0 16px #00ff8840;pointer-events:none}
+.stack.shake{animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
+.block{
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:500;color:#000;letter-spacing:.5px;
+  transition:transform .12s ease,box-shadow .12s;
+  margin-bottom:3px;flex-shrink:0;
+}
+.block:last-child{margin-bottom:0}
+.stack.selected .block:last-child{
+  transform:translateY(-8px);
+  box-shadow:0 6px 16px #0008;
+}
+
+.stack-empty-slot{
+  border-radius:4px;border:1px dashed #1a1a3e;margin-bottom:3px;flex-shrink:0;opacity:.4;
+}
+
+#overlay{
+  position:fixed;inset:0;background:#07071acc;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:100;
+}
+#win-box{
+  border:1px solid var(--green);border-radius:12px;
+  background:#0a0a20;padding:36px 48px;text-align:center;
+  box-shadow:0 0 40px #00ff8830;min-width:300px;
+}
+#win-title{font-size:26px;color:var(--green);letter-spacing:2px;margin-bottom:8px}
+#win-grade{font-size:72px;color:var(--gold);line-height:1;margin:8px 0}
+#win-new-best{font-size:13px;color:var(--gold);margin-bottom:12px;min-height:18px}
+.win-row{display:flex;justify-content:center;gap:32px;margin-bottom:8px}
+.win-stat{display:flex;flex-direction:column;align-items:center}
+.win-stat-label{font-size:10px;color:#666;letter-spacing:1px}
+.win-stat-val{font-size:18px;color:var(--cyan)}
+#win-new-game{
+  margin-top:20px;background:none;border:1px solid var(--green);
+  color:var(--green);font-family:'DM Mono',monospace;font-size:13px;
+  padding:8px 24px;cursor:pointer;border-radius:5px;
+}
+#win-new-game:hover{background:#00ff8820}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <button id="back-btn" onclick="location.href='index.html'">← 게임 목록</button>
+  <span id="title">STACK.EXE</span>
+  <span class="hud-sep">|</span>
+  <div class="stat-box"><span class="stat-label">MOVES</span><span class="stat-val" id="hud-moves">0</span></div>
+  <span class="hud-sep">|</span>
+  <div class="stat-box"><span class="stat-label">TIME</span><span class="stat-val" id="hud-time">0:00</span></div>
+  <span class="hud-sep">|</span>
+  <div class="stat-box"><span class="stat-label">BEST</span><span class="stat-val" id="hud-best">--</span></div>
+  <span class="hud-sep">|</span>
+  <div class="diff-group">
+    <button class="diff-btn active" id="btn-easy" onclick="setDifficulty('easy')">EASY</button>
+    <button class="diff-btn" id="btn-med" onclick="setDifficulty('med')">MED</button>
+    <button class="diff-btn" id="btn-hard" onclick="setDifficulty('hard')">HARD</button>
+  </div>
+  <button id="new-btn" onclick="newGame()">↺ NEW</button>
+</div>
+
+<div id="arena">
+  <div id="stacks-wrap"></div>
+</div>
+
+<div id="overlay" class="hidden">
+  <div id="win-box">
+    <div id="win-title">STACK SORTED</div>
+    <div id="win-grade">S</div>
+    <div id="win-new-best"></div>
+    <div class="win-row">
+      <div class="win-stat"><span class="win-stat-label">MOVES</span><span class="win-stat-val" id="win-moves">0</span></div>
+      <div class="win-stat"><span class="win-stat-label">TIME</span><span class="win-stat-val" id="win-time">0:00</span></div>
+    </div>
+    <div class="win-row">
+      <div class="win-stat"><span class="win-stat-label">FILES</span><span class="win-stat-val" id="win-files">0</span></div>
+      <div class="win-stat"><span class="win-stat-label">BEST</span><span class="win-stat-val" id="win-best">--</span></div>
+    </div>
+    <button id="win-new-game" onclick="newGame()">↺ NEW GAME</button>
+  </div>
+</div>
+
+<script>
+const FILE_TYPES = [
+  {label:'.JS',  color:'#F7DF1E'},
+  {label:'.PY',  color:'#3572A5'},
+  {label:'.CSS', color:'#563D7C'},
+  {label:'.SQL', color:'#00D4FF'},
+  {label:'.JSON',color:'#8B5CF6'},
+  {label:'.TS',  color:'#007ACC'},
+  {label:'.MD',  color:'#00FF88'},
+];
+
+const DIFF = {
+  easy:{colors:4,empty:2,key:'stack_easy',grade:[15,25,40]},
+  med: {colors:5,empty:2,key:'stack_medium',grade:[20,35,55]},
+  hard:{colors:7,empty:2,key:'stack_hard',grade:[30,50,80]},
+};
+
+let diff = 'easy';
+let stacks = [];
+let selected = -1;
+let moves = 0;
+let timerInterval = null;
+let elapsed = 0;
+let timerStarted = false;
+let gameOver = false;
+
+const audioCtx = (() => {
+  try { return new (window.AudioContext || window.webkitAudioContext)(); } catch(e){ return null; }
+})();
+
+function playSound(type) {
+  if (!audioCtx) return;
+  const ctx = audioCtx;
+  const t = ctx.currentTime;
+  if (type === 'select') {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(600, t);
+    g.gain.setValueAtTime(0.15, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    o.start(t); o.stop(t + 0.08);
+  } else if (type === 'move') {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(440, t);
+    o.frequency.exponentialRampToValueAtTime(660, t + 0.06);
+    g.gain.setValueAtTime(0.2, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+    o.start(t); o.stop(t + 0.09);
+  } else if (type === 'error') {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sawtooth';
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.setValueAtTime(200, t);
+    o.frequency.exponentialRampToValueAtTime(100, t + 0.15);
+    g.gain.setValueAtTime(0.1, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    o.start(t); o.stop(t + 0.15);
+  } else if (type === 'done') {
+    [0,1,2].forEach((i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(440 * Math.pow(2, i/4), t + i*0.1);
+      g.gain.setValueAtTime(0.18, t + i*0.1);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i*0.1 + 0.15);
+      o.start(t + i*0.1); o.stop(t + i*0.1 + 0.15);
+    });
+  } else if (type === 'fanfare') {
+    const notes = [523,659,784,1047];
+    notes.forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'triangle';
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.setValueAtTime(freq, t + i*0.12);
+      g.gain.setValueAtTime(0.22, t + i*0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i*0.12 + 0.25);
+      o.start(t + i*0.12); o.stop(t + i*0.12 + 0.3);
+    });
+  }
+}
+
+function calcSizes() {
+  const arena = document.getElementById('arena');
+  const W = arena.clientWidth - 32;
+  const H = arena.clientHeight - 32;
+  const cfg = DIFF[diff];
+  const n = cfg.colors + cfg.empty;
+  const ROWS = n <= 6 ? 1 : 2;
+  const perRow = Math.ceil(n / ROWS);
+  const blockH_ratio = 0.55;
+  const GAP = 10;
+  const PAD = 6;
+  const maxW = Math.floor((W - GAP*(perRow-1)) / perRow);
+  const maxH = Math.floor((H * 0.92 - (ROWS > 1 ? GAP : 0)) / ROWS);
+  let bw = Math.min(maxW - PAD*2, 80);
+  const bh = Math.round(bw * blockH_ratio);
+  const stackH = bh*4 + 3*3 + PAD*2;
+  if (stackH > maxH) {
+    const scale = maxH / stackH;
+    bw = Math.floor(bw * scale);
+  }
+  bw = Math.max(44, Math.min(bw, 84));
+  return {bw, bh: Math.round(bw * blockH_ratio)};
+}
+
+function generateStacks() {
+  const cfg = DIFF[diff];
+  const n = cfg.colors;
+  const blocks = [];
+  for (let c = 0; c < n; c++) for (let k = 0; k < 4; k++) blocks.push(c);
+  for (let i = blocks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [blocks[i], blocks[j]] = [blocks[j], blocks[i]];
+  }
+  const result = [];
+  for (let i = 0; i < n; i++) result.push(blocks.slice(i * 4, (i + 1) * 4));
+  for (let i = 0; i < cfg.empty; i++) result.push([]);
+  if (result.every(s => stackDone(s))) return generateStacks();
+  return result;
+}
+
+function stackDone(s) {
+  return s.length === 0 || (s.length === 4 && s.every(c => c === s[0]));
+}
+
+function canMove(from, to) {
+  if (from === to) return false;
+  if (stacks[from].length === 0) return false;
+  if (stacks[to].length >= 4) return false;
+  if (stacks[to].length === 0) return true;
+  return stacks[to][stacks[to].length-1] === stacks[from][stacks[from].length-1];
+}
+
+function doMove(from, to) {
+  stacks[to].push(stacks[from].pop());
+}
+
+function formatTime(s) {
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  return m + ':' + String(sec).padStart(2,'0');
+}
+
+function updateHUD() {
+  document.getElementById('hud-moves').textContent = moves;
+  document.getElementById('hud-time').textContent = formatTime(elapsed);
+  const key = DIFF[diff].key;
+  const best = localStorage.getItem(key);
+  document.getElementById('hud-best').textContent = best ? best : '--';
+}
+
+function startTimer() {
+  if (timerStarted) return;
+  timerStarted = true;
+  timerInterval = setInterval(() => {
+    elapsed++;
+    document.getElementById('hud-time').textContent = formatTime(elapsed);
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function render() {
+  const wrap = document.getElementById('stacks-wrap');
+  wrap.innerHTML = '';
+  const {bw, bh} = calcSizes();
+  const cfg = DIFF[diff];
+  const n = cfg.colors + cfg.empty;
+
+  for (let i = 0; i < stacks.length; i++) {
+    const s = stacks[i];
+    const div = document.createElement('div');
+    div.className = 'stack' + (selected===i?' selected':'') + (stackDone(s)&&s.length>0?' done':'');
+    div.dataset.idx = i;
+    div.style.width = (bw + 12) + 'px';
+    div.style.minHeight = (bh*4 + 3*3 + 12) + 'px';
+    div.onclick = () => handleClick(i);
+
+    const filled = s.length;
+    const empty = 4 - filled;
+    for (let e = 0; e < empty; e++) {
+      const slot = document.createElement('div');
+      slot.className = 'stack-empty-slot';
+      slot.style.width = bw + 'px';
+      slot.style.height = bh + 'px';
+      slot.style.marginBottom = '3px';
+      div.appendChild(slot);
+    }
+    for (let k = filled - 1; k >= 0; k--) {
+      const c = s[k];
+      const ft = FILE_TYPES[c];
+      const blk = document.createElement('div');
+      blk.className = 'block';
+      blk.style.width = bw + 'px';
+      blk.style.height = bh + 'px';
+      blk.style.background = ft.color;
+      blk.style.fontSize = Math.max(9, Math.round(bw * 0.14)) + 'px';
+      blk.textContent = ft.label;
+      div.appendChild(blk);
+    }
+    wrap.appendChild(div);
+  }
+}
+
+function handleClick(idx) {
+  if (gameOver) return;
+  if (selected === -1) {
+    if (stacks[idx].length === 0) return;
+    if (stackDone(stacks[idx])) return;
+    selected = idx;
+    playSound('select');
+    render();
+  } else if (selected === idx) {
+    selected = -1;
+    render();
+  } else {
+    if (canMove(selected, idx)) {
+      if (!timerStarted) startTimer();
+      doMove(selected, idx);
+      moves++;
+      playSound('move');
+      const wasDone = stackDone(stacks[idx]);
+      selected = -1;
+      render();
+      if (wasDone && stacks[idx].length === 4) {
+        playSound('done');
+      }
+      updateHUD();
+      checkWin();
+    } else {
+      const el = document.querySelector('.stack[data-idx="'+idx+'"]');
+      if (el) {
+        el.classList.remove('shake');
+        void el.offsetWidth;
+        el.classList.add('shake');
+      }
+      playSound('error');
+    }
+  }
+}
+
+function checkWin() {
+  const all = stacks.every(s => stackDone(s));
+  if (!all) return;
+  gameOver = true;
+  stopTimer();
+  playSound('fanfare');
+  setTimeout(showWin, 500);
+}
+
+function showWin() {
+  const cfg = DIFF[diff];
+  const [gs, ga, gb] = cfg.grade;
+  let grade = 'C';
+  if (moves <= gs) grade = 'S';
+  else if (moves <= ga) grade = 'A';
+  else if (moves <= gb) grade = 'B';
+
+  const key = cfg.key;
+  const prev = localStorage.getItem(key);
+  const isNew = !prev || moves < parseInt(prev);
+  if (isNew) localStorage.setItem(key, moves);
+
+  document.getElementById('win-grade').textContent = grade;
+  document.getElementById('win-grade').style.color = grade==='S'?'#FFD700':grade==='A'?'#00FF88':grade==='B'?'#00D4FF':'#888';
+  document.getElementById('win-new-best').textContent = isNew ? '★ NEW BEST' : '';
+  document.getElementById('win-moves').textContent = moves;
+  document.getElementById('win-time').textContent = formatTime(elapsed);
+  document.getElementById('win-files').textContent = cfg.colors;
+  document.getElementById('win-best').textContent = localStorage.getItem(key) || '--';
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function setDifficulty(d) {
+  diff = d;
+  ['easy','med','hard'].forEach(x => {
+    document.getElementById('btn-'+x).classList.toggle('active', x===d);
+  });
+  newGame();
+}
+
+function newGame() {
+  stopTimer();
+  stacks = generateStacks();
+  selected = -1;
+  moves = 0;
+  elapsed = 0;
+  timerStarted = false;
+  gameOver = false;
+  document.getElementById('overlay').classList.add('hidden');
+  updateHUD();
+  render();
+}
+
+window.addEventListener('resize', () => render());
+newGame();
+</script>
+</body>
+</html>

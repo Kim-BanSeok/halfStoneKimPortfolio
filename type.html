@@ -134,6 +134,8 @@
     .r-wv{font-family:'DM Mono',monospace;font-size:5rem;font-weight:500;color:var(--cyan);line-height:1;
       text-shadow:0 0 30px rgba(0,212,255,.55),0 0 60px rgba(0,212,255,.2);}
     .r-new{display:block;font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold);margin-top:.3rem;min-height:1.2em;}
+    .r-rank{display:inline-block;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;
+      padding:.2rem .65rem;border-radius:3px;margin-top:.45rem;}
     .r-new.new-best{color:var(--gold);text-shadow:0 0 12px rgba(255,215,0,.6);animation:newbest 1.2s ease-in-out infinite alternate;}
     @keyframes newbest{0%{opacity:.7;text-shadow:0 0 8px rgba(255,215,0,.4);}100%{opacity:1;text-shadow:0 0 20px rgba(255,215,0,.9),0 0 40px rgba(255,215,0,.3);}}
 
@@ -263,6 +265,7 @@
   <div class="csep"></div>
   <div id="mg" style="display:flex;gap:.3rem">
     <button class="cb on" data-m="words">단어</button>
+    <button class="cb" data-m="it" style="color:var(--cyan)">IT</button>
     <button class="cb" data-m="quotes">인용구</button>
     <button class="cb" data-m="code">코드</button>
     <button class="cb" data-m="custom">커스텀</button>
@@ -318,6 +321,7 @@ exit_code           : 0</div>
     <span class="r-wl">WPM</span>
     <span class="r-wv" id="r-wpm">0</span>
     <span class="r-new" id="r-new"></span>
+    <span class="r-rank" id="r-rank"></span>
   </div>
   <div class="r-grid">
     <div class="r-cell"><span class="r-cv" id="r-acc">–</span><span class="r-cl">정확도</span></div>
@@ -485,6 +489,8 @@ const KO_QUOTES = [
   "버그를 수정하는 가장 좋은 방법은 처음부터 만들지 않는 것이다.",
 ];
 
+const IT_WORDS = 'function async await const return interface class extends import export default null undefined typeof instanceof void delete new this prototype callback promise resolve reject fetch middleware router endpoint payload schema migration transaction rollback commit branch merge rebase checkout stash refactor deploy release rollout canary hotfix version semver changelog dockerfile kubernetes container orchestration microservice serverless lambda webhook oauth token refresh session cookie csrf injection sanitize encrypt decrypt hash salt bcrypt jwt authorization authentication middleware interceptor pipeline buffer stream socket latency throughput bandwidth bottleneck profiler benchmark garbage deadlock mutex semaphore thread process daemon stdin stdout stderr compiler transpiler minify bundle treeshake polyfill shim hydrate serialize deserialize stringify parse regex glob wildcard recursion iteration memoize closure scope hoisting prototype immutable mutation pure side-effect idempotent pagination cursor offset aggregate index foreign primary constraint nullable cascade truncate partition shard replica failover redundancy load-balance proxy gateway cache invalidate TTL CDN gzip websocket handshake heartbeat polling backoff retry timeout circuit-breaker'.split(' ');
+
 const CODE = [
   "const sum = arr.reduce((a, b) => a + b, 0);",
   "async function fetchData(url) { const res = await fetch(url); return res.json(); }",
@@ -540,12 +546,17 @@ function gen(){
     return customTxt || gen_words();
   }
   if(mode==='words')  return gen_words();
+  if(mode==='it')     return gen_it();
   if(mode==='quotes') return gen_quotes();
   if(mode==='code')   return gen_code();
 }
 function gen_words(){
   const pool = lang==='ko' ? KO_WORDS : EN_WORDS;
   const a=[];for(let i=0;i<100;i++) a.push(pool[Math.floor(Math.random()*pool.length)]);
+  return a.join(' ');
+}
+function gen_it(){
+  const a=[];for(let i=0;i<80;i++) a.push(IT_WORDS[Math.floor(Math.random()*IT_WORDS.length)]);
   return a.join(' ');
 }
 function gen_quotes(){
@@ -651,7 +662,7 @@ function updateAccUI(){
 }
 
 function extendText(){
-  const pool=lang==='ko'?KO_WORDS:EN_WORDS;
+  const pool=mode==='it'?IT_WORDS:lang==='ko'?KO_WORDS:EN_WORDS;
   const extra=[]; for(let i=0;i<50;i++) extra.push(pool[Math.floor(Math.random()*pool.length)]);
   const add=' '+extra.join(' '); text+=add;
   const el=$('tt');
@@ -731,6 +742,18 @@ function endTest(){
   const rNew=$('r-new');
   rNew.textContent=newPB?'🎉 신기록!':'';
   rNew.classList.toggle('new-best',newPB);
+  const RANKS=[
+    {min:110,label:'1x ENGINEER', bg:'rgba(255,215,0,.12)',border:'rgba(255,215,0,.4)',color:'#FFD700'},
+    {min:90, label:'STAFF ENG',   bg:'rgba(0,212,255,.1)', border:'rgba(0,212,255,.4)',color:'#00D4FF'},
+    {min:70, label:'TECH LEAD',   bg:'rgba(0,255,136,.08)',border:'rgba(0,255,136,.35)',color:'#00FF88'},
+    {min:50, label:'SENIOR DEV',  bg:'rgba(139,92,246,.1)',border:'rgba(139,92,246,.4)',color:'#8B5CF6'},
+    {min:30, label:'JUNIOR DEV',  bg:'rgba(255,121,198,.08)',border:'rgba(255,121,198,.3)',color:'#FF79C6'},
+    {min:0,  label:'INTERN',      bg:'rgba(88,88,160,.1)', border:'rgba(88,88,160,.3)', color:'#5858A0'},
+  ];
+  const rank=RANKS.find(r=>wpm>=r.min)||RANKS[RANKS.length-1];
+  const rEl=$('r-rank');
+  rEl.textContent='[ '+rank.label+' ]';
+  rEl.style.cssText=`background:${rank.bg};border:1px solid ${rank.border};color:${rank.color};`;
   const rAccEl=$('r-acc');
   rAccEl.textContent=acc+'%';
   rAccEl.style.color=acc>=95?'var(--green)':acc>=80?'var(--gold)':'#FF8C00';
