@@ -17,12 +17,37 @@ body{background:var(--bg);color:#E0E0FF;font-family:'DM Mono',monospace;height:1
 canvas{display:block;width:100%;height:100%;}
 .touch-hint{display:none;}
 @media(hover:none)and(pointer:coarse){.touch-hint{display:block;font-size:0.65rem;color:rgba(0,212,255,0.45);text-align:center;padding:0.3rem;font-family:'DM Mono',monospace;}}
+#intro-overlay{position:fixed;inset:0;background:rgba(7,7,26,.93);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+#intro-box{background:#0D0D2A;border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:2rem 2.2rem;max-width:400px;width:90%;display:flex;flex-direction:column;gap:1rem;box-shadow:0 0 60px rgba(0,212,255,.08);}
+.intro-tag{font-size:.6rem;letter-spacing:.22em;color:#00D4FF;text-transform:uppercase;}
+.intro-title{font-size:1.6rem;font-weight:500;color:#fff;line-height:1.2;margin:0;}
+.intro-obj{font-size:.78rem;color:#8080B0;line-height:1.6;margin:0;}
+.intro-ctrls{display:flex;flex-direction:column;gap:.4rem;border-top:1px solid rgba(255,255,255,.06);padding-top:.8rem;}
+.intro-ctrl-row{display:flex;align-items:center;gap:.7rem;font-size:.72rem;}
+.intro-key{display:inline-block;padding:.15rem .5rem;border-radius:4px;border:1px solid rgba(0,212,255,.3);color:#00D4FF;font-family:'DM Mono',monospace;font-size:.65rem;white-space:nowrap;}
+.intro-ctrl-desc{color:#6060A0;}
+#intro-start{margin-top:.4rem;padding:.65rem 1.4rem;background:#00D4FF;color:#000;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;letter-spacing:.1em;border:none;border-radius:6px;cursor:pointer;transition:box-shadow .3s,transform .2s;align-self:flex-start;}
+#intro-start:hover{box-shadow:0 0 28px rgba(0,212,255,.5);transform:translateY(-2px);}
 </style>
 </head>
 <body>
 <div id="topbar">
   <a href="index.html#games">← 게임 목록</a>
   <span class="ttl">FIREWALL.EXE</span>
+</div>
+<div id="intro-overlay">
+  <div id="intro-box">
+    <div class="intro-tag">FIREWALL.EXE</div>
+    <h2 class="intro-title">방화벽 수호자</h2>
+    <p class="intro-obj">밀려오는 악성코드 웨이브를 막아라. 모든 스테이지를 방어하면 WIN. 쉴드 0이 되면 GAME OVER.</p>
+    <div class="intro-ctrls">
+      <div class="intro-ctrl-row"><span class="intro-key">마우스 이동</span><span class="intro-ctrl-desc">플레이어 이동</span></div>
+      <div class="intro-ctrl-row"><span class="intro-key">클릭 / 자동</span><span class="intro-ctrl-desc">총알 발사 (자동 조준)</span></div>
+      <div class="intro-ctrl-row"><span class="intro-key">Z / X / 더블탭</span><span class="intro-ctrl-desc">폭탄 사용</span></div>
+      <div class="intro-ctrl-row"><span class="intro-key">웨이브 사이</span><span class="intro-ctrl-desc">업그레이드 선택</span></div>
+    </div>
+    <button id="intro-start">[ GAME START ]</button>
+  </div>
 </div>
 <div id="cv-wrap"><canvas id="cv"></canvas></div>
 <div class="touch-hint">DRAG to move &middot; DOUBLE-TAP for bomb</div>
@@ -1164,6 +1189,12 @@ function loop(ts){
 
 // ── BOOT ──
 resize();initStars();lastTs=performance.now();requestAnimationFrame(loop);
+</script>
+<script>
+document.getElementById('intro-start').addEventListener('click',()=>{
+  document.getElementById('intro-overlay').remove();
+  startGame();
+});
 </script>
 </body>
 </html>

@@ -229,9 +229,35 @@
       .tt{font-size:1.05rem;line-height:37px;} .tc{height:111px;}
       .r-wv{font-size:3.5rem;} .dash-grid{grid-template-columns:repeat(2,1fr);}
     }
+
+    #intro-overlay{position:fixed;inset:0;background:rgba(7,7,26,.93);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+    #intro-box{background:#0D0D2A;border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:2rem 2.2rem;max-width:400px;width:90%;display:flex;flex-direction:column;gap:1rem;box-shadow:0 0 60px rgba(0,212,255,.08);}
+    .intro-tag{font-size:.6rem;letter-spacing:.22em;color:#00D4FF;text-transform:uppercase;}
+    .intro-title{font-size:1.6rem;font-weight:500;color:#fff;line-height:1.2;margin:0;}
+    .intro-obj{font-size:.78rem;color:#8080B0;line-height:1.6;margin:0;}
+    .intro-ctrls{display:flex;flex-direction:column;gap:.4rem;border-top:1px solid rgba(255,255,255,.06);padding-top:.8rem;}
+    .intro-ctrl-row{display:flex;align-items:center;gap:.7rem;font-size:.72rem;}
+    .intro-key{display:inline-block;padding:.15rem .5rem;border-radius:4px;border:1px solid rgba(0,212,255,.3);color:#00D4FF;font-family:'DM Mono',monospace;font-size:.65rem;white-space:nowrap;}
+    .intro-ctrl-desc{color:#6060A0;}
+    #intro-start{margin-top:.4rem;padding:.65rem 1.4rem;background:#00D4FF;color:#000;font-family:'DM Mono',monospace;font-size:.8rem;font-weight:500;letter-spacing:.1em;border:none;border-radius:6px;cursor:pointer;transition:box-shadow .3s,transform .2s;align-self:flex-start;}
+    #intro-start:hover{box-shadow:0 0 28px rgba(0,212,255,.5);transform:translateY(-2px);}
+
   </style>
 </head>
 <body>
+<div id="intro-overlay">
+  <div id="intro-box">
+    <div class="intro-tag">TYPE.EXE</div>
+    <h2 class="intro-title">타자 연습</h2>
+    <p class="intro-obj">화면에 나타나는 IT 단어를 타이핑하라. 정확도와 WPM을 높여라.</p>
+    <div class="intro-ctrls">
+      <div class="intro-ctrl-row"><span class="intro-key">키보드</span><span class="intro-ctrl-desc">단어 입력</span></div>
+      <div class="intro-ctrl-row"><span class="intro-key">ENTER</span><span class="intro-ctrl-desc">단어 확정</span></div>
+      <div class="intro-ctrl-row"><span class="intro-key">BACKSPACE</span><span class="intro-ctrl-desc">수정</span></div>
+    </div>
+    <button id="intro-start">[ GAME START ]</button>
+  </div>
+</div>
 <canvas id="bgc"></canvas>
 
 <nav>
@@ -1067,6 +1093,12 @@ $('r-home').addEventListener('click',()=>location.href='index.html');
 // ──────────────────────────────────────────
 reset();
 setTimeout(focus,80);
+</script>
+<script>
+
+document.getElementById('intro-start').addEventListener('click',()=>{
+  document.getElementById('intro-overlay').remove();
+});
 </script>
 </body>
 </html>
