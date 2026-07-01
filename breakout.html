@@ -77,6 +77,29 @@
     .ov-error-block .err-sep { color: rgba(255,102,68,.5); }
     .ov-error-block .err-key { color: #FF6644; }
     .ov-error-block .err-val { color: #FF4444; }
+    /* ── WIN BLOCK ── */
+    .ov-win-block {
+      font-family: 'DM Mono', monospace;
+      font-size: .65rem;
+      line-height: 1.75;
+      color: #00FF88;
+      background: rgba(0,255,136,.05);
+      border: 1px solid rgba(0,255,136,.22);
+      border-left: 3px solid #00FF88;
+      border-radius: 4px;
+      padding: .55rem .85rem;
+      text-align: left;
+      letter-spacing: .04em;
+      white-space: pre;
+      text-shadow: 0 0 8px rgba(0,255,136,.4);
+    }
+    .ov-win-block .win-head { color: #00FF88; font-size:.72rem; font-weight:500; letter-spacing:.06em; }
+    .ov-win-block .win-sep  { color: rgba(0,255,136,.4); }
+    .ov-win-block .win-key  { color: #00D4FF; }
+    .ov-win-block .win-val  { color: #00FF88; }
+    #scr-win .ov-title { background: linear-gradient(130deg,#fff 10%,#00FF88 55%,#00D4FF 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    #scr-win .ov-score-big { color: #00FF88; text-shadow: 0 0 40px rgba(0,255,136,.5); }
+    #scr-win .ov-btn { background: #00FF88; }
   </style>
 </head>
 <body>
@@ -112,6 +135,20 @@
       <div class="ov-score-big" id="over-score">0</div>
       <div class="ov-best">BEST &nbsp;<em id="over-best">0</em></div>
       <button class="ov-btn" id="btn-restart">RESTART</button>
+    </div>
+
+    <div class="overlay" id="scr-win">
+      <div class="ov-win-block"><span class="win-head">SYSTEM_STATUS: BREACH_COMPLETE</span>
+<span class="win-sep">── kernel log ───────────</span>
+<span class="win-key">Thread:</span> <span class="win-val">game_loop</span>
+<span class="win-key">Status:</span> <span class="win-val">ALL_LEVELS_SOLVED</span>
+<span class="win-key">Code  :</span> <span class="win-val">0x00FF88</span>
+<span class="win-sep">─────────────────────────</span></div>
+      <div class="ov-label">ALL LEVELS CLEARED</div>
+      <div class="ov-title">ACCESS GRANTED</div>
+      <div class="ov-score-big" id="win-score">0</div>
+      <div class="ov-best">BEST &nbsp;<em id="win-best">0</em></div>
+      <button class="ov-btn" id="btn-win-restart">PLAY AGAIN</button>
     </div>
 
     <div id="lv-announce"><div class="lv-inner">
@@ -817,13 +854,26 @@ function gameLoop(ts) {
 function levelClear() {
   sfx.clear(); STATE='levelup';
   burst(W/2, H/2, '#00D4FF', 24); burst(W/2, H/2, '#8B5CF6', 14);
-  // Loop continues running during transition; just reinit state after delay
+  if (level === LEVELS.length - 1) {
+    setTimeout(gameWin, 1400);
+    return;
+  }
   setTimeout(()=>{
     if (STATE!=='levelup') return;
     level++; drops=[]; lasers=[];
     pu.wide=0; pu.slow=0; pu.laser=0; pu.shield=false;
     loadLevel(level); initBalls(); lastTs=performance.now();
   }, 1400);
+}
+
+// ── GAME WIN ──
+function gameWin() {
+  STATE='gameover';
+  if (score>best) { best=score; localStorage.setItem('breakout-best',best); }
+  document.getElementById('win-score').textContent = score;
+  document.getElementById('win-best').textContent  = best;
+  document.getElementById('ui-best').textContent   = best;
+  document.getElementById('scr-win').classList.add('show');
 }
 
 // ── LOSE LIFE ──
@@ -851,6 +901,7 @@ function gameOver() {
 function startGame() {
   document.getElementById('scr-start').classList.remove('show');
   document.getElementById('scr-over').classList.remove('show');
+  document.getElementById('scr-win').classList.remove('show');
   document.getElementById('lv-announce').classList.remove('show');
   document.getElementById('m-hint').style.display='none';
   score=0; lives=3; level=0; combo=0;
@@ -924,6 +975,7 @@ wrap.addEventListener('touchstart', e=>{
 
 document.getElementById('btn-start').addEventListener('click', startGame);
 document.getElementById('btn-restart').addEventListener('click', startGame);
+document.getElementById('btn-win-restart').addEventListener('click', startGame);
 if (!('ontouchstart' in window)) document.getElementById('m-hint').style.display='none';
 
 resize();

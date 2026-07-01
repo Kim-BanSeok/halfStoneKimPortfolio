@@ -1039,6 +1039,34 @@
     .runner-card:hover .game-arrow { color: #FF5555; transform: translate(3px,-3px); }
     .runner-card .ftag { border: 1px solid rgba(255,85,85,.25); color: #FF5555; background: rgba(255,85,85,.05); }
 
+    /* binary card */
+    .binary-card:hover { border-color: rgba(139,92,246,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(139,92,246,.1); }
+    .binary-card:hover .game-arrow { color: var(--purple); transform: translate(3px,-3px); }
+
+    /* pipe card */
+    .pipe-card:hover { border-color: rgba(0,255,136,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,255,136,.08); }
+    .pipe-card:hover .game-arrow { color: #00FF88; transform: translate(3px,-3px); }
+
+    /* defrag card */
+    .defrag-card:hover { border-color: rgba(255,215,0,.3); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(255,215,0,.07); }
+    .defrag-card:hover .game-arrow { color: #FFD700; transform: translate(3px,-3px); }
+
+    /* memory card */
+    .memory-card:hover { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.1); }
+    .memory-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
+
+    /* wordle card */
+    .wordle-card:hover { border-color: rgba(0,255,136,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,255,136,.08); }
+    .wordle-card:hover .game-arrow { color: #00FF88; transform: translate(3px,-3px); }
+
+    /* stack card */
+    .stack-card:hover { border-color: rgba(255,121,198,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(255,121,198,.1); }
+    .stack-card:hover .game-arrow { color: #FF79C6; transform: translate(3px,-3px); }
+
+    /* puzzle card */
+    .puzzle-card:hover { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.1); }
+    .puzzle-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
+
     /* breakout card */
     .break-card:hover { border-color: rgba(0,212,255,.35); box-shadow: 0 24px 64px rgba(0,0,0,.45), 0 0 36px rgba(0,212,255,.1); }
     .break-card:hover .game-arrow { color: var(--cyan); transform: translate(3px,-3px); }
@@ -1972,7 +2000,7 @@
           </div>
         </a>
 
-        <a class="game-card fade-up" href="binary.html">
+        <a class="game-card binary-card fade-up" href="binary.html">
           <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.09) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
             <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;width:108px;">
               <div style="height:16px;border-radius:2px;background:rgba(0,212,255,.18);border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--cyan);">0</div>
@@ -1989,22 +2017,24 @@
               <div style="height:16px;border-radius:2px;background:rgba(0,212,255,.18);border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-family:'DM Mono',monospace;color:var(--cyan);">0</div>
             </div>
           </div>
-          <div class="game-badges">
-            <span class="game-badge" style="color:var(--purple);">⊞ BINARY</span>
-            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:var(--purple);">⊞ BINARY</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-binary-title">이진 퍼즐</div>
+            <p class="game-desc" data-i18n="game-binary-desc">BINARY.EXE. 비트를 채워라. 6×6·8×8·10×10, 3연속 금지·행열 균등 규칙, 시간 기반 S~C 등급.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">3난이도</span>
+              <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">논리 퍼즐</span>
+              <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">S~C 등급</span>
+              <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">Web Audio</span>
+            </div>
+            <div class="game-record" id="rec-binary"></div>
           </div>
-          <div class="game-title" data-i18n="game-binary-title">이진 퍼즐</div>
-          <p class="game-desc" data-i18n="game-binary-desc">BINARY.EXE. 비트를 채워라. 6×6·8×8·10×10, 3연속 금지·행열 균등 규칙, 시간 기반 S~C 등급.</p>
-          <div class="game-feature-tags" style="--ftag-border:rgba(139,92,246,.25);--ftag-color:var(--purple);--ftag-bg:rgba(139,92,246,.05);">
-            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">3난이도</span>
-            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">논리 퍼즐</span>
-            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">S~C 등급</span>
-            <span class="ftag" style="border-color:rgba(139,92,246,.25);color:var(--purple);background:rgba(139,92,246,.05);">Web Audio</span>
-          </div>
-          <div class="game-record" id="rec-binary"></div>
         </a>
 
-        <a class="game-card fade-up" href="pipe.html">
+        <a class="game-card pipe-card fade-up" href="pipe.html">
           <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,255,136,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
             <svg width="108" height="72" viewBox="0 0 108 72" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="6" stroke="#00D4FF" stroke-width="2" fill="rgba(0,212,255,.15)"/>
@@ -2018,22 +2048,24 @@
               <path d="M90 12 L72 12 L72 30" stroke="#FFD700" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="game-badges">
-            <span class="game-badge" style="color:#00FF88;">⊞ PIPE</span>
-            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:#00FF88;">⊞ PIPE</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-pipe-title">파이프 연결</div>
+            <p class="game-desc" data-i18n="game-pipe-desc">PIPE.EXE. 서버를 연결하라. 5×5·7×7·9×9 격자, 전체 칸 채우기, 이동 수 기반 S~C 등급.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">3난이도</span>
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">라우팅 퍼즐</span>
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">전체 채우기</span>
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">Web Audio</span>
+            </div>
+            <div class="game-record" id="rec-pipe"></div>
           </div>
-          <div class="game-title" data-i18n="game-pipe-title">파이프 연결</div>
-          <p class="game-desc" data-i18n="game-pipe-desc">PIPE.EXE. 서버를 연결하라. 5×5·7×7·9×9 격자, 전체 칸 채우기, 이동 수 기반 S~C 등급.</p>
-          <div class="game-feature-tags" style="--ftag-border:rgba(0,255,136,.25);--ftag-color:#00FF88;--ftag-bg:rgba(0,255,136,.05);">
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">3난이도</span>
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">라우팅 퍼즐</span>
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">전체 채우기</span>
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">Web Audio</span>
-          </div>
-          <div class="game-record" id="rec-pipe"></div>
         </a>
 
-        <a class="game-card fade-up" href="defrag.html">
+        <a class="game-card defrag-card fade-up" href="defrag.html">
           <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(255,215,0,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;">
             <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;width:108px;">
               <div style="height:18px;border-radius:2px;background:rgba(0,212,255,.35);border:1px solid rgba(0,212,255,.5);"></div>
@@ -2053,22 +2085,24 @@
               <div style="height:18px;border-radius:2px;background:rgba(0,255,136,.35);border:1px solid rgba(0,255,136,.5);"></div>
             </div>
           </div>
-          <div class="game-badges">
-            <span class="game-badge" style="color:var(--gold, #FFD700);">⊞ DEFRAG</span>
-            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:#FFD700;">⊞ DEFRAG</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-defrag-title">디스크 조각 모음</div>
+            <p class="game-desc" data-i18n="game-defrag-desc">DEFRAG.EXE. 메모리를 정렬하라. 색상 블록을 인접 이동시켜 파일 정렬 완료. 이동 수 기반 S~C 등급.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">3난이도</span>
+              <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">블록 이동</span>
+              <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">BFS 연결 판정</span>
+              <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">Web Audio</span>
+            </div>
+            <div class="game-record" id="rec-defrag"></div>
           </div>
-          <div class="game-title" data-i18n="game-defrag-title">디스크 조각 모음</div>
-          <p class="game-desc" data-i18n="game-defrag-desc">DEFRAG.EXE. 메모리를 정렬하라. 색상 블록을 인접 이동시켜 파일 정렬 완료. 이동 수 기반 S~C 등급.</p>
-          <div class="game-feature-tags" style="--ftag-border:rgba(255,215,0,.25);--ftag-color:#FFD700;--ftag-bg:rgba(255,215,0,.05);">
-            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">3난이도</span>
-            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">블록 이동</span>
-            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">BFS 연결 판정</span>
-            <span class="ftag" style="border-color:rgba(255,215,0,.25);color:#FFD700;background:rgba(255,215,0,.05);">Web Audio</span>
-          </div>
-          <div class="game-record" id="rec-defrag"></div>
         </a>
 
-        <a class="game-card fade-up" href="memory.html">
+        <a class="game-card memory-card fade-up" href="memory.html">
           <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;padding:8px;">
             <div style="width:30px;height:30px;border-radius:4px;background:#0D0D2A;border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:var(--cyan,#00D4FF);">[?]</div>
             <div style="width:30px;height:30px;border-radius:4px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.5);display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#00D4FF;">async</div>
@@ -2077,22 +2111,24 @@
             <div style="width:30px;height:30px;border-radius:4px;background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.5);display:flex;align-items:center;justify-content:center;font-size:.45rem;color:#00FF88;">redux</div>
             <div style="width:30px;height:30px;border-radius:4px;background:#0D0D2A;border:1px solid rgba(0,212,255,.3);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:var(--cyan,#00D4FF);">[?]</div>
           </div>
-          <div class="game-badges">
-            <span class="game-badge" style="color:var(--cyan,#00D4FF);">⊞ MEMORY</span>
-            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:var(--cyan);">⊞ MEMORY</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-memory-title">메모리 매칭</div>
+            <p class="game-desc" data-i18n="game-memory-desc">MEMORY.EXE. IT 키워드를 기억하라. 카드를 뒤집어 같은 단어 2장 매칭. 타임 기반 S~C 등급.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">3난이도</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">3D 플립</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">IT 키워드</span>
+              <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">Web Audio</span>
+            </div>
+            <div class="game-record" id="rec-memory"></div>
           </div>
-          <div class="game-title" data-i18n="game-memory-title">메모리 매칭</div>
-          <p class="game-desc" data-i18n="game-memory-desc">MEMORY.EXE. IT 키워드를 기억하라. 카드를 뒤집어 같은 단어 2장 매칭. 타임 기반 S~C 등급.</p>
-          <div class="game-feature-tags">
-            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">3난이도</span>
-            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">3D 플립</span>
-            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">IT 키워드</span>
-            <span class="ftag" style="border-color:rgba(0,212,255,.25);color:#00D4FF;background:rgba(0,212,255,.05);">Web Audio</span>
-          </div>
-          <div class="game-record" id="rec-memory"></div>
         </a>
 
-        <a class="game-card fade-up" href="wordle.html">
+        <a class="game-card wordle-card fade-up" href="wordle.html">
           <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(0,255,136,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;gap:3px;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <div style="display:flex;gap:3px;">
@@ -2111,22 +2147,24 @@
               </div>
             </div>
           </div>
-          <div class="game-badges">
-            <span class="game-badge" style="color:var(--green,#00FF88);">⊞ WORDLE</span>
-            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:#00FF88;">⊞ WORDLE</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-wordle-title">IT 워들</div>
+            <p class="game-desc" data-i18n="game-wordle-desc">WORDLE.EXE. IT 용어를 추측하라. 5글자 IT 단어를 6번 안에. 초록=정답, 노랑=위치 오류. 스트릭 누적.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">무한플레이</span>
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">QWERTY 키보드</span>
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">65개 IT단어</span>
+              <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">스트릭 기록</span>
+            </div>
+            <div class="game-record" id="rec-wordle"></div>
           </div>
-          <div class="game-title" data-i18n="game-wordle-title">IT 워들</div>
-          <p class="game-desc" data-i18n="game-wordle-desc">WORDLE.EXE. IT 용어를 추측하라. 5글자 IT 단어를 6번 안에. 초록=정답, 노랑=위치 오류. 스트릭 누적.</p>
-          <div class="game-feature-tags">
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">무한플레이</span>
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">QWERTY 키보드</span>
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">65개 IT단어</span>
-            <span class="ftag" style="border-color:rgba(0,255,136,.25);color:#00FF88;background:rgba(0,255,136,.05);">스트릭 기록</span>
-          </div>
-          <div class="game-record" id="rec-wordle"></div>
         </a>
 
-        <a class="game-card fade-up" href="stack.html">
+        <a class="game-card stack-card fade-up" href="stack.html">
           <div class="game-preview" style="background:radial-gradient(ellipse at 50% 50%,rgba(255,121,198,.07) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;gap:5px;">
             <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
               <div style="width:36px;height:18px;border-radius:3px;background:#F7DF1E;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:#000;font-weight:700;">.JS</div>
@@ -2144,19 +2182,21 @@
               <div style="width:36px;height:72px;background:#0D0D2A;border:1px solid #1E1E4A;border-radius:3px;"></div>
             </div>
           </div>
-          <div class="game-badges">
-            <span class="game-badge" style="color:#FF79C6;">⊞ STACK</span>
-            <span class="game-arrow" style="transition:color .2s,transform .2s;">↗</span>
+          <div class="game-info">
+            <div class="game-info-top">
+              <span class="game-badge" style="color:#FF79C6;">⊞ STACK</span>
+              <span class="game-arrow">↗</span>
+            </div>
+            <div class="game-title" data-i18n="game-stack-title">스택 정렬</div>
+            <p class="game-desc" data-i18n="game-stack-desc">STACK.EXE. 파일을 정렬하라. .JS .PY .CSS 등 IT 파일 블록을 같은 종류끼리 스택에 쌓아라. 이동 수 기반 S~C 등급.</p>
+            <div class="game-feature-tags">
+              <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">3난이도</span>
+              <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">IT 파일 블록</span>
+              <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">Water Sort</span>
+              <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">Web Audio</span>
+            </div>
+            <div class="game-record" id="rec-stack"></div>
           </div>
-          <div class="game-title" data-i18n="game-stack-title">스택 정렬</div>
-          <p class="game-desc" data-i18n="game-stack-desc">STACK.EXE. 파일을 정렬하라. .JS .PY .CSS 등 IT 파일 블록을 같은 종류끼리 스택에 쌓아라. 이동 수 기반 S~C 등급.</p>
-          <div class="game-feature-tags">
-            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">3난이도</span>
-            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">IT 파일 블록</span>
-            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">Water Sort</span>
-            <span class="ftag" style="border-color:rgba(255,121,198,.25);color:#FF79C6;background:rgba(255,121,198,.05);">Web Audio</span>
-          </div>
-          <div class="game-record" id="rec-stack"></div>
         </a>
 
       </div>
